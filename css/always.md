@@ -1,0 +1,12 @@
+# Always
+
+```css
+* {
+  margin: 0;
+  padding: 0;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  outline: 1px solid red;
+}
+```
