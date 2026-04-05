@@ -8,24 +8,24 @@ marcelo.alarcon@shipedge.com
 pass: google
 
 
-Personal Access Tokens: glpat-eExeSpV7CN3NXPCuRuxg
-Personal access Token Cubing 2025: glpat-J_U5KkxfzteKzM1QdV1c  
+Personal Access Tokens: <GITLAB_TOKEN>
+Personal access Token Cubing 2025: <GITLAB_TOKEN_2025>
 # Si generaste un nuevo token actualiza la url del remote:
-git remote set-url origin https://marcelo.alarcon:glpat-eExeSpV7CN3NXPCuRuxg@gitlab.com/altacrest/x5.xenvio.git
+git remote set-url origin https://marcelo.alarcon:<GITLAB_TOKEN>@gitlab.com/altacrest/x5.xenvio.git
 # Mejor puedes usar un gestor de contrasenas:
 git config --global credential.helper osxkeychain
 git push
 #aca te pedira las credenciales solo una vez si no funciona borra el cache: git credential-cache exit
 
 
-Feed token: glft-jFWAJ7zLhyXL9N1u42hV
-Incoming email token: glimt-d312ycjf6llhixwukp4figmvn
+Feed token: <GITLAB_FEED_TOKEN>
+Incoming email token: <GITLAB_EMAIL_TOKEN>
 # Git Clone
-git clone https://marcelo.alarcon:glpat-eBLPssyNRG3TCTFsPLXn@gitlab.com/altacrest/x5.xenvio.git
+git clone https://marcelo.alarcon:<GITLAB_TOKEN>@gitlab.com/altacrest/x5.xenvio.git
 
 # SSH
 ssh malarcon@dev.shipedge.com -p 10022
-pass brownParro+35
+pass <SSH_PASSWORD>
 
 # Clickup
 marcelo.alarcon@altacrest.dev
@@ -35,7 +35,7 @@ lobo last
 server: team.shipedge.com
 
 # Claude
-https://www.google.com/url?q=https://console.anthropic.com/magic-link%238b6513b811d275c06b542778cb20cd05:bWFyY2Vsby5hbGFyY29uQHNoaXBlZGdlLmNvbQ%3D%3D&source=gmail-imap&ust=1720289087000000&usg=AOvVaw0IkTxx3VbrxnmVxswY8Vrt
+# (magic link — ver CREDENTIALS.md)
 ```
 
 
@@ -47,7 +47,7 @@ scp -P 10022 malarcon@dev.shipedge.com:/home/malarcon/x5_development.sql ./nuevo
 cap x5demo1 deploy REVISION=f9330fdf9
 
 # SSH
-pass: shipedgex510
+pass: <SSH_PASSWORD>
 ssh x5demo1@dev.shipedge.com -p 10022
 ssh x5demo2@dev.shipedge.com -p 10022
 cap x5demo1 deploy BRANCH=XEN-12-M
@@ -60,14 +60,14 @@ cap test deploy BRANCH=XEN-12-M
 
 ssh cubingtest@dev.shipedge.com -p 10022
 cap test deploy BRANCH=XEN-32-M
-secret: "jqrx5G3FSnP1LdsnH5rA8dS13SACXROwN/BKThoNOzhYDgyfWfm4pdkVXVkAYMvkQNe57FzU"
+secret: "<CUBING_SECRET>"
 
 ssh x52@xenvio.shipedge.com -p 10022
 
 # Users:
 usuario test: test@send.com / test123
 usuario admin: admin@send.com
-password: MasterCluster360$
+password: <ADMIN_PASSWORD>
 # SSO XENVIO
 marcelo.alarcon@shipedge.com
 Qwerty123$
@@ -75,19 +75,19 @@ Qwerty123$
 
 gmail
 xenvio-no-reply@shipedge.com
-X8b$Efd6N3e7V17a|69Of
-2 factor: 70424508
+<GMAIL_PASSWORD>
+2 factor: <2FA_CODE>
 xenvio_mail_v1
-cyxw buoi ppmr ramz
+<GMAIL_APP_PASSWORD>
 
 X3
 x3.shipedge.com
 test@send.com
-notocar567
+<X3_PASSWORD>
 
 omnio06.shipedge.com
 oms@shipedge.com
-Oms123
+<OMS_PASSWORD>
 ```
 
 ```shell
@@ -95,53 +95,53 @@ Oms123
 # DHL API
 https://developer.dhl.com/
 U: silvia@shipedge.com
-P: Shipedge123!
+P: <DHL_PASSWORD>
 
 account_number: 799909537
-API Key: apF5pA7yP0xO3o
-API Secret: I!4dN#0wF#9eG#7w
+API Key: <DHL_API_KEY>
+API Secret: <DHL_API_SECRET>
 
 
 # EzUSPS CREDENTIALS
-api key EZTK4b06ae49e994406f82f3dc31471ba0a1GZZhVa6AmC6UHYVLa4xKUg
-carrier account ca_61e1976f144345629664e3e8c76abede
+api key <EASYPOST_KEY_1>
+carrier account <CARRIER_ACCOUNT_1>
 
-api key: EZTK416450bf40d549a1aceaf1027886890bFqvw53xxmATYvatqc4Khwg
-carrier account: ca_bda5a173f3704f8b8b16ad5554ae020b
+api key: <EASYPOST_KEY_2>
+carrier account: <CARRIER_ACCOUNT_2>
 
-api key: EZTKa2c3f4cbcd904416ba739db1dee6a0a2bRACqWDB7kz7tbsg9LvbbQ
-carrier_account: ca_aea6b80053654d82a8d366dbc4619594
+api key: <EASYPOST_KEY_3>
+carrier_account: <CARRIER_ACCOUNT_3>
 
 # EAZY DAP
-api key: EZTKa2c3f4cbcd904416ba739db1dee6a0a2bRACqWDB7kz7tbsg9LvbbQ 
-carrier acount: ca_6cb827aaac3348c5996b1d8c5f0dc3b3
+api key: <EASYPOST_KEY_3>
+carrier acount: <CARRIER_ACCOUNT_DAP>
 
 # EzUPS Mail innovation
-api key: EZTKa2c3f4cbcd904416ba739db1dee6a0a2bRACqWDB7kz7tbsg9LvbbQ
-carrier_acount: ca_d9518bebd10e4000af4938d9a61608f3
+api key: <EASYPOST_KEY_3>
+carrier_acount: <CARRIER_ACCOUNT_UPS>
 
-ca_bf96bdf521ce4a78a96065a3b37bae7d
-EZTK416450bf40d549a1aceaf1027886890bFqvw53xxmATYvatqc4Khwg
+<CARRIER_ACCOUNT_EXTRA>
+<EASYPOST_KEY_2>
 
 #
 ```
 
 ```shell
 # CUBING
-secret: "jqrx5G3FSnP1LdsnH5rA8dS13SACXROwN/BKThoNOzhYDgyfWfm4pdkVXVkAYMvkQNe57FzU"
+secret: "<CUBING_SECRET>"
 {
     "user": {
         "email": "marcelo.alarcon@shipedge.com",
-        "password": "7!*8UYFm@AY6N0",
-        "invitation_token": "68d6bbc3-db43-4c89-81d9-b853cb7883cc"
+        "password": "<CUBING_PASSWORD>",
+        "invitation_token": "<INVITATION_TOKEN>"
     }
 }
 
 test:
-Bearer eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI2ZWE0Mzc2ZC1iYzlhLTQwOTItOGIwMy0yNDZiNzkzMDg5ZDgiLCJzdWIiOiIzIiwic2NwIjoidXNlciIsImF1ZCI6bnVsbCwiaWF0IjoxNzM3MTQwNjMyLCJleHAiOjE4OTQ5MjUzOTJ9.hn3efruVw3_KiiJHmZmEaXVYR6n9QEqYCpb19rNPLFo
+Bearer <BEARER_TEST>
 
 production:
-Bearer eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI5Y2U4MDBiZC1lOWI1LTRkYmYtYjVhZi03NzgyNzg1ZjMzZTAiLCJzdWIiOiIzIiwic2NwIjoidXNlciIsImF1ZCI6bnVsbCwiaWF0IjoxNzM3MTQwNDI1LCJleHAiOjE4OTQ5MjUxODV9.Zr7u__wAzYktjUbv5435g10iUfGA-QhTsLzvfed_408
+Bearer <BEARER_PRODUCTION>
 
 
 ```
@@ -242,7 +242,7 @@ El nombre que creaste en el fixture en el switch:
 POST: http://localhost:3000/api/v3/orders/new
  Header: 
  Email: test@send.com
- Token: 3d9d274951f7ea5780f6e6be7bfb5b6e
+ Token: <API_TOKEN>
  
  Body:
  {
@@ -447,18 +447,6 @@ POST: http://localhost:3000/api/v3/orders/new
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 ## Fragment 3: Gems
 
 ```ruby
@@ -543,4 +531,3 @@ Naming/AccessorMethodName:
 2. Arreglar formatos que se hayan cambiado
 3. Hacer deploy
 4. Testear en el server
-

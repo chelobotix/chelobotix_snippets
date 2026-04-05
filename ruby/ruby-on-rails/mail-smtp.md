@@ -9,7 +9,7 @@ ActionMailer::Base.smtp_settings = {
 	:address              => 'smtp.gmail.com',
 	:port                 => '587',
 	:user_name            => 'marcelo.alarcon@shipedge.com',
-	:password             => 'odzt aigz fvas ajpj',
+	:password             => 'YOUR_GMAIL_APP_PASSWORD',
 	:authentication       => 'plain',
 	:enable_starttls_auto => true
   }
@@ -25,7 +25,7 @@ ActionMailer::Base.smtp_settings = {
 
 xenvio-no-reply@shipedge.com
 # xenvio_mail_v1
-# cyxw buoi ppmr ramz
+# <GMAIL_APP_PASSWORD>
 
 
 ```
@@ -51,7 +51,7 @@ ActionMailer::Base.smtp_settings = {
   :address              => 'in-v3.mailjet.com',
   :port                 => '587',
   :user_name            => '212c9f8bad415b3fd1eb8715c97ca004',
-  :password             => '96e3763116a27abce551cb803deb47cc',
+  :password             => 'YOUR_MAILJET_API_SECRET',
   :authentication       => 'plain',
   :enable_starttls_auto => true
 }

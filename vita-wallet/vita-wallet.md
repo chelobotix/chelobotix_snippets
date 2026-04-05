@@ -4,10 +4,10 @@
 
 ```shell
 GitLab: Google_Account -> marcelo@vitawallet.io
-SSH: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGQST1Cs8aC95lOG3ZlzNKePYI9DkPqobkuqiLNUzL3l vitawallet@gitlab.com
-Access Token: glpat-c6BqsGq8XmKmeTHgWB5C
-Feed Token: glft-hn4bsfTUCGT9MRjPHcp-
-Email token: glimt-ahkfdbo5uj8c3runjv4b9fnyu 
+SSH: ssh-ed25519 <SSH_PUBLIC_KEY> vitawallet@gitlab.com
+Access Token: <GITLAB_ACCESS_TOKEN>
+Feed Token: <GITLAB_FEED_TOKEN>
+Email token: <GITLAB_EMAIL_TOKEN>
 ```
 
 
@@ -18,7 +18,7 @@ Email token: glimt-ahkfdbo5uj8c3runjv4b9fnyu
 git clone git@gitlab-vitawallet:VitaWallet/alejandra-web.git
 
 # En emergencias
-git clone https://marcelo143:glpat-c6BqsGq8XmKmeTHgWB5C@gitlab.com/VitaWallet/alejandra-web.git
+git clone https://marcelo143:<GITLAB_ACCESS_TOKEN>@gitlab.com/VitaWallet/alejandra-web.git
 ```
 
 
@@ -35,7 +35,7 @@ marcelo+admin@vitawallet.io
 # ADMIN
 https://admin.vitawallet.io/
 marcelo+admin@vitawallet.io
-Vy*pQtSp$%Vy6xWRPZtj
+<ADMIN_PASSWORD>
 
 
 # USERS
@@ -47,7 +47,7 @@ marcelo+admin@vitawallet.io # Admin
 marcelo+cripto1@vitawallet.io # btc usdt usdc usd clp ars col b2c
 marcelo+b2c_api@vitawallet.io # B2C API
 
-Qwerty1!
+<USERS_PASSWORD>
 
 # USERS QA 
 santiago+empre@vitawallet.io  # Empresa Chile Qwer1234
@@ -59,7 +59,7 @@ marcelo+user2@vitawallet.io # Argentina
 marcelo+empre@vitawallet.io
 marcelo+user1@vitawallet.io # Chile
 marcelo+user_arg@vitawallet.io # Argentina
-derly+b2b13@vitawallet.io	Qwerty1!
+derly+b2b13@vitawallet.io	<USERS_PASSWORD>
 ```
 ```shell
 # ALEJANDRA WEB
@@ -81,7 +81,7 @@ NODE 22.17.1
 # FINTOC
 https://dashboard.fintoc.com/
 soporte@vitawallet.io
-snUX6HidsjBAJeL
+<FINTOC_PASSWORD>
 
 RUT 41614850-3
 jonsnow
@@ -135,7 +135,7 @@ def check_permission(permission, target_id = nil, target_name = nil, field = nil
 # SIDEKIQ
 http://localhost:3000/api/sidekiq
 soporte@vitawallet.io
-w68s2xesjgaputs7
+<SIDEKIQ_PASSWORD>
 
 #En local
 docker compose run --rm --service-ports api bundle exec sidekiq 
@@ -165,7 +165,7 @@ git merge --no-ff master
 # GCLOUD
 gcloud cloud-shell ssh --authorize-session --project=vita-wallet-api-qa-2
 
-pass: vitawallet
+pass: <GCLOUD_PASSWORD>
 
 kep-stg
 kep-qa
@@ -191,7 +191,7 @@ gcloud container clusters get-credentials gke-vw-stg-management \
     --zone us-central1 \
     --project vita-serverless
     
-    
+
 
 
 # Si no entra con kep-qa

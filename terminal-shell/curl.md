@@ -22,6 +22,6 @@ curl -X POST -H "Content-Type: application/json" \
      https://example.com/api
      
 # otro
-curl -i -X POST -H "Content-Type: application/json" --write-out '%{http_code}' -d '{"user": {"email": "howard@shipedge.com", "password": "lazyCircl370"}}' https://cubing.shipedge.com/login
+curl -i -X POST -H "Content-Type: application/json" --write-out '%{http_code}' -d '{"user": {"email": "USER@example.com", "password": "PASSWORD"}}' https://cubing.shipedge.com/login
 
 ```

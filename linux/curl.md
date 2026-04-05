@@ -7,8 +7,8 @@ curl -X POST \
   -H 'Accept: application/json' \
   -d '{
     "nova": {
-      "token": "ZXlKaGJHY2lPaUpJVXpJMU5pSjkuZXlKbGJXRnBiQ0k2SW0xaGNtTmxiRzh1WVd4aGNtTnZia0J6YUdsd1pXUm5aUzVqYjIwaUxDSmxlSEFpT2pFM01UVTJNRGMxTURSOS5BazJwUjJmcWN1QTJrckw1TGo2VGtPcnJDM3NMUGNXemdpOEpEVGJmcDlZ",
-      "email": "marcelo.alarcon@shipedge.com"
+      "token": "YOUR_TOKEN",
+      "email": "YOUR_EMAIL"
     }
   }'
 ```
