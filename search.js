@@ -23,13 +23,9 @@ marked.setOptions({
   gfm: true,
 });
 
-fetch('snippets.json')
-  .then(r => r.json())
-  .then(data => {
-    snippets = data;
-    populateCategories();
-    renderList(snippets);
-  });
+snippets = window.SNIPPETS_DATA || [];
+populateCategories();
+renderList(snippets);
 
 function populateCategories() {
   const cats = [...new Set(snippets.map(s => s.category))].sort();

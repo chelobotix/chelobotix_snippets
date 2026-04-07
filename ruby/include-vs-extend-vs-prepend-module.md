@@ -65,3 +65,12 @@ bar1.foo
 Bar2.foo       # Llama al método foo como método de clase
 
 ```
+
+
+```ruby
+# FORZAR EXTEND
+def self.included(**)
+  raise "#{name} debe ser extendido"
+end
+```
+

@@ -14,10 +14,17 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = ["my_target"]
 
+  // Se ejecuta cada vez que el elemento entra al DOM y el controller queda conectado.
   connect() {
     console.log("connected to test controller")
     console.log(this.element) // <div data-controller="test">
   }
+
+  // Se ejecuta una sola vez por instancia del controller, en el momento en que Stimulus crea el controller
+  initialize() {
+    this.config = this.buildComplexConfig()
+  }
+
 
   my_click() {
     this.my_targetTarget.textContent = "Hello Works"
@@ -131,4 +138,32 @@ keypress
 </label>
 <%= f.file_field :avatar, data: { washup_admin__profile__avatar_target: "fileInput", action: "change->washup-admin--profile--avatar#handleFileSelect" } %>
 
+```
+
+## Fragment 4: Outlets
+
+```js
+import { Controller } from "@hotwired/stimulus"
+
+export default class extends Controller {
+  open() {
+    console.log("Modal abierto")
+  }
+
+  close() {
+    console.log("Modal cerrado")
+  }
+}
+```
+
+```js
+import { Controller } from "@hotwired/stimulus"
+
+export default class extends Controller {
+  static outlets = ["modal"]
+
+  show() {
+    this.modalOutlet.open()
+  }
+}
 ```

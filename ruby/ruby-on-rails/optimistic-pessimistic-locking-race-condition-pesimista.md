@@ -43,3 +43,17 @@ end
 # FOR UPDATE NOWAIT
 RateLimitToRequest.lock('FOR UPDATE NOWAIT').find_by(user: current_user)
 ```
+
+
+
+```ruby
+# ADVISORY LOCK
+# Regla práctica 🚀
+# Usa with_lock si existe fila concreta.
+# Usa advisory lock si bloqueas proceso lógico.
+User.with_advisory_lock("email_#{email}") do
+  User.find_or_create_by!(email: email)
+end
+
+
+```
