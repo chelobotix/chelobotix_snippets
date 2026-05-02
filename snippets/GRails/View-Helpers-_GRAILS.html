@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>View Helpers - GRAILS · GRails · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">GRails</span>
+    <span class="sep">/</span>
+    <span class="current">View Helpers - GRAILS</span></nav>
+  <main><h1>View Helpers - GRAILS</h1>
+<h1>Grails GSP Tag Helpers — Referencia</h1>
+<blockquote>
+<p>Ordenados de mayor a menor frecuencia de uso (análisis sobre 526 archivos <code>.gsp</code>).
+Cada sección es buscable de forma independiente.</p>
+</blockquote>
+<hr>
+<h2>g:if</h2>
+<p><strong>Frecuencia:</strong> ~1312 usos<br><strong>Tipo:</strong> Control de flujo<br><strong>Descripción:</strong> Bloque condicional. Renderiza su contenido solo si <code>test</code> evalúa a verdadero. Es el tag más usado del proyecto.</p>
+<pre><code class="language-gsp">&lt;g:if test=&quot;${usuario.activo}&quot;&gt;
+  &lt;span&gt;Activo&lt;/span&gt;
+&lt;/g:if&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;span&gt;Activo&lt;/span&gt;
+</code></pre>
+<p><em>(nada si la condición es falsa)</em></p>
+<hr>
+<h2>g:message</h2>
+<p><strong>Frecuencia:</strong> ~979 usos<br><strong>Tipo:</strong> Internacionalización (i18n)<br><strong>Descripción:</strong> Obtiene un texto traducido desde <code>messages.properties</code> según el <code>code</code>. Acepta <code>args</code> para interpolación. Indispensable para i18n.</p>
+<pre><code class="language-gsp">&lt;g:message code=&quot;default.create.label&quot; args=&quot;[entityName]&quot; /&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">Crear Turno
+</code></pre>
+<p><em>(texto leído de messages.properties para el locale activo)</em></p>
+<hr>
+<h2>g:resource</h2>
+<p><strong>Frecuencia:</strong> ~938 usos<br><strong>Tipo:</strong> Assets estáticos<br><strong>Descripción:</strong> Genera la URL correcta a un recurso estático (JS, CSS, imágenes). Incluye cache-busting automático. Se usa dentro de <code>&lt;script src&gt;</code>, <code>&lt;link href&gt;</code>, <code>&lt;img src&gt;</code>, etc.</p>
+<pre><code class="language-gsp">&lt;script src=&quot;&lt;g:resource dir=&#39;js&#39; file=&#39;turno.js&#39;/&gt;&quot;&gt;&lt;/script&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;&lt;g:resource dir=&#39;css&#39; file=&#39;main.css&#39;/&gt;&quot;/&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;script src=&quot;/ctrlit/js/turno.js?_=1234567890&quot;&gt;&lt;/script&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;/ctrlit/css/main.css?_=1234567890&quot;/&gt;
+</code></pre>
+<hr>
+<h2>g:each</h2>
+<p><strong>Frecuencia:</strong> ~613 usos<br><strong>Tipo:</strong> Control de flujo / iteración<br><strong>Descripción:</strong> Itera sobre una colección. Expone cada elemento en la variable <code>var</code>. Equivalente a un <code>for-each</code>.</p>
+<pre><code class="language-gsp">&lt;g:each in=&quot;${turnos}&quot; var=&quot;turno&quot;&gt;
+  &lt;li&gt;${turno.nombre}&lt;/li&gt;
+&lt;/g:each&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;li&gt;Turno Mañana&lt;/li&gt;
+&lt;li&gt;Turno Tarde&lt;/li&gt;
+&lt;li&gt;Turno Noche&lt;/li&gt;
+</code></pre>
+<hr>
+<h2>g:else</h2>
+<p><strong>Frecuencia:</strong> ~367 usos<br><strong>Tipo:</strong> Control de flujo<br><strong>Descripción:</strong> Bloque alternativo que se ejecuta cuando la condición del <code>g:if</code> precedente es falsa. Debe ir inmediatamente después de un <code>g:if</code> o <code>g:elseif</code>.</p>
+<pre><code class="language-gsp">&lt;g:if test=&quot;${marcaje.entrada}&quot;&gt;
+  &lt;span&gt;Entrada registrada&lt;/span&gt;
+&lt;/g:if&gt;
+&lt;g:else&gt;
+  &lt;span&gt;Sin entrada&lt;/span&gt;
+&lt;/g:else&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;span&gt;Sin entrada&lt;/span&gt;
+</code></pre>
+<p><em>(cuando <code>marcaje.entrada</code> es falso/null)</em></p>
+<hr>
+<h2>g:form</h2>
+<p><strong>Frecuencia:</strong> ~161 usos<br><strong>Tipo:</strong> Formulario<br><strong>Descripción:</strong> Renderiza un elemento <code>&lt;form&gt;</code> HTML con el token CSRF incluido automáticamente. Acepta <code>url</code> como mapa con <code>controller</code>, <code>action</code> e <code>id</code>.</p>
+<pre><code class="language-gsp">&lt;g:form url=&quot;[resource: turnoInstance, action: &#39;save&#39;]&quot;&gt;
+  &lt;!-- campos --&gt;
+&lt;/g:form&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;form action=&quot;/ctrlit/turno/save&quot; method=&quot;POST&quot;&gt;
+  &lt;input type=&quot;hidden&quot; name=&quot;_method&quot; value=&quot;POST&quot;/&gt;
+  &lt;input type=&quot;hidden&quot; name=&quot;${_csrf.parameterName}&quot; value=&quot;${_csrf.token}&quot;/&gt;
+  &lt;!-- campos --&gt;
+&lt;/form&gt;
+</code></pre>
+<hr>
+<h2>g:include</h2>
+<p><strong>Frecuencia:</strong> ~141 usos<br><strong>Tipo:</strong> Composición de vistas<br><strong>Descripción:</strong> Incluye el output de otro action/controller dentro de la vista actual. Útil para widgets o secciones reutilizables que requieren lógica de controlador.</p>
+<pre><code class="language-gsp">&lt;g:include action=&quot;areas&quot; controller=&quot;subcontrato&quot; id=&quot;${params.id}&quot; /&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;!-- HTML completo generado por SubcontratoController#areas --&gt;
+</code></pre>
+<hr>
+<h2>g:render</h2>
+<p><strong>Frecuencia:</strong> ~135 usos<br><strong>Tipo:</strong> Composición de vistas<br><strong>Descripción:</strong> Incluye un template parcial (<code>_nombreTemplate.gsp</code>) en la vista. Equivalente a un partial/partial view. El template debe comenzar con <code>_</code>.</p>
+<pre><code class="language-gsp">&lt;g:render template=&quot;form&quot;/&gt;
+&lt;g:render template=&quot;fila&quot; model=&quot;[turno: turnoInstance]&quot; collection=&quot;${turnos}&quot; var=&quot;turno&quot;/&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;!-- contenido de grails-app/views/turno/_form.gsp --&gt;
+</code></pre>
+<hr>
+<h2>g:set</h2>
+<p><strong>Frecuencia:</strong> ~93 usos<br><strong>Tipo:</strong> Variables<br><strong>Descripción:</strong> Declara una variable en el scope de la vista (page, request, session o application). Muy usado para evitar repetir expresiones largas.</p>
+<pre><code class="language-gsp">&lt;g:set var=&quot;entityName&quot; value=&quot;${message(code: &#39;turno.label&#39;, default: &#39;Turno&#39;)}&quot; /&gt;
+&lt;title&gt;Crear ${entityName}&lt;/title&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;title&gt;Crear Turno&lt;/title&gt;
+</code></pre>
+<hr>
+<h2>g:link</h2>
+<p><strong>Frecuencia:</strong> ~75 usos<br><strong>Tipo:</strong> Navegación<br><strong>Descripción:</strong> Renderiza un <code>&lt;a href&gt;</code> usando el sistema de URL mapping de Grails. Evita hardcodear URLs.</p>
+<pre><code class="language-gsp">&lt;g:link class=&quot;btn btn-default&quot; action=&quot;index&quot; controller=&quot;turno&quot; id=&quot;${obra.id}&quot;&gt;
+  &lt;g:message code=&quot;default.list.label&quot; args=&quot;[entityName]&quot; /&gt;
+&lt;/g:link&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;a class=&quot;btn btn-default&quot; href=&quot;/ctrlit/turno/index/42&quot;&gt;Listar Turnos&lt;/a&gt;
+</code></pre>
+<hr>
+<h2>g:fieldValue</h2>
+<p><strong>Frecuencia:</strong> ~38 usos<br><strong>Tipo:</strong> Presentación<br><strong>Descripción:</strong> Obtiene y escapa el valor de una propiedad de un bean para mostrarla en la vista. Aplica HTML escaping automático. Útil en vistas <code>show</code>.</p>
+<pre><code class="language-gsp">&lt;g:fieldValue bean=&quot;${turnoInstance}&quot; field=&quot;nombre&quot;/&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">Turno Mañana
+</code></pre>
+<p><em>(texto escapado de <code>turnoInstance.nombre</code>)</em></p>
+<hr>
+<h2>g:textField</h2>
+<p><strong>Frecuencia:</strong> ~36 usos<br><strong>Tipo:</strong> Formulario — input<br><strong>Descripción:</strong> Renderiza un <code>&lt;input type=&quot;text&quot;&gt;</code>. Acepta atributos HTML estándar como <code>class</code>, <code>maxlength</code>, <code>required</code>, <code>placeholder</code>.</p>
+<pre><code class="language-gsp">&lt;g:textField name=&quot;nombre&quot; class=&quot;form-control&quot; maxlength=&quot;100&quot; value=&quot;${turnoInstance?.nombre}&quot; /&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;input type=&quot;text&quot; name=&quot;nombre&quot; id=&quot;nombre&quot; class=&quot;form-control&quot; maxlength=&quot;100&quot; value=&quot;Turno Mañana&quot;/&gt;
+</code></pre>
+<hr>
+<h2>g:datePicker</h2>
+<p><strong>Frecuencia:</strong> ~36 usos<br><strong>Tipo:</strong> Formulario — input fecha<br><strong>Descripción:</strong> Renderiza un selector de fecha. Con <code>precision=&quot;day&quot;</code> muestra día/mes/año como dropdowns separados. Puede integrarse con jQuery UI calendar.</p>
+<pre><code class="language-gsp">&lt;g:datePicker name=&quot;fechaInicio&quot; precision=&quot;day&quot; value=&quot;${turnoInstance?.fechaInicio}&quot; /&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;select name=&quot;fechaInicio_day&quot;&gt;...&lt;/select&gt;
+&lt;select name=&quot;fechaInicio_month&quot;&gt;...&lt;/select&gt;
+&lt;select name=&quot;fechaInicio_year&quot;&gt;...&lt;/select&gt;
+</code></pre>
+<hr>
+<h2>g:textArea</h2>
+<p><strong>Frecuencia:</strong> ~29 usos<br><strong>Tipo:</strong> Formulario — textarea<br><strong>Descripción:</strong> Renderiza un <code>&lt;textarea&gt;</code> HTML. Acepta <code>rows</code>, <code>cols</code>, <code>maxlength</code>, <code>placeholder</code>, etc.</p>
+<pre><code class="language-gsp">&lt;g:textArea name=&quot;notas&quot; class=&quot;form-control&quot; maxlength=&quot;200&quot; placeholder=&quot;Observaciones&quot;/&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;textarea name=&quot;notas&quot; id=&quot;notas&quot; class=&quot;form-control&quot; maxlength=&quot;200&quot; placeholder=&quot;Observaciones&quot;&gt;&lt;/textarea&gt;
+</code></pre>
+<hr>
+<h2>g:elseif</h2>
+<p><strong>Frecuencia:</strong> ~28 usos<br><strong>Tipo:</strong> Control de flujo<br><strong>Descripción:</strong> Permite agregar condiciones adicionales entre <code>g:if</code> y <code>g:else</code>. Equivalente a <code>else if</code>.</p>
+<pre><code class="language-gsp">&lt;g:if test=&quot;${estado == &#39;ACTIVO&#39;}&quot;&gt;
+  &lt;span class=&quot;green&quot;&gt;Activo&lt;/span&gt;
+&lt;/g:if&gt;
+&lt;g:elseif test=&quot;${estado == &#39;PENDIENTE&#39;}&quot;&gt;
+  &lt;span class=&quot;yellow&quot;&gt;Pendiente&lt;/span&gt;
+&lt;/g:elseif&gt;
+&lt;g:else&gt;
+  &lt;span class=&quot;red&quot;&gt;Inactivo&lt;/span&gt;
+&lt;/g:else&gt;
+</code></pre>
+<p><strong>Renderiza</strong> (cuando <code>estado == &#39;PENDIENTE&#39;</code>):</p>
+<pre><code class="language-html">&lt;span class=&quot;yellow&quot;&gt;Pendiente&lt;/span&gt;
+</code></pre>
+<hr>
+<h2>g:formatDate</h2>
+<p><strong>Frecuencia:</strong> ~27 usos<br><strong>Tipo:</strong> Formateo<br><strong>Descripción:</strong> Formatea un objeto <code>Date</code> a string según el formato o locale especificado. Si no se da <code>format</code>, usa el locale del sistema.</p>
+<pre><code class="language-gsp">&lt;g:formatDate date=&quot;${turnoInstance?.fechaCreacion}&quot; format=&quot;dd/MM/yyyy HH:mm&quot;/&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">15/05/2024 09:30
+</code></pre>
+<hr>
+<h2>g:hiddenField</h2>
+<p><strong>Frecuencia:</strong> ~25 usos<br><strong>Tipo:</strong> Formulario — input oculto<br><strong>Descripción:</strong> Renderiza un <code>&lt;input type=&quot;hidden&quot;&gt;</code>. Esencial para pasar datos backend→frontend o IDs dentro de formularios sin mostrarlos al usuario.</p>
+<pre><code class="language-gsp">&lt;g:hiddenField name=&quot;obraId&quot; value=&quot;${obraInstance?.id}&quot; /&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;input type=&quot;hidden&quot; name=&quot;obraId&quot; id=&quot;obraId&quot; value=&quot;42&quot;/&gt;
+</code></pre>
+<hr>
+<h2>g:formatBoolean</h2>
+<p><strong>Frecuencia:</strong> ~8 usos<br><strong>Tipo:</strong> Formateo<br><strong>Descripción:</strong> Convierte un booleano en texto localizado. Por defecto usa &quot;Sí&quot;/&quot;No&quot; según locale. Se puede personalizar con <code>true</code> y <code>false</code>.</p>
+<pre><code class="language-gsp">&lt;g:formatBoolean boolean=&quot;${turnoInstance?.activo}&quot; true=&quot;Habilitado&quot; false=&quot;Deshabilitado&quot;/&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">Habilitado
+</code></pre>
+<hr>
+<h2>g:hasErrors</h2>
+<p><strong>Frecuencia:</strong> ~6 usos<br><strong>Tipo:</strong> Manejo de errores<br><strong>Descripción:</strong> Bloque condicional que se renderiza solo si el bean tiene errores de validación. Se usa para envolver la lista de errores.</p>
+<pre><code class="language-gsp">&lt;g:hasErrors bean=&quot;${turnoInstance}&quot;&gt;
+  &lt;ul class=&quot;errors&quot;&gt;
+    &lt;g:eachError bean=&quot;${turnoInstance}&quot; var=&quot;error&quot;&gt;
+      &lt;li&gt;&lt;g:message error=&quot;${error}&quot;/&gt;&lt;/li&gt;
+    &lt;/g:eachError&gt;
+  &lt;/ul&gt;
+&lt;/g:hasErrors&gt;
+</code></pre>
+<p><strong>Renderiza</strong> (cuando hay errores):</p>
+<pre><code class="language-html">&lt;ul class=&quot;errors&quot;&gt;
+  &lt;li&gt;El nombre no puede estar vacío&lt;/li&gt;
+&lt;/ul&gt;
+</code></pre>
+<hr>
+<h2>g:eachError</h2>
+<p><strong>Frecuencia:</strong> ~6 usos<br><strong>Tipo:</strong> Manejo de errores<br><strong>Descripción:</strong> Itera sobre los errores de validación de un bean. Se usa dentro de <code>g:hasErrors</code>. Expone cada error en <code>var</code> para usar con <code>g:message</code>.</p>
+<pre><code class="language-gsp">&lt;g:eachError bean=&quot;${turnoInstance}&quot; var=&quot;error&quot;&gt;
+  &lt;li &lt;g:if test=&quot;${error in org.springframework.validation.FieldError}&quot;&gt;
+      data-field-id=&quot;${error.field}&quot;&lt;/g:if&gt;&gt;
+    &lt;g:message error=&quot;${error}&quot;/&gt;
+  &lt;/li&gt;
+&lt;/g:eachError&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;li data-field-id=&quot;nombre&quot;&gt;El nombre no puede estar vacío&lt;/li&gt;
+</code></pre>
+<hr>
+<h2>g:checkBox</h2>
+<p><strong>Frecuencia:</strong> ~6 usos<br><strong>Tipo:</strong> Formulario — checkbox<br><strong>Descripción:</strong> Renderiza un <code>&lt;input type=&quot;checkbox&quot;&gt;</code>. Grails añade automáticamente un campo oculto asociado para manejar el caso <code>false</code> cuando el checkbox no está marcado.</p>
+<pre><code class="language-gsp">&lt;g:checkBox name=&quot;entrada&quot; value=&quot;${registroInstance?.entrada}&quot; /&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;input type=&quot;hidden&quot; name=&quot;_entrada&quot;/&gt;
+&lt;input type=&quot;checkbox&quot; name=&quot;entrada&quot; id=&quot;entrada&quot; checked=&quot;checked&quot;/&gt;
+</code></pre>
+<hr>
+<h2>g:submitButton</h2>
+<p><strong>Frecuencia:</strong> ~4 usos<br><strong>Tipo:</strong> Formulario — botón<br><strong>Descripción:</strong> Renderiza un botón <code>&lt;input type=&quot;submit&quot;&gt;</code> estándar para enviar el formulario.</p>
+<pre><code class="language-gsp">&lt;g:submitButton name=&quot;create&quot; class=&quot;btn btn-success&quot; value=&quot;${message(code: &#39;default.button.create.label&#39;, default: &#39;Crear&#39;)}&quot; /&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;input type=&quot;submit&quot; name=&quot;create&quot; id=&quot;create&quot; class=&quot;btn btn-success&quot; value=&quot;Crear&quot;/&gt;
+</code></pre>
+<hr>
+<h2>g:actionSubmit</h2>
+<p><strong>Frecuencia:</strong> ~5 usos<br><strong>Tipo:</strong> Formulario — botón con acción<br><strong>Descripción:</strong> Similar a <code>g:submitButton</code> pero permite especificar un <code>action</code> distinto al del formulario. Útil para formularios con múltiples acciones (guardar vs. eliminar).</p>
+<pre><code class="language-gsp">&lt;g:actionSubmit class=&quot;btn btn-success&quot; action=&quot;update&quot; value=&quot;${message(code: &#39;default.button.save.label&#39;)}&quot; /&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;input type=&quot;submit&quot; name=&quot;_action_update&quot; class=&quot;btn btn-success&quot; value=&quot;Guardar&quot;/&gt;
+</code></pre>
+<hr>
+<h2>g:select</h2>
+<p><strong>Frecuencia:</strong> ~10 usos<br><strong>Tipo:</strong> Formulario — dropdown<br><strong>Descripción:</strong> Renderiza un <code>&lt;select&gt;</code> HTML. Acepta <code>from</code> (colección de opciones), <code>optionKey</code>, <code>optionValue</code>, <code>value</code> (seleccionado) y <code>noSelection</code>.</p>
+<pre><code class="language-gsp">&lt;g:select name=&quot;horaInicio&quot;
+          from=&quot;${[&#39;00&#39;,&#39;01&#39;,&#39;02&#39;,&#39;03&#39;,&#39;04&#39;,&#39;05&#39;,&#39;06&#39;,&#39;07&#39;,&#39;08&#39;,&#39;09&#39;,&#39;10&#39;,&#39;11&#39;,&#39;12&#39;]}&quot;
+          value=&quot;${turnoInstance?.horaInicio}&quot;
+          noSelection=&quot;[&#39;&#39;: &#39;Seleccione...&#39;]&quot;/&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;select name=&quot;horaInicio&quot; id=&quot;horaInicio&quot;&gt;
+  &lt;option value=&quot;&quot;&gt;Seleccione...&lt;/option&gt;
+  &lt;option value=&quot;00&quot;&gt;00&lt;/option&gt;
+  &lt;option value=&quot;01&quot; selected=&quot;selected&quot;&gt;01&lt;/option&gt;
+  ...
+&lt;/select&gt;
+</code></pre>
+<hr>
+<h2>g:paginate</h2>
+<p><strong>Frecuencia:</strong> ~10 usos<br><strong>Tipo:</strong> Paginación<br><strong>Descripción:</strong> Renderiza controles de paginación (anterior/siguiente/páginas). Requiere <code>total</code> con el total de registros. Lee el parámetro <code>offset</code> automáticamente.</p>
+<pre><code class="language-gsp">&lt;g:paginate total=&quot;${registroInstanceCount ?: 0}&quot; /&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;div class=&quot;pagination&quot;&gt;
+  &lt;span class=&quot;step previous disabled&quot;&gt;Anterior&lt;/span&gt;
+  &lt;span class=&quot;currentStep&quot;&gt;1&lt;/span&gt;
+  &lt;a href=&quot;/ctrlit/registro/index?offset=10&quot;&gt;2&lt;/a&gt;
+  &lt;a href=&quot;/ctrlit/registro/index?offset=10&quot;&gt;Siguiente&lt;/a&gt;
+&lt;/div&gt;
+</code></pre>
+<hr>
+<h2>g:sortableColumn</h2>
+<p><strong>Frecuencia:</strong> ~6 usos<br><strong>Tipo:</strong> Tabla — columna ordenable<br><strong>Descripción:</strong> Renderiza un <code>&lt;th&gt;</code> con un enlace de ordenación. Alterna entre ASC y DESC al hacer clic. Usa los parámetros <code>sort</code> y <code>order</code> en la URL.</p>
+<pre><code class="language-gsp">&lt;g:sortableColumn property=&quot;fecha&quot; title=&quot;${message(code: &#39;registro.fecha.label&#39;, default: &#39;Fecha&#39;)}&quot; /&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;th class=&quot;sortable asc&quot;&gt;
+  &lt;a href=&quot;/ctrlit/registro/index?sort=fecha&amp;order=desc&quot;&gt;Fecha&lt;/a&gt;
+&lt;/th&gt;
+</code></pre>
+<hr>
+<h2>g:field</h2>
+<p><strong>Frecuencia:</strong> ~15 usos<br><strong>Tipo:</strong> Formulario — input genérico<br><strong>Descripción:</strong> Renderiza inputs HTML5 de cualquier tipo especificado en <code>type</code> (<code>number</code>, <code>email</code>, <code>date</code>, <code>range</code>, etc.). Más flexible que <code>g:textField</code>.</p>
+<pre><code class="language-gsp">&lt;g:field name=&quot;gmt&quot; type=&quot;number&quot; step=&quot;1&quot; min=&quot;-12&quot; max=&quot;12&quot; class=&quot;form-control&quot; placeholder=&quot;-12 a 12&quot;/&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;input type=&quot;number&quot; name=&quot;gmt&quot; id=&quot;gmt&quot; step=&quot;1&quot; min=&quot;-12&quot; max=&quot;12&quot; class=&quot;form-control&quot; placeholder=&quot;-12 a 12&quot;/&gt;
+</code></pre>
+<hr>
+<h2>g:renderErrors</h2>
+<p><strong>Frecuencia:</strong> ~19 usos<br><strong>Tipo:</strong> Manejo de errores<br><strong>Descripción:</strong> Renderiza directamente todos los errores de validación de un bean sin necesitar iterar manualmente. Alternativa compacta a <code>g:hasErrors</code> + <code>g:eachError</code>.</p>
+<pre><code class="language-gsp">&lt;g:renderErrors bean=&quot;${turnoInstance}&quot;/&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;ul class=&quot;errors&quot;&gt;
+  &lt;li&gt;El nombre no puede estar vacío&lt;/li&gt;
+  &lt;li&gt;La hora de inicio es requerida&lt;/li&gt;
+&lt;/ul&gt;
+</code></pre>
+<hr>
+<h2>g:formatNumber</h2>
+<p><strong>Frecuencia:</strong> ~2 usos<br><strong>Tipo:</strong> Formateo numérico<br><strong>Descripción:</strong> Formatea números con separadores de miles, decimales o como porcentaje/moneda, según el <code>type</code> y <code>locale</code>.</p>
+<pre><code class="language-gsp">&lt;g:formatNumber number=&quot;${totalHoras}&quot; type=&quot;number&quot; maxFractionDigits=&quot;2&quot;/&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">1.234,56
+</code></pre>
+<p><em>(formato según locale; en es_CL: punto como miles, coma como decimal)</em></p>
+<hr>
+<h2>g:meta</h2>
+<p><strong>Frecuencia:</strong> ~2 usos<br><strong>Tipo:</strong> Metadatos de aplicación<br><strong>Descripción:</strong> Renderiza un valor de los metadatos de la aplicación Grails (definidos en <code>application.properties</code> o <code>build.gradle</code>), como la versión.</p>
+<pre><code class="language-gsp">&lt;g:meta name=&quot;info.app.version&quot;/&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">3.2.1
+</code></pre>
+<hr>
+<h2>g:layoutHead</h2>
+<p><strong>Frecuencia:</strong> ~8 usos<br><strong>Tipo:</strong> Layout<br><strong>Descripción:</strong> Usado en templates de layout. Renderiza el contenido del bloque <code>&lt;head&gt;</code> de la vista hija dentro del layout padre. Sin este tag, los <code>&lt;script&gt;</code> y <code>&lt;link&gt;</code> de la vista hija no se incluirían.</p>
+<pre><code class="language-gsp">&lt;!-- En layouts/main.gsp --&gt;
+&lt;head&gt;
+  &lt;title&gt;Mi App&lt;/title&gt;
+  &lt;g:layoutHead /&gt;
+&lt;/head&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;head&gt;
+  &lt;title&gt;Mi App&lt;/title&gt;
+  &lt;!-- contenido del &lt;head&gt; de la vista hija --&gt;
+  &lt;script src=&quot;/ctrlit/js/turno.js&quot;&gt;&lt;/script&gt;
+&lt;/head&gt;
+</code></pre>
+<hr>
+<h2>g:layoutBody</h2>
+<p><strong>Frecuencia:</strong> ~8 usos<br><strong>Tipo:</strong> Layout<br><strong>Descripción:</strong> Usado en templates de layout. Renderiza el <code>&lt;body&gt;</code> de la vista hija dentro del layout padre. El equivalente al <code>yield</code> en otros frameworks de templating.</p>
+<pre><code class="language-gsp">&lt;!-- En layouts/main.gsp --&gt;
+&lt;body&gt;
+  &lt;nav&gt;...&lt;/nav&gt;
+  &lt;g:layoutBody/&gt;
+  &lt;footer&gt;...&lt;/footer&gt;
+&lt;/body&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;body&gt;
+  &lt;nav&gt;...&lt;/nav&gt;
+  &lt;!-- contenido del &lt;body&gt; de la vista hija --&gt;
+  &lt;footer&gt;...&lt;/footer&gt;
+&lt;/body&gt;
+</code></pre>
+<hr>
+<h2>g:layoutTitle</h2>
+<p><strong>Frecuencia:</strong> ~6 usos<br><strong>Tipo:</strong> Layout<br><strong>Descripción:</strong> Renderiza el título definido en la vista hija (<code>&lt;title&gt;</code>) dentro del layout padre. Permite que cada vista personalice el <code>&lt;title&gt;</code> de la página.</p>
+<pre><code class="language-gsp">&lt;!-- En layouts/main.gsp --&gt;
+&lt;title&gt;&lt;g:layoutTitle default=&quot;ctrlit&quot;/&gt; - Buk&lt;/title&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;title&gt;Crear Turno - Buk&lt;/title&gt;
+</code></pre>
+<hr>
+<h2>g:pageProperty</h2>
+<p><strong>Frecuencia:</strong> ~1 uso<br><strong>Tipo:</strong> Layout<br><strong>Descripción:</strong> Permite a la vista hija pasar contenido con nombre arbitrario al layout padre. Similar a <code>content_for</code> en Rails. La vista hija define el bloque con <code>&lt;content tag=&quot;nombre&quot;&gt;</code>.</p>
+<pre><code class="language-gsp">&lt;!-- En layouts/main.gsp --&gt;
+&lt;g:pageProperty name=&quot;page.nav&quot;/&gt;
+
+&lt;!-- En la vista hija --&gt;
+&lt;content tag=&quot;nav&quot;&gt;
+  &lt;ul&gt;...&lt;/ul&gt;
+&lt;/content&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;ul&gt;...&lt;/ul&gt;
+</code></pre>
+<hr>
+<h2>g:findAll</h2>
+<p><strong>Frecuencia:</strong> ~2 usos<br><strong>Tipo:</strong> Colecciones<br><strong>Descripción:</strong> Filtra una colección usando una expresión Groovy en <code>expr</code>. Retorna solo los elementos que cumplen la condición. Poco usado; preferir filtrar en el controller.</p>
+<pre><code class="language-gsp">&lt;g:findAll in=&quot;${usuarios}&quot; expr=&quot;it?.activo == true&quot;&gt;
+  &lt;li&gt;${it.nombre}&lt;/li&gt;
+&lt;/g:findAll&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;li&gt;Juan Pérez&lt;/li&gt;
+&lt;li&gt;María González&lt;/li&gt;
+</code></pre>
+<hr>
+<h2>g:passwordField</h2>
+<p><strong>Frecuencia:</strong> ~1 uso<br><strong>Tipo:</strong> Formulario — input contraseña<br><strong>Descripción:</strong> Renderiza un <code>&lt;input type=&quot;password&quot;&gt;</code> con el texto enmascarado. El valor nunca se muestra al usuario.</p>
+<pre><code class="language-gsp">&lt;g:passwordField name=&quot;pwd&quot; class=&quot;form-control&quot; /&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;input type=&quot;password&quot; name=&quot;pwd&quot; id=&quot;pwd&quot; class=&quot;form-control&quot; value=&quot;&quot;/&gt;
+</code></pre>
+<hr>
+<h2>g:javascript</h2>
+<p><strong>Frecuencia:</strong> ~2 usos<br><strong>Tipo:</strong> Scripts inline<br><strong>Descripción:</strong> Renderiza un bloque <code>&lt;script&gt;</code> con el contenido del body del tag. Aplica escaping correcto. Preferir archivos JS externos en la mayoría de casos.</p>
+<pre><code class="language-gsp">&lt;g:javascript&gt;
+  var obraId = ${obraInstance.id};
+  console.log(obraId);
+&lt;/g:javascript&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;script type=&quot;text/javascript&quot;&gt;
+  var obraId = 42;
+  console.log(obraId);
+&lt;/script&gt;
+</code></pre>
+<hr>
+<h2>g:renderException</h2>
+<p><strong>Frecuencia:</strong> ~1 uso<br><strong>Tipo:</strong> Debug / errores<br><strong>Descripción:</strong> Renderiza el stack trace completo de una excepción. Solo se usa en la vista de error (<code>error.gsp</code>). No debe usarse en vistas de producción.</p>
+<pre><code class="language-gsp">&lt;g:renderException exception=&quot;${exception}&quot; /&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;h2&gt;groovy.lang.MissingPropertyException: No such property...&lt;/h2&gt;
+&lt;pre&gt;at ctrl.TurnoController.index(TurnoController.groovy:25)
+...&lt;/pre&gt;
+</code></pre>
+<hr>
+<h2>f:all</h2>
+<p><strong>Frecuencia:</strong> ~3 usos<br><strong>Tipo:</strong> Form fields library<br><strong>Descripción:</strong> Del plugin <code>fields</code>. Renderiza automáticamente todos los campos de un bean como un formulario completo. Útil para scaffolding rápido; menos control que renderizar campo a campo.</p>
+<pre><code class="language-gsp">&lt;f:all bean=&quot;turno&quot;/&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;div class=&quot;fieldcontain&quot;&gt;
+  &lt;label for=&quot;nombre&quot;&gt;Nombre&lt;/label&gt;
+  &lt;input type=&quot;text&quot; name=&quot;nombre&quot; id=&quot;nombre&quot; value=&quot;&quot;/&gt;
+&lt;/div&gt;
+&lt;div class=&quot;fieldcontain&quot;&gt;
+  &lt;label for=&quot;horaInicio&quot;&gt;Hora inicio&lt;/label&gt;
+  &lt;input type=&quot;text&quot; name=&quot;horaInicio&quot; id=&quot;horaInicio&quot; value=&quot;&quot;/&gt;
+&lt;/div&gt;
+&lt;!-- ... un bloque por cada propiedad del bean --&gt;
+</code></pre>
+<hr>
+<h2>f:table</h2>
+<p><strong>Frecuencia:</strong> ~1 uso<br><strong>Tipo:</strong> Form fields library<br><strong>Descripción:</strong> Del plugin <code>fields</code>. Renderiza una tabla HTML completa con headers y filas a partir de una colección de beans. Útil para scaffolding; poco control visual.</p>
+<pre><code class="language-gsp">&lt;f:table collection=&quot;${turnos}&quot; /&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;&lt;th&gt;Nombre&lt;/th&gt;&lt;th&gt;Hora Inicio&lt;/th&gt;...&lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;&lt;td&gt;Turno Mañana&lt;/td&gt;&lt;td&gt;08:00&lt;/td&gt;...&lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+</code></pre>
+<hr>
+<h2>f:display</h2>
+<p><strong>Frecuencia:</strong> ~1 uso<br><strong>Tipo:</strong> Form fields library<br><strong>Descripción:</strong> Del plugin <code>fields</code>. Renderiza todas las propiedades de un bean en modo lectura (sin inputs). Útil para vistas <code>show</code> generadas por scaffolding.</p>
+<pre><code class="language-gsp">&lt;f:display bean=&quot;turno&quot; /&gt;
+</code></pre>
+<p><strong>Renderiza:</strong></p>
+<pre><code class="language-html">&lt;div class=&quot;fieldcontain&quot;&gt;
+  &lt;span class=&quot;property-label&quot;&gt;Nombre&lt;/span&gt;
+  &lt;span class=&quot;property-value&quot;&gt;Turno Mañana&lt;/span&gt;
+&lt;/div&gt;
+&lt;!-- ... uno por cada propiedad --&gt;
+</code></pre>
+<hr>
+<p><em>Generado el 2026-04-13 · Basado en análisis de 526 archivos GSP del proyecto ctrlit</em></p>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

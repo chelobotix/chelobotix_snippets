@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRUD - GRAILS · GRails · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">GRails</span>
+    <span class="sep">/</span>
+    <span class="current">CRUD - GRAILS</span></nav>
+  <main><h1>CRUD - GRAILS</h1>
+<pre><code class="language-java">package domain
+
+class Testo {
+    String name
+    String email
+    Integer age
+    Float height
+    Boolean isStudent = false
+    Date dateCreated
+    Date lastUpdated
+
+    static constraints = {
+        name size: 5..250, blank: false, nullable: false
+        email email: true, blank: false, nullable: false
+        age nullable: false
+        height nullable: false
+        isStudent nullable: false, defaultValue: false
+    }
+    
+    static mapping = {
+      // Ver lista abajo
+    }
+}
+
+
+.
+</code></pre>
+<pre><code class="language-java">static mapping = {
+
+    // ── TABLA ────────────────────────────────────────────────────────────────
+    table &#39;nombre_tabla&#39;              // nombre de tabla en BD (default: nombre del dominio en snake_case)
+    schema &#39;mi_schema&#39;                // schema de BD (útil en PostgreSQL/Oracle con múltiples schemas)
+
+    // ── PRIMARY KEY ──────────────────────────────────────────────────────────
+    id column: &#39;mi_pk&#39;                // nombre de la columna PK (default: &#39;id&#39;)
+    id generator: &#39;sequence&#39;         // generador: &#39;native&#39;, &#39;sequence&#39;, &#39;uuid&#39;, &#39;assigned&#39;, &#39;increment&#39;
+    id name: &#39;miId&#39;                  // nombre del campo en la clase (si no es &#39;id&#39;)
+    id composite: [&#39;campo1&#39;, &#39;campo2&#39;] // PK compuesta (en vez de usar @EmbeddedId)
+
+    // ── VERSION (optimistic locking) ─────────────────────────────────────────
+    version false                     // deshabilita la columna &#39;version&#39; de Hibernate (cuidado con concurrencia)
+    version &#39;mi_version&#39;             // nombre de columna custom para el campo version
+
+    // ── COLUMNAS ─────────────────────────────────────────────────────────────
+    nombre column: &#39;nm_nombre&#39;        // nombre de columna custom
+    nombre column: &#39;nm_nombre&#39;, sqlType: &#39;TEXT&#39;  // tipo SQL explícito
+    descripcion type: &#39;text&#39;          // tipo Hibernate (&#39;text&#39;, &#39;string&#39;, &#39;integer&#39;, etc.)
+    monto sqlType: &#39;decimal(18,4)&#39;    // tipo SQL raw
+    activo defaultValue: &#39;true&#39;      // valor por defecto a nivel de columna en BD
+    campo insertable: false          // no incluir en INSERT
+    campo updateable: false          // no incluir en UPDATE
+    campo index: &#39;idx_nombre&#39;        // crear índice en esa columna
+
+    // ── ENUMS ────────────────────────────────────────────────────────────────
+    estado enumType: &#39;string&#39;         // guarda el nombre del enum como String (&quot;ACTIVO&quot;)
+    estado enumType: &#39;identity&#39;       // guarda el ordinal numérico del enum (0, 1, 2...)
+
+    // ── ASOCIACIONES (hasMany / belongsTo) ───────────────────────────────────
+    items cascade: &#39;all&#39;             // cuándo propagar: &#39;all&#39;, &#39;save-update&#39;, &#39;delete&#39;, &#39;none&#39;
+    items cascade: &#39;all-delete-orphan&#39; // borra hijos al desasociarlos del padre
+    items lazy: true                  // lazy loading (default: true)
+    items lazy: false                 // eager loading (carga inmediata, cuidado con N+1)
+    items fetch: &#39;join&#39;              // estrategia de fetch: &#39;select&#39; (default) o &#39;join&#39;
+    items batchSize: 10              // carga en batches de N para evitar N+1
+    items cache: true                // cachear esta colección
+
+    // ── HERENCIA ─────────────────────────────────────────────────────────────
+    tablePerHierarchy false          // TABLE_PER_CLASS: una tabla por subclase (default: single table)
+    tablePerSubclass true            // JOINED: tabla base + tabla por subclase con JOIN
+
+    // ── CACHE (second-level cache, requiere plugin/config) ───────────────────
+    cache true                       // habilitar caché con estrategia default (&#39;read-write&#39;)
+    cache usage: &#39;read-only&#39;         // estrategia: &#39;read-only&#39;, &#39;read-write&#39;, &#39;nonstrict-read-write&#39;, &#39;transactional&#39;
+    cache include: &#39;all&#39;             // qué incluir: &#39;all&#39; (default) o &#39;non-lazy&#39;
+
+    // ── ORDENAMIENTO ─────────────────────────────────────────────────────────
+    sort &#39;nombre&#39;                    // campo de orden por defecto en queries
+    sort nombre: &#39;asc&#39;              // orden ascendente explícito
+    sort nombre: &#39;desc&#39;             // orden descendente
+
+    // ── AUTOTIME STAMPS ──────────────────────────────────────────────────────
+    autoTimestamp false              // deshabilita el manejo automático de dateCreated/lastUpdated
+
+    // ── DISCRIMINADOR (herencia single-table) ────────────────────────────────
+    discriminator value: &#39;admin&#39;, column: [name: &#39;tipo&#39;, sqlType: &#39;varchar(50)&#39;]
+
+    // ── COMENTARIO DE TABLA ──────────────────────────────────────────────────
+    comment &#39;Tabla de usuarios del sistema&#39; // comentario en DDL (no todos los motores lo soportan)
+}
+</code></pre>
+<pre><code class="language-java">package ctrl
+
+import domain.Testo
+import domain.TestoDomainService
+
+class TestosController {
+
+    TestoDomainService testoDomainService
+
+    def index() {
+        List&lt;Testo&gt; testoList = testoDomainService.listarTestos()
+
+        [testoList: testoList]
+    }
+
+    def show() {
+        Testo testoInstance = testoDomainService.obtenerTesto(params.long(&#39;id&#39;))
+
+        if (!testoInstance) {
+            response.sendError(404)
+            return
+        }
+
+        [testoInstance: testoInstance]
+    }
+
+    def create() {
+        [testoInstance: new Testo()]
+    }
+
+    def save() {
+        Testo testoInstance = new Testo()
+        bindData(testoInstance, testoParams())
+
+        if (testoInstance.hasErrors() || !testoInstance.save(flush: true)) {
+            flash.error = &quot;Error al crear testo&quot;
+            render view: &#39;create&#39;, model: [testoInstance: testoInstance]
+            return
+        }
+
+        flash.message = &quot;Testo creado correctamente&quot;
+        redirect action: &quot;show&quot;, id: testoInstance.id
+    }
+
+    def edit() {
+        Testo testoInstance = testoDomainService.obtenerTesto(params.long(&#39;id&#39;))
+
+        if (!testoInstance) {
+            response.sendError(404)
+            return
+        }
+
+        [testoInstance: testoInstance]
+    }
+
+    def update() {
+        Testo testoInstance = testoDomainService.obtenerTesto(params.long(&#39;id&#39;))
+
+        if (!testoInstance) {
+            response.sendError(404)
+            return
+        }
+
+        bindData(testoInstance, testoParams())
+
+        if (testoInstance.hasErrors() || !testoInstance.save(flush: true)) {
+            render view: &#39;edit&#39;, model: [testoInstance: testoInstance]
+            return
+        }
+
+        flash.message = &quot;Testo actualizado correctamente&quot;
+        redirect action: &quot;show&quot;, id: testoInstance.id
+    }
+
+    def delete() {
+        Testo testoInstance = testoDomainService.obtenerTesto(params.long(&#39;id&#39;))
+
+        if (!testoInstance) {
+            response.sendError(404)
+            return
+        }
+
+        testoDomainService.eliminarTesto(testoInstance)
+        flash.message = &quot;Testo eliminado correctamente&quot;
+        redirect action: &quot;index&quot;
+    }
+
+    // Strong params estilo Grails
+    private Map testoParams() {
+        params.subMap([&#39;name&#39;, &#39;email&#39;, &#39;age&#39;, &#39;height&#39;, &#39;isStudent&#39;])
+    }
+}
+</code></pre>
+<pre><code class="language-java">package domain
+
+class TestoDomainService {
+
+    // Listar todos los Testos
+    List&lt;Testo&gt; listarTestos() {
+        Testo.list()
+    }
+
+    // Obtener un Testo por su ID
+    Testo obtenerTesto(Long id) {
+        Testo.get(id)
+    }
+
+    // Eliminar un Testo
+    void eliminarTesto(Testo testo) {
+        testo.delete(flush: true)
+    }
+}
+</code></pre>
+<pre><code class="language-html">// INDEX
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;meta name=&quot;layout&quot; content=&quot;active_admin&quot;&gt;
+        &lt;title&gt;&lt;g:message code=&quot;default.create.testo.label&quot; args=&quot;[entityName]&quot; /&gt;&lt;/title&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;g:if test=&quot;${flash.message}&quot;&gt;
+            &lt;div class=&quot;alert alert-success&quot;&gt;
+                &lt;g:message code=&quot;testo.message.label&quot; default=&quot;Message&quot; /&gt;: ${flash.message}
+            &lt;/div&gt;
+        &lt;/g:if&gt;
+
+        &lt;h1&gt;Testos&lt;/h1&gt;
+        &lt;g:link action=&quot;create&quot;&gt;Create Testo&lt;/g:link&gt;
+
+    &lt;g:each in=&quot;${testoList}&quot; var=&quot;testo&quot;&gt;
+      &lt;g:link action=&quot;show&quot; id=&quot;${testo.id}&quot;&gt;
+        &lt;p&gt;${testo.name}&lt;/p&gt;
+      &lt;/g:link&gt;
+    &lt;/g:each&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+
+
+.
+</code></pre>
+<pre><code class="language-html">// SHOW
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;meta name=&quot;layout&quot; content=&quot;active_admin&quot;&gt;
+        &lt;title&gt;&lt;g:message code=&quot;default.show.label&quot; args=&quot;[entityName]&quot; /&gt;&lt;/title&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+          &lt;%-- Check messages with flash.message --%&gt;
+        &lt;g:if test=&quot;${flash.message}&quot;&gt;
+            &lt;div class=&quot;alert alert-success&quot;&gt;
+                &lt;g:message code=&quot;testo.message.label&quot; default=&quot;Message&quot; /&gt;: ${flash.message}
+            &lt;/div&gt;
+        &lt;/g:if&gt;
+          &lt;h1&gt;Show Testo&lt;/h1&gt;
+
+        &lt;p&gt;&lt;strong&gt;Name:&lt;/strong&gt; ${testoInstance?.name}&lt;/p&gt;
+      	&lt;p&gt;&lt;strong&gt;Email:&lt;/strong&gt; ${testoInstance?.email}&lt;/p&gt;
+     	&lt;p&gt;&lt;strong&gt;Age:&lt;/strong&gt; ${testoInstance?.age}&lt;/p&gt;
+      	&lt;p&gt;&lt;strong&gt;Height:&lt;/strong&gt; ${testoInstance?.height}&lt;/p&gt;
+      	&lt;p&gt;&lt;strong&gt;Is Student:&lt;/strong&gt; ${testoInstance?.isStudent ? &#39;Yes&#39; : &#39;No&#39;}&lt;/p&gt;
+
+        &lt;g:link action=&quot;index&quot;&gt;Back to List&lt;/g:link&gt;
+      &lt;g:link action=&quot;edit&quot; id=&quot;${testoInstance?.id}&quot;&gt;Edit&lt;/g:link&gt;
+        &lt;g:link action=&quot;delete&quot; id=&quot;${testoInstance?.id}&quot;&gt;Delete&lt;/g:link&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+
+
+.
+</code></pre>
+<pre><code class="language-html">// CREATE
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;meta name=&quot;layout&quot; content=&quot;active_admin&quot;&gt;
+        &lt;g:set var=&quot;entityName&quot; value=&quot;${message(code: &#39;testo.label&#39;, default: &#39;Testo&#39;)}&quot; /&gt;
+        &lt;title&gt;&lt;g:message code=&quot;default.create.testo.label&quot; args=&quot;[entityName]&quot; /&gt;&lt;/title&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;%-- Check errors with hasErrors --%&gt;
+        &lt;g:hasErrors bean=&quot;${testoInstance}&quot;&gt;
+            &lt;div class=&quot;alert alert-danger&quot;&gt;
+                &lt;ul&gt;
+                    &lt;g:eachError bean=&quot;${testoInstance}&quot; var=&quot;err&quot;&gt;
+                        &lt;li&gt;&lt;g:message error=&quot;${err}&quot; /&gt;&lt;/li&gt;
+                    &lt;/g:eachError&gt;
+                &lt;/ul&gt;
+            &lt;/div&gt;
+        &lt;/g:hasErrors&gt;
+
+    &lt;%-- Link to index action --%&gt;
+    &lt;g:link action=&quot;index&quot;&gt;Go To All Testos&lt;/g:link&gt;
+
+        &lt;%-- Form to save testo --%&gt;
+        &lt;g:form action=&quot;save&quot;&gt;
+            &lt;%-- Render form template --%&gt;
+            &lt;fieldset class=&quot;form&quot;&gt;
+                &lt;g:render template=&quot;form&quot; model=&quot;[testoInstance: testoInstance]&quot; /&gt;
+            &lt;/fieldset&gt;
+
+            &lt;%-- Submit button --%&gt;
+            &lt;fieldset class=&quot;buttons&quot;&gt;
+                &lt;g:submitButton name=&quot;create&quot; class=&quot;save&quot; value=&quot;${message(code: &#39;default.button.create.label&#39;, default: &#39;Create&#39;)}&quot; /&gt;
+            &lt;/fieldset&gt;
+        &lt;/g:form&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+
+
+.
+</code></pre>
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+// EDIT
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;meta name=&quot;layout&quot; content=&quot;active_admin&quot;&gt;
+        &lt;g:set var=&quot;entityName&quot; value=&quot;${message(code: &#39;testo.label&#39;, default: &#39;Testo&#39;)}&quot; /&gt;
+        &lt;title&gt;&lt;g:message code=&quot;default.create.testo.label&quot; args=&quot;[entityName]&quot; /&gt;&lt;/title&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;%-- Check errors with hasErrors --%&gt;
+        &lt;g:hasErrors bean=&quot;${testoInstance}&quot;&gt;
+            &lt;div class=&quot;alert alert-danger&quot;&gt;
+                &lt;ul&gt;
+                    &lt;g:eachError bean=&quot;${testoInstance}&quot; var=&quot;err&quot;&gt;
+                        &lt;li&gt;&lt;g:message error=&quot;${err}&quot; /&gt;&lt;/li&gt;
+                    &lt;/g:eachError&gt;
+                &lt;/ul&gt;
+            &lt;/div&gt;
+        &lt;/g:hasErrors&gt;
+
+    &lt;%-- Link to index action --%&gt;
+    &lt;g:link action=&quot;index&quot;&gt;Go To All Testos&lt;/g:link&gt;
+
+        &lt;%-- Form to save testo --%&gt;
+        &lt;g:form action=&quot;update&quot; id=&quot;${testoInstance.id}&quot; method=&quot;post&quot;&gt;
+            &lt;%-- Render form template --%&gt;
+            &lt;fieldset class=&quot;form&quot;&gt;
+                &lt;g:render template=&quot;form&quot; model=&quot;[testoInstance: testoInstance]&quot; /&gt;
+            &lt;/fieldset&gt;
+
+            &lt;%-- Submit button --%&gt;
+            &lt;fieldset class=&quot;buttons&quot;&gt;
+                &lt;g:submitButton name=&quot;update&quot; class=&quot;save&quot; value=&quot;${message(code: &#39;default.button.create.label&#39;, default: &#39;Update&#39;)}&quot; /&gt;
+            &lt;/fieldset&gt;
+        &lt;/g:form&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+
+
+.
+</code></pre>
+<pre><code class="language-html">// FORM
+&lt;div class=&quot;fieldcontain ${hasErrors(bean: testoInstance, field: &#39;name&#39;, &#39;error&#39;)} required&quot;&gt;
+    &lt;label for=&quot;name&quot;&gt;
+        &lt;g:message code=&quot;testo.name.label&quot; default=&quot;Names&quot; /&gt;
+        &lt;span class=&quot;required-indicator&quot;&gt;*&lt;/span&gt;
+    &lt;/label&gt;
+    &lt;g:textField name=&quot;name&quot; value=&quot;${testoInstance?.name}&quot; /&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;fieldcontain ${hasErrors(bean: testoInstance, field: &#39;email&#39;, &#39;mi_clase_css_error&#39;)} required&quot;&gt;
+    &lt;label for=&quot;email&quot;&gt;
+        &lt;g:message code=&quot;testo.email.label&quot; default=&quot;Email&quot; /&gt;
+        &lt;span class=&quot;required-indicator&quot;&gt;*&lt;/span&gt;
+    &lt;/label&gt;
+    &lt;g:textField name=&quot;email&quot; value=&quot;${testoInstance?.email}&quot; /&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;fieldcontain ${hasErrors(bean: testoInstance, field: &#39;age&#39;, &#39;error&#39;)} required&quot;&gt;
+    &lt;label for=&quot;age&quot;&gt;
+        &lt;g:message code=&quot;testo.age.label&quot; default=&quot;Age&quot; /&gt;
+        &lt;span class=&quot;required-indicator&quot;&gt;*&lt;/span&gt;
+    &lt;/label&gt;
+    &lt;g:field type=&quot;number&quot; name=&quot;age&quot; min=&quot;5&quot; max=&quot;10&quot; required value=&quot;${testoInstance?.age}&quot; /&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;fieldcontain ${hasErrors(bean: testoInstance, field: &#39;height&#39;, &#39;error&#39;)} required&quot;&gt;
+    &lt;label for=&quot;height&quot;&gt;
+        &lt;g:message code=&quot;testo.height.label&quot; default=&quot;Height&quot; /&gt;
+        &lt;span class=&quot;required-indicator&quot;&gt;*&lt;/span&gt;
+    &lt;/label&gt;
+    &lt;g:field type=&quot;number&quot; name=&quot;height&quot; required value=&quot;${testoInstance?.height}&quot; /&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;fieldcontain ${hasErrors(bean: testoInstance, field: &#39;isStudent&#39;, &#39;error&#39;)}&quot;&gt;
+    &lt;label for=&quot;isStudent&quot;&gt;
+        &lt;g:message code=&quot;testo.isStudent.label&quot; default=&quot;Is Student&quot; /&gt;
+    &lt;/label&gt;
+    &lt;g:checkBox name=&quot;isStudent&quot; checked=&quot;${testoInstance?.isStudent}&quot;/&gt;
+&lt;/div&gt;
+
+</code></pre>
+<pre><code class="language-java">// migrations/changelog.groovy
+include file: &#39;crear-tabla-testo.groovy&#39;
+</code></pre>
+<pre><code class="language-java">databaseChangeLog = {
+
+    changeSet(author: &quot;malarcon&quot;, id: &quot;crear_tabla_testo&quot;) {
+        tagDatabase(tag: &quot;antes_de_crear_tabla_testo&quot;)
+
+        createTable(tableName: &quot;testo&quot;) {
+            column(name: &quot;id&quot;, type: &quot;BIGINT&quot;, autoIncrement: true) {
+                constraints(primaryKey: true, nullable: false)
+            }
+            column(name: &quot;name&quot;, type: &quot;VARCHAR(250)&quot;) {
+                constraints(nullable: false)
+            }
+            column(name: &quot;email&quot;, type: &quot;VARCHAR(250)&quot;) {
+                constraints(nullable: false)
+            }
+            column(name: &quot;age&quot;, type: &quot;INT&quot;) {
+                constraints(nullable: false)
+            }
+            column(name: &quot;height&quot;, type: &quot;FLOAT&quot;) {
+                constraints(nullable: false)
+            }
+            column(name: &quot;is_student&quot;, type: &quot;BOOLEAN&quot;) {
+                constraints(nullable: false, defaultValue: false)
+            }
+            column(name: &quot;date_created&quot;, type: &quot;datetime&quot;)
+            column(name: &quot;last_updated&quot;, type: &quot;datetime&quot;)
+            column(name: &quot;version&quot;, type: &quot;BIGINT&quot;)
+        }
+
+        rollback {
+            dropTable(tableName: &quot;testo&quot;)
+        }
+    }
+}
+</code></pre>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

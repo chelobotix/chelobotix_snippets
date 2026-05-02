@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forms · Go · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Go</span>
+    <span class="sep">/</span>
+    <span class="current">Forms</span></nav>
+  <main><h1>Forms</h1>
+<pre><code class="language-go">// BASIC
+// All data comes as a string
+func (repo *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
+  // Primero parseas
+  err := r.ParseForm()
+    if err != nil {
+        log.Println(err)
+    }
+    
+    email := r.Form.Get(&quot;email&quot;)
+    
+    // Para fechas
+    start := r.Form.Get(&quot;start_date&quot;) //form field start_date is this case is a date 
+    end := r.Form.Get(&quot;another&quot;)
+
+    w.Write([]byte(fmt.Sprintf(&quot;start date is %s and end date is %s&quot;, start, end)))
+}
+</code></pre>
+<pre><code class="language-go">// RESPONSE JSON
+type jsonResponse struct {
+    Ok      bool   `json:&quot;ok&quot;`
+    Message string `json:&quot;message&quot;`
+}
+
+// AvailabilityJSON is the handler for the home page
+func (repo *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
+    response := jsonResponse{
+        Ok:      true,
+        Message: &quot;Available&quot;,
+    }
+
+    outResponse, err := json.MarshalIndent(response, &quot;&quot;, &quot;    &quot;) //se daran 4 espacions de indentacion en el resultado
+    if err != nil {
+        log.Println(err)
+    }
+
+    log.Println(string(outResponse))
+    w.Header().Set(&quot;Content-Type&quot;, &quot;application-json&quot;)
+    w.Write(outResponse)
+}
+</code></pre>
+<pre><code class="language-go">// CSRFToken from NOSURF
+github.com/justinas/nosurf v1.1.1 // indirect
+&lt;input type=&quot;hidden&quot; name=&quot;csrf_token&quot; value=&quot;{{.CSRFToken}}&quot;&gt;
+</code></pre>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hash Ruby · Ruby on Rails · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Ruby on Rails</span>
+    <span class="sep">/</span>
+    <span class="current">Hash Ruby</span></nav>
+  <main><h1>Hash Ruby</h1>
+<pre><code class="language-ruby">hash = { a: 1, b: 2, c: 3 }
+
+# NEW (Se usa cuando se quiere poner un valor por defecto cuando la clave no exista)
+h = Hash.new(0)  # Valor por defecto: 0
+puts h[:key]     # =&gt; 0
+
+# dinamicamente
+h = Hash.new { |hash, key| hash[key] = a + b }
+# o
+h = Hash.new
+h.default_proc = -&gt;(hash, key) { hash[key] = a + b }
+</code></pre>
+<pre><code class="language-ruby"># EACH
+hash.each do |key, value|
+  puts &quot;#{key}: #{value}&quot;
+end
+</code></pre>
+<pre><code class="language-ruby"># EACH_KEY
+hash.each_key { |key| puts key }
+</code></pre>
+<pre><code class="language-ruby"># EACH_VALUE
+hash.each_value { |value| puts value }
+</code></pre>
+<pre><code class="language-ruby"># MAP
+new_hash = hash.map { |k, v| [k, v * 2] }.to_h
+# =&gt; { a: 2, b: 4, c: 6 }
+</code></pre>
+<pre><code class="language-ruby"># TRANSFORM_KEY
+
+# One level
+uppercase_keys = hash.transform_keys(&amp;:upcase)
+# =&gt; { A: 1, B: 2, C: 3 }
+
+# Multi level
+hash = { person: { name: &#39;Rob&#39;, age: &#39;28&#39; } }
+hash.deep_transform_keys{ |key| key.to_s.upcase }
+# =&gt; { &quot;PERSON&quot; =&gt; { &quot;NAME&quot; =&gt; &quot;Rob&quot;, &quot;AGE&quot; =&gt; &quot;28&quot; } }
+</code></pre>
+<pre><code class="language-ruby"># TRANSFORM VALUE
+doubled_values = hash.transform_values { |v| v * 2 }
+# =&gt; { a: 2, b: 4, c: 6 }
+</code></pre>
+<pre><code class="language-ruby"># SELECT - FILTER
+even_values = hash.select { |k, v| v.even? }
+# =&gt; { b: 2 }
+</code></pre>
+<pre><code class="language-ruby"># REJECT
+odd_values = hash.reject { |k, v| v.odd? }
+# =&gt; { b: 2 }
+</code></pre>
+<pre><code class="language-ruby"># MERGE
+hash.merge({ d: 4 })
+# =&gt; { a: 1, b: 2, c: 3, d: 4 }
+
+# reverse_merge (solo copia los keys que no existen en el target)
+options = { a: 1 }.reverse_merge(b: 2) # =&gt; { a: 1, b: 2 }
+</code></pre>
+<pre><code class="language-ruby"># DEEP MERGE (RECURSIVE NESTED)
+a = { foo: { bar: 1 }, baz: 2 }
+b = { foo: { qux: 3 } }
+
+a.deep_merge(b)
+# =&gt; { foo: { bar: 1, qux: 3 }, baz: 2 }
+</code></pre>
+<pre><code class="language-ruby"># DIG
+nested_hash = { a: { b: { c: 3 } } }
+nested_hash.dig(:a, :b, :c)
+</code></pre>
+<pre><code class="language-ruby"># COMPACT
+hash = { a: 1, b: nil, c: 3, d: nil }.compact 
+# { a: 1, c: 3 }
+</code></pre>
+<pre><code class="language-ruby"># ACCESS SYMBOLS - STRINGS - INDIFFERENT
+# convierte todas las claves en symbol
+hash.deep_symbolize_keys 
+
+# convierte todas las claves en string
+hash.stringify_keys
+
+# indifferent
+# Puedes acceder como simbolo o como cadena (Solo Rails)
+hash.with_indifferent_access
+</code></pre>
+<pre><code class="language-ruby"># KEY?
+hash.key?(:name)
+hash.has_key?(:name) 
+hash.include?(:name)
+hash.member?(:name)
+hash[:name].nil?
+
+# con un array
+hash = { &quot;test1&quot; =&gt; &quot;valor1&quot;, &quot;test3&quot; =&gt; &quot;valor3&quot; }
+keys_to_check = [&#39;test1&#39;, &#39;test2&#39;]
+matching_keys = hash.keys &amp; keys_to_check # =&gt; [&quot;test1&quot;]
+</code></pre>
+<pre><code class="language-ruby"># DELETE
+deleted_key = hash.delete(:edad)
+</code></pre>
+<pre><code class="language-ruby"># REPLACE KEY_NAME
+hash[:new_name] = hash.delete(:old_name)
+</code></pre>
+<pre><code class="language-ruby"># CONVERT STRING TO HASH
+string_to_hash = JSON.parse(@app.headers, symbolize_names: true)
+#or
+string_to_hash = JSON.parse(@app.headers.gsub(&#39;=&gt;&#39;, &#39;:&#39;))
+</code></pre>
+<pre><code class="language-ruby"># ACTIVE RECORD TO HASH
+active_record_model.attributes
+</code></pre>
+<pre><code class="language-ruby"># EACH_WITH_OBJECT
+# Creas un nuevo Hash o Array a partir de otro
+
+# Array
+(1..9).each_with_object([]) do |item, my_array|
+  my_array &lt;&lt; item
+end
+# result -&gt; [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+# Hash
+[&quot;banana&quot;, &quot;pineapple&quot;, &quot;orange&quot;].each_with_object({}) do |item, my_hash|
+  my_hash[item] = item.upcase
+end
+# -&gt; {&quot;banana&quot;=&gt;&quot;BANANA&quot;, &quot;pineapple&quot;=&gt;&quot;PINEAPPLE&quot;, &quot;orange&quot;=&gt;&quot;ORANGE&quot;} 
+
+
+#
+</code></pre>
+<pre><code class="language-ruby"># TO_UNSAFE_HASH
+.to_unsafe_h
+</code></pre>
+<pre><code class="language-ruby"># COPY - CLONE
+h2 = hash.dup # Shallow
+h2 = hash.deep_dup # Deep
+
+
+
+.
+</code></pre>
+<pre><code class="language-ruby"># COMPARACION
+
+| Método   | Qué compara      |
+| -------- | ---------------- |
+| `==`     | Contenido        |
+| `eql?`   | Contenido + tipo |
+| `equal?` | Mismo objeto     |
+
+
+h1 = { zip: 123 }
+h2 = { zip: 123.0 }
+
+h1 == h2        # true
+h1.eql?(h2)     # false
+h1.equal?(h2)   # false
+
+
+.
+</code></pre>
+<pre><code class="language-ruby"># FETCH
+options = { active: false }
+
+options.fetch(:active, true)
+</code></pre>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

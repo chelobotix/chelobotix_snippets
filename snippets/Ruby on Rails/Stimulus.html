@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stimulus · Ruby on Rails · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Ruby on Rails</span>
+    <span class="sep">/</span>
+    <span class="current">Stimulus</span></nav>
+  <main><h1>Stimulus</h1>
+<pre><code class="language-js">//Crear un controller en app/javascript/controllers/
+//test_controller.js
+
+import { Controller } from &quot;@hotwired/stimulus&quot;
+
+// Connects to data-controller=&quot;test&quot;
+export default class extends Controller {
+  static targets = [&quot;my_target&quot;]
+
+  // Se ejecuta cada vez que el elemento entra al DOM y el controller queda conectado.
+  connect() {
+    console.log(&quot;connected to test controller&quot;)
+    console.log(this.element) // &lt;div data-controller=&quot;test&quot;&gt;
+  }
+  
+  // Se ejecuta una sola vez por instancia del controller, en el momento en que Stimulus crea el controller
+  initialize() {
+    this.config = this.buildComplexConfig()
+  }
+
+  my_click() {
+    this.my_targetTarget.textContent = &quot;Hello Works&quot;
+    console.log(this.my_targetTarget) // &lt;p data-test-target=&quot;my_target&quot;&gt;Hello Works&lt;/p&gt;
+  }
+  
+  my_func_with_params(e) {
+    const nombre = event.params.nombre
+  }
+}
+</code></pre>
+<pre><code class="language-html">// Crear un elemento HTML que obtenga todo lo que se quiera manejar y ponerle data-controller=&quot;test&quot;, todos los elementos deben estar dentro del tag
+
+&lt;div data-controller=&quot;test&quot;&gt;
+  &lt;p data-action=&quot;click-&gt;test#my_click&quot;&gt;click me&lt;/p&gt;
+  
+  // data-[controller]-[nombre_param]-param=&quot;valor&quot;
+  &lt;p data-action=&quot;click-&gt;test#my_func_with_params&quot; data-test-nombre-param=&quot;Marcelo&quot;&gt;click me&lt;/p&gt; 
+  
+  &lt;p data-test-target=&quot;my_target&quot;&gt;&lt;/p&gt;
+&lt;/div&gt;
+</code></pre>
+<blockquote>
+<p>rails generate stimulus scroll_top</p>
+</blockquote>
+<pre><code class="language-shell">Acciones/eventos más usados en Stimulus:
+
+Eventos de click y mouse:
+
+click
+
+dblclick
+
+mouseenter
+
+mouseleave
+
+mouseover
+
+mouseout
+
+Eventos de formularios:
+
+submit
+
+change
+
+input
+
+focus
+
+blur
+
+Eventos de teclado:
+
+keydown
+
+keyup
+
+keypress
+
+Acciones/eventos más usados en Stimulus:
+
+Eventos de click y mouse:
+
+click
+
+dblclick
+
+mouseenter
+
+mouseleave
+
+mouseover
+
+mouseout
+
+Eventos de formularios:
+
+submit
+
+change
+
+input
+
+focus
+
+blur
+
+Eventos de teclado:
+
+keydown
+
+keyup
+
+keypress
+</code></pre>
+<pre><code class="language-erb"># Siempre es con doble guion si es que el controlador de Stimulus esta dentro de una sub carpeta
+&lt;%= form_with model: @user, url: washup_admin_profile_path, method: :patch, local: true, html: { multipart: true, data: { washup_admin__profile__avatar_target: &quot;form&quot; } } do |f| %&gt;
+
+&lt;label data-action=&quot;click-&gt;washup-admin--profile--avatar#openFilePicker&quot;&gt;
+  &lt;%= lucide_icon(&quot;upload&quot;, width: 18, height: 18) %&gt;
+  &lt;span&gt;Change Image&lt;/span&gt;
+&lt;/label&gt;
+&lt;%= f.file_field :avatar, data: { washup_admin__profile__avatar_target: &quot;fileInput&quot;, action: &quot;change-&gt;washup-admin--profile--avatar#handleFileSelect&quot; } %&gt;
+</code></pre>
+<pre><code class="language-js">// REQUEST ANIMATION FRAME
+// Regla mental útil
+// Usa requestAnimationFrame cuando:
+// Manipulas UI (cursor, scroll, focus) Y necesitas esperar a que el DOM esté “listo visualmente”
+
+requestAnimationFrame(() =&gt; this.moveCursorToEnd())
+</code></pre>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

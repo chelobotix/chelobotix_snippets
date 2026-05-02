@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRUD RAILS · Ruby on Rails · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Ruby on Rails</span>
+    <span class="sep">/</span>
+    <span class="current">CRUD RAILS</span></nav>
+  <main><h1>CRUD RAILS</h1>
+<pre><code class="language-ruby"># Delete without turbo
+
+= link_to &#39;Delete&#39;, article_path(article), data: { turbo_method: :delete, turbo_confirm: &#39;Are you sure?&#39; }
+# or with turbo
+= button_to &#39;Delete&#39;, quote_path(quote), method: :delete, class: &#39;btn btn--light&#39; %&gt;
+
+# POST
+&lt;%= link_to(&quot;Join&quot;, chatroom_chatroom_users_path(chatroom), data: { turbo_method: :post }) %&gt;
+
+#
+</code></pre>
+<pre><code class="language-ruby"># FIRST OR CREATE (si no encuentra un registro va a crear un nuevo like con user_id = current_user.id)
+
+# en este caso las dos tablas que se vinculan son posts y likes
+@post.likes.where(user_id: current_user.id).first_or_create!
+# en este caso existe una tercera tabla que es chatroom_users y las principlaes son chatrooms y users
+@chatroom_user = @chatroom.chatroom_users.where(user_id: current_user.id).first_or_create
+
+
+
+#
+</code></pre>
+<pre><code class="language-ruby"># Rails update_attributes without save
+
+@box.assign_attributes(box_params)
+#or
+@box.attributes = box_params
+
+# only one field
+@box.write_attribute(field, value)
+
+#
+</code></pre>
+<pre><code class="language-ruby"># UPDATE attributes
+
+@box.update_attributes(box_params)
+
+
+
+#
+</code></pre>
+<pre><code class="language-ruby"># UPDATE only specific columns
+
+@user.update_column(:column_name, &#39;new value&#39;)
+#o
+@user.update_columns(column_name: &#39;new value&#39;, another_column: &#39;another value&#39;)
+
+
+
+#
+</code></pre>
+<pre><code class="language-ruby"># RELOAD object
+
+@box.reload
+
+
+
+#
+</code></pre>
+<pre><code class="language-ruby"># TRANSACTION (cada dia me sorprendes más)
+# 05-04-2025 Por fin te entendi
+# 27-03-2026 Por fin entendi exceptions
+# si exception sale -&gt; rollback
+# si no sale -&gt; commit sin rollback
+
+# ************
+# El Rescue siempre debe ir fuera del bloque de transaction
+# No recuperes jamas de Standar error pq entrara ahi y no se hara rollback
+# Si tienes Transactions anidados y quieres hacer un rollback en el Nested tambien debes llamar rollback en el Parent (ver ejemplo)
+# ************
+
+
+# Cualquier excepcion que se genere que herede de StandardError dentro del bloque generara el rollback. Ej: ActiveRecord::RecordInvalid
+# WAY 1
+posts_data = [
+  { title: &#39;Post 1&#39;, content: &#39;Content for post 1&#39; },
+  { title: &#39;Post 2&#39;, content: &#39;Content for post 2&#39; },
+  { title: &#39;Post 3&#39;, content: &#39;Content for post 3&#39; }
+]
+
+
+# Blueprint
+
+ActiveRecord::Base.transaction do
+
+end
+
+rescue ActiveRecord::RecordInvalid =&gt; e
+  puts &quot;&quot;
+rescue ActiveRecord::RecordNotFound =&gt; e
+  puts &quot;&quot;
+rescue ActiveRecord::StatementInvalid =&gt; e
+  puts &quot;&quot;
+  
+  
+  
+# WAY 2 WITH BEGIN AND RESCUE (Esta es mejor)
+begin
+  ActiveRecord::Base.transaction do
+    raise(StandardError, &quot;Failed to save shipment: #{shipment.errors.full_messages}&quot;) unless shipment.save
+
+    box.shipment_id = shipment.id
+    raise(StandardError, &quot;Failed to save box #{box.errors.full_messages}&quot;) unless box.save
+    raise(StandardError, &#39;Failed to associate shipment with box&#39;) unless shipment.boxes &lt;&lt; box
+  end
+rescue StandardError =&gt; e
+  return render(json: { error: e }, status: :bad_request)
+end
+
+# WAY 3 VARIABLE DE ESTADO
+transaction_successful = true
+
+ActiveRecord::Base.transaction do
+  unless @record1.save
+    transaction_successful = false
+  end
+  
+  unless @record2.save
+    transaction_successful = false
+  end
+
+  raise ActiveRecord::Rollback unless transaction_successful
+end
+
+unless transaction_successful
+  &quot;tu_logica&quot;
+end
+#
+
+
+# ANIDADO
+target_movie = nil
+ActiveRecord::Base.transaction do
+  Movie.create!(name: &#39;Star Wars&#39;, year: 1977)
+
+  ActiveRecord::Base.transaction do
+    target_movie = Movie.create!(name: &#39;LORD&#39;, year: 1980)
+    raise(ActiveRecord::Rollback)
+  end
+
+  Movie.create!(name: &#39;LORD2&#39;, year: 1981)
+  raise(ActiveRecord::Rollback) if target_movie.is_a?(Movie)
+end
+
+# Aca manajas tus rescue afuera:
+rescue...
+
+
+# FORZANDO NUEVA TRANSACTION ANIDADA SI N AFECTAR LA DE AFUERA
+ActiveRecord::Base.transaction do
+  User.create!(...)
+
+  ActiveRecord::Base.transaction(requires_new: true) do
+    Order.create!(...)
+    raise ActiveRecord::Rollback
+  end
+
+  # El rollback anterior NO revierte User
+end
+</code></pre>
+<pre><code class="language-ruby"># DUPLICAR OBJETO
+
+@item1.dup
+
+# Duplicar un objeto con sus relaciones
+# Duplicar el objeto shipment
+shipment_clone = shipment.dup
+
+# Duplicar cada box asociado y agregarlo al clon
+shipment.boxes.each do |box|
+  shipment_clone.boxes &lt;&lt; box.dup
+end
+
+
+# dup: Crea una copia superficial y limpia algunos atributos (como el ID)
+# clone: Similar a dup pero mantiene el estado &quot;frozen&quot; si existe
+# deep_dup: Crea una copia profunda de los atributos y relaciones
+# Marshal.load(Marshal.dump()): Crea una copia completamente nueva pero puede tener problemas con ciertos tipos de objetos
+
+
+
+#
+</code></pre>
+<pre><code class="language-ruby"># NEW RECORD?
+shipment.order.importer.new_record?
+</code></pre>
+<pre><code class="language-ruby"># PERSISTED
+
+#(Devuelve true si el objeto ya esta guardado en la base de datos)
+box.persisted?
+
+
+
+#
+</code></pre>
+<pre><code class="language-ruby"># SKIP VALIDATIONS
+
+user.save(validate: false)
+
+
+
+#
+</code></pre>
+<pre><code class="language-ruby"># CHANGED Compara si hubo cambios en el modelo antes de guardar en la BD
+
+# No funciona con nested attributes, si quieres nested debes usarlo directo en el modelo shipment.order.changed?
+box.assign_attributes(params)
+box.changed? # =&gt; true 
+box.changes # =&gt; {&quot;length&quot;=&gt;[80, 90]}
+end
+# aca esta la guia brutal en la seccion dirty 
+https://guides.rubyonrails.org/active_model_basics.html
+### change sin el signo de interrogacion si quieres ver que atributo ha cambiado
+### changed_attributes para ver el valor original del cambio
+### changes para ver el valor original y el actual de todos os cambios
+
+### email_changed? puedes poner el attributo y encadenarlo con changed? para ver si ha cambiado
+### email_was muestra el valor antes del cambio
+### email_change muestra un array con el valor antes del cambio
+
+
+
+#
+</code></pre>
+<pre><code class="language-ruby"># ASIGNAR UN METODO - RELACION DE MANERA TEMPORARIA (define_singleton_method)
+shipment.define_singleton_method(:boxes) { box }
+# En este caso se esta asignanndo un box al modelo shipment de manera temporaria. Esto lo use en la serializacion del History en la vista Shipper 10-2024
+</code></pre>
+<pre><code class="language-ruby"># COMO STRING O CADENA
+string = &quot;Box&quot;
+string.constantize.find(1)
+# o
+string = &quot;Box&quot;
+Object.const_get(string).find(1)
+# este es mas seguro
+string = &quot;Box&quot;
+klass = string.safe_constantize
+klass&amp;.find(1)
+</code></pre>
+<pre><code class="language-ruby">#  REPLACE ActiveRecord::Associations::CollectionProxy model
+@shipment.boxes[index].attributes = old_model.attributes
+</code></pre>
+<pre><code class="language-ruby"># NEXT ID
+Shipment.connection.execute(&quot;SELECT nextval(&#39;#{Shipment.sequence_name}&#39;)&quot;)[0][&#39;nextval&#39;]
+</code></pre>
+<pre><code class="language-ruby"># FIND OR CREATE BY
+
+# Bloque
+AccountProviderCountry.find_or_create_by!(
+      account_provider: account_provider,
+      currency: currency,
+      country: country
+    ) do |record|
+      record.active = true
+      record.arrive_message = &#39;5 min a 1 hora&#39;
+      record.commission_type = 0
+      record.commission = 0
+    end
+
+# Sencillo
+    CountriesCurrency.find_or_create_by!(
+      country: country,
+      currency: currency,
+      is_available: true
+    )
+</code></pre>
+<pre><code class="language-ruby">class ArticlesController &lt; ApplicationController
+  before_action :set_article, only: %i[show edit update destroy]
+  before_action :require_user, except: %i[index show]
+  before_action :require_same_user, only: %i[edit update destroy]
+  # index
+  def index
+    @articles = Article.paginate(page: params[:page], per_page: 5)
+  end
+
+  # show
+  def show; end
+
+  # new
+  def new
+    @article = Article.new
+  end
+
+  # edit
+  def edit; end
+
+  # create
+  def create
+    @article = Article.new(article_params)
+    @article.user = current_user
+    if @article.save
+      flash[:notice] = &#39;Article has been created&#39;
+      redirect_to(@article)
+    else
+      render(:new, status: :unprocessable_entity)
+    end
+  end
+
+  # update
+  def update
+    if @article.update(article_params)
+      flash[:notice] = &#39;Article has been updated&#39;
+      redirect_to(@article)
+    else
+      render(:edit, status: :unprocessable_entity)
+    end
+  end
+
+  # destroy
+  def destroy
+    @article.destroy!
+    flash[:notice] = &#39;Article has been deleted&#39;
+    redirect_to(articles_path)
+  end
+
+  private
+
+  # get Article
+  def set_article
+    @article = Article.find(params[:id])
+  end
+
+  # article params
+  def article_params
+    params.require(:article).permit(:title, :description, category_ids: [])
+  end
+
+  # require_same_user
+  def require_same_user
+    if current_user != @article.user &amp;&amp; !current_user.admin?
+      flash[:alert] = &#39;You can only edit your own article&#39;
+      redirect_to(@article)
+    end
+  end
+end
+</code></pre>
+<pre><code class="language-ruby">module RulesBase
+  extend ActiveSupport::Concern
+
+  included do
+    skip_before_action :authenticate_user!
+    skip_before_action :verify_authenticity_token
+    before_action :set_default_response_format
+    rescue_from ActionController::ParameterMissing, ArgumentError, with: :handle_params_exception
+  end
+
+  protected
+
+  def handle_params_exception(exception)
+    render(json: {
+             error: {
+               title: &#39;Missing params&#39;,
+               detail: exception.message
+             },
+             xenvio_api: {
+               year: &#39;2024&#39;
+             },
+             status: :bad_request
+           })
+  end
+
+  def handle_error(errors, status)
+    error_array = []
+    errors.details.keys.each_with_index do |key, index|
+      error_array &lt;&lt; {
+        title: &quot;Invalid #{key}&quot;,
+        detail: errors.full_messages[index]
+      }
+    end
+
+    render(json: {
+             error: error_array,
+             xenvio_api: {
+               year: &#39;2024&#39;
+             },
+             status: status
+           })
+  end
+
+  def meta_xenvio
+    { xenvio_api:
+        {
+          year: &#39;2024&#39;
+        } }
+  end
+
+  def set_default_response_format
+    request.format = :json
+  end
+  
+  def ensure_json_request
+      render(json: { error: &#39;Not JSON request&#39; }, status: :not_found) unless request.format == :json
+  end
+  
+  def validate_number
+    params[:id].to_i.to_s == params[:id]
+  end
+end
+</code></pre>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

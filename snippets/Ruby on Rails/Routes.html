@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Routes · Ruby on Rails · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Ruby on Rails</span>
+    <span class="sep">/</span>
+    <span class="current">Routes</span></nav>
+  <main><h1>Routes</h1>
+<pre><code class="language-ruby"># examples:
+root &#39;users#index&#39;
+ 
+ 
+ 
+ 
+# normal
+get &quot;/users/&quot;, to: &quot;users#index&quot;
+get &quot;/users/:id&quot;, to: &quot;users#show&quot;
+ 
+ 
+ 
+ 
+# nested
+resources :users, only: [:index, :show, :new, :create, :edit, :update] do
+  resources :posts, only: [:index, :show]
+end
+
+
+
+
+# COLLECTION (cuando vas a operar con todo el Modelo)
+resources :pages, only: [:index] do
+    collection do
+      get &#39;test23&#39;, to: &quot;pages#test23&quot;
+    end
+end
+# test23_pages_path
+# /pages/test23(.:format)
+
+
+
+
+# MEMBER (Cuando vas a operar con una instancia del Modelo)
+resources :posts do
+    member do
+      get &quot;test23&quot;
+    end
+end
+#test23_post_path
+#/posts/:id/test23(.:format)
+
+
+
+
+# SCOPE: 
+# sirve para agrupar algunas rutas dentro de prefijo por ejemplo admin:
+scope &#39;/admin&#39; do
+    resources :movies
+end
+# movies_path	GET	/admin/movies(.:format)
+#o
+#tambien puedes asignarle un prefijo a los paths para que sea mas facil diferenciarlos: admin_articles_path
+scope path: &#39;/admin&#39;, as: &#39;admin&#39; do
+    resources :movies
+end
+#admin_movies_path	GET	/admin/movies(.:format)
+
+#Tambien sirve para indicar dentro de que modulo se encuentra el controlador pero sin usar el path
+scope module: &#39;shipper&#39; do
+  resources :shipment_finder, only: :index # Generara /shipment_finder y no /shipper/shipment_finder
+end
+# or
+resources :shipment_finder, path: &#39;search&#39;, only: [:show], module: &#39;shipper&#39;
+
+
+
+
+# PARA USAR OTRO NOMBRE DE RUTA
+resources :third_party_shipment_apps, path: &#39;app&#39;
+# en este caso la ruta sera /app y ya no /third_party_shipment_apps
+
+
+
+
+
+# RESOUCE singular sirve para indicar que el atribut o nested tiene una relacion de 1 a 1 con el padre o sea no tendra un id para identificarlo
+resources :posts do
+    resource :like
+end
+# /posts/:post_id/like
+
+
+
+#Namespace sirve para crear dentro de una carpeta Nova en la carpeta controlador y la ruta sera /nova/tito
+namespace :nova do
+    get :tito, to: &#39;nova#tito&#39;
+  end
+  
+  
+
+
+# MODULE sirve para crear el archivo del controlador de like dentro de una carpeta posts 
+# app/controllers/posts/likes_controller (class Posts::LikesController &lt; ApplicationController)
+#si vas a devolver AJAX JS tus vistas deben ir en views/posts/likes/create.js.haml
+resources :posts do
+    resource :like, module: :posts
+end
+
+
+
+
+# CONSTRAINTS
+get &#39;/posts/:slug&#39;, to: &#39;posts#show&#39;, constraints: { slug: /[a-z]+/ }
+#or
+get &#39;/posts/:slug&#39;, to: &#39;posts#show&#39;, slug: /[a-z]+/
+
+get &#39;/posts/:slug&#39;, to: &#39;posts#show&#39;, constraints: -&gt;(req) { req.params[:slug].length &lt; 10 }
+
+get &#39;/posts/:slug&#39;, to: &#39;posts#show&#39;, constraints: SlugLength.new
+# app/constraints/slug_length.rb
+class SlugLength
+  def matches?(request)
+    request.params[:slug].length &lt; 5
+  end
+end
+
+
+
+
+# REDIRECT
+get &#39;/amazing&#39;, to: redirect(&#39;controller#action&#39;)
+
+
+# Testear una ruta rapido create /pato
+match &quot;pato&quot;, to: -&gt; (env) { [200, {}, [&quot;Success!&quot;]] }, via: :get
+
+
+
+# Default response JSON o sea no necesitas poner /posts.json
+resources :posts, defaults: { format: :json }
+
+
+
+# Optional Segments
+get &#39;songs(/:genre)&#39;, to: &#39;songs#index&#39; # opcional con parentesis
+get &quot;songs(/:genre)&quot;, to: &quot;songs#index&quot;, defaults: { genre: &quot;rock&quot; }
+
+
+
+# SHALLOW genera nersted para index, new y create pero para los demas no
+resources :courses do
+  resources :lessons, shallow: true
+end
+
+
+
+
+
+# SOBREESCRIBIR :ID
+resources :shipment_finder,
+          path: &#39;search&#39;,
+          only: [:show],
+          module: &#39;shipper&#39;,
+          param: :shipment_number # aca sobreescribes :id por :shipment_number
+#or
+get &quot;posts/:slug&quot;, to: &quot;posts#show&quot;, as: &quot;post&quot;
+
+
+
+# Access URL Helper Methods
+# controller
+helpers.user_account_url
+# console
+app.root_path
+
+
+
+
+# ROUTE TO RACK
+match &#39;/my_app&#39;, to: CustomApp::MyApp, via: :all
+#or
+mount CustomApp::MyApp, at: &quot;/my_app&quot;
+
+# lib/custom_app/my_app.rb
+module CustomApp
+  module MyApp
+    def self.call(env)
+      [200, {}, [&quot;&lt;h1&gt;My app yeah!&lt;/h1&gt;&quot;]]
+    end
+  end
+end
+
+
+
+# CONCERN
+#En vez de declarar un resource nested en varios lugares asi:
+resources :posts do
+  resources :comments
+end
+
+resources :photos do
+  resources :comments
+end
+
+# Mejor lo haces asi:
+resources :posts, concerns: :commentable
+resources :photos, concerns: :commentable
+
+# Igual acepta un array resources :messages, concerns: [:commentable, :attachable, ...]
+</code></pre>
+<blockquote>
+<h1>Check all routes</h1>
+<p><a href="http://localhost:3000/rails/info/routes">http://localhost:3000/rails/info/routes</a></p>
+</blockquote>
+<h1>or</h1>
+<p>rails routes
+#or
+rails routes --expanded
+#or
+rails routes --expanded | grep &quot;edit&quot;</p>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

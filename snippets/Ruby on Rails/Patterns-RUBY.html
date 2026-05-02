@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patterns RUBY · Ruby on Rails · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Ruby on Rails</span>
+    <span class="sep">/</span>
+    <span class="current">Patterns RUBY</span></nav>
+  <main><h1>Patterns RUBY</h1>
+<pre><code class="language-ruby"># Primero, creamos un módulo Result para manejar éxitos y fracasos
+module Result
+  class Success
+    attr_reader :value
+    
+    def initialize(value)
+      @value = value
+    end
+
+    def success?
+      true
+    end
+
+    def bind(&amp;block)
+      block.call(@value)
+    end
+  end
+
+  class Failure
+    attr_reader :error
+    
+    def initialize(error)
+      @error = error
+    end
+
+    def success?
+      false
+    end
+
+    def bind(&amp;_block)
+      self
+    end
+  end
+end
+
+# Ejemplo de uso en un servicio de creación de usuario
+class UserCreationService
+  def self.create(params)
+    validate_params(params)
+      .bind { |valid_params| create_user(valid_params) }
+      .bind { |user| send_welcome_email(user) }
+  end
+
+  private
+
+  def self.validate_params(params)
+    if params[:email].present? &amp;&amp; params[:password].present?
+      Result::Success.new(params)
+    else
+      Result::Failure.new(&quot;Parámetros inválidos&quot;)
+    end
+  end
+
+  def self.create_user(params)
+    user = User.new(params)
+    if user.save
+      Result::Success.new(user)
+    else
+      Result::Failure.new(user.errors.full_messages.join(&quot;, &quot;))
+    end
+  end
+
+  def self.send_welcome_email(user)
+    UserMailer.welcome_email(user).deliver_now
+    Result::Success.new(user)
+  rescue StandardError =&gt; e
+    Result::Failure.new(&quot;Error enviando email: #{e.message}&quot;)
+  end
+end
+
+# Uso del servicio
+result = UserCreationService.create(email: &quot;user@example.com&quot;, password: &quot;consultar en local&quot;)
+
+if result.success?
+  puts &quot;Usuario creado exitosamente: #{result.value.email}&quot;
+else
+  puts &quot;Error: #{result.error}&quot;
+end
+</code></pre>
+<pre><code class="language-ruby"># Encapsula tanto los resultados exitosos como los errores en un solo objeto, evitando excepciones y mejorando la legibilidad del código
+</code></pre>
+<pre><code class="language-ruby"># SERVICE
+class PaymentService
+  def initialize(user, amount)
+    @user = user
+    @amount = amount
+  end
+
+  def call
+    process_payment
+  end
+
+  private
+
+  def failure(message)
+    Result.new(success: false, error: message)
+  end
+
+  def success(data = {})
+    Result.new(success: true, data: data)
+  end
+
+  def process_payment
+    return failure(&#39;invalid amount&#39;) unless @amount.positive?
+
+    ActiveRecord::Base.transaction do
+      # Logic
+      success({ result: &#39;success&#39; })
+    rescue StandardError =&gt; e
+      failure(e.message)
+    end
+  end
+end
+</code></pre>
+<pre><code class="language-ruby"># RESULT
+class Result
+  attr_reader :success, :error, :data
+
+  def initialize(success:, error: nil, data: nil)
+    @success = success
+    @error = error
+    @data = data
+  end
+
+  def success?
+    @success
+  end
+end
+</code></pre>
+<pre><code class="language-ruby"># CONTROLLER
+payment_service = PaymentService.new(User.find(1), 0).call
+if payment_service.success?
+  puts(&#39;yeah&#39;)
+else
+  puts(&#39;nop&#39;)
+end
+</code></pre>
+<pre><code class="language-ruby">class MyService
+  attr_reader :errors
+  
+  def initialize(data)
+    @data = data
+    @error = nil # @errors = []
+  end
+  
+  def call
+    start_logic
+  end
+  
+  private
+  
+  def start_logic
+    # ...
+  end
+end
+</code></pre>
+<p><img src="file:///.attachment/7BBC05FE-C895-4C06-B054-9BBD587F9BFE.png" alt="PastedGraphics"></p>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

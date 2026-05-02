@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Datatables · Ruby on Rails · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Ruby on Rails</span>
+    <span class="sep">/</span>
+    <span class="current">Datatables</span></nav>
+  <main><h1>Datatables</h1>
+<pre><code class="language-ruby"># application.js
+//= require jquery3
+//= require rails-ujs
+//= require jquery-ui
+//= require dataTables/jquery.dataTables
+//= require dataTables/extras/dataTables.scroller
+//= require dataTables/dataTables.yadcf.js
+//= require dataTables/dataTables.checkboxes.js
+
+# application.scss
+@import &#39;dataTables/jquery.dataTables&#39;;
+@import &#39;dataTables/extras/dataTables.tableTools&#39;;
+@import &#39;dataTables/dataTables.checkboxes.css&#39;;
+
+# view (esta opcion solo si tiene menos de 500 rows o elementos)
+Crear un table con un id especifico:
+%table#users.table
+  %thead
+    %tr
+      %th{:scope =&gt; &quot;col&quot;}
+      %th{:scope =&gt; &quot;col&quot;} #
+      %th{:scope =&gt; &quot;col&quot;} Id
+      %th{:scope =&gt; &quot;col&quot;} Name
+      %th{:scope =&gt; &quot;col&quot;} Age
+  %tbody
+    -@users.each_with_index do |user, index|
+      %tr
+        %td
+        %th{:scope =&gt; &quot;row&quot;}=index + 1
+        %td= user[:id]
+        %td= user[:name]
+        %td= user[:age]
+
+#*********************************
+# countries.js.coffee
+jQuery -&gt;
+    console.log(&#39;entre&#39;);
+    $(&#39;#users&#39;).dataTable({
+        order: [2, &#39;asc&#39;],
+        columnDefs: [{
+            targets: 0,
+            checkboxes: {selectRow: true}
+        }],
+        select: {style: &#39;multi&#39;},
+    })
+    
+    
+    
+#**************** repintar
+vTable.draw(false)
+
+
+
+
+
+#**************** Callbacks
+$(&#39;#example&#39;).DataTable({
+    &quot;initComplete&quot;: function(settings, json) {
+        alert(&#39;DataTable inicializado completamente&#39;);
+    }
+});
+
+$(&#39;#example&#39;).DataTable({
+    &quot;drawCallback&quot;: function(settings) {
+        alert(&#39;DataTable dibujado/re-dibujado&#39;);
+    }
+});
+</code></pre>
+<blockquote>
+<p>gem &#39;jquery-rails&#39;
+gem &#39;jquery-datatables-rails&#39;, &#39;~&gt; 3.4.0&#39;
+gem &#39;ajax-datatables-rails&#39;
+gem &#39;jquery-ui-rails&#39;</p>
+</blockquote>
+<p><a href="https://github.com/rweng/jquery-datatables-rails">https://github.com/rweng/jquery-datatables-rails</a></p>
+<pre><code class="language-ruby">
+//$.fn.dataTable.ext.errMode = &#39;none&#39;; #disable notifications
+
+1. rails generate datatable Movie
+
+
+2. routes
+concern :with_datatable do
+    post &#39;datatable&#39;, on: :collection
+  end
+
+resources :movies, only: [:index], concerns: [:with_datatable]
+
+
+
+3. controller
+class MoviesController &lt; ApplicationController
+  def index
+  end
+
+  def datatable
+    render json: MovieDatatable.new(params, view_context: view_context)
+  end
+end
+
+4. clase
+#application
+class ApplicationDatatable &lt; AjaxDatatablesRails::ActiveRecord
+
+    extend Forwardable
+    attr_reader :view
+
+    def initialize(params, opts = {})
+        @view = opts[:view_context]
+        super
+    end
+
+end
+
+#movies
+class MovieDatatable &lt; ApplicationDatatable
+
+  def view_columns
+    # Declare strings in this format: ModelName.column_name
+    # or in aliased_join_table.column_name format
+    @view_columns ||= {
+      id: { source: &quot;Movie.name&quot; },
+      name: { source: &quot;Movie.year&quot; }
+      user: { source: &quot;User.name&quot; } #aca pones el nombre de la tabla que tiene relacion no pongas Movie.user.name!
+    }
+  end
+
+  def data
+    records.map do |record|
+      {
+        name: record.name,
+        year: record.year
+      }
+    end
+  end
+
+  def get_raw_records
+    Movie.all
+  end
+
+end
+
+5. vista
+%table.table.card-table.hover.w-100#movies-datatable(data-source=&quot;#{datatable_movies_path(format: :json)}&quot;)
+    %thead
+        %tr
+            %th{:width =&gt; &quot;100&quot;} Name
+            %th{:width =&gt; &quot;100&quot;} Year
+    %tbody
+
+6. coffee
+$ -&gt;
+  $(&#39;#movies-datatable&#39;).dataTable
+    processing: true,
+    serverSide: true,
+    ajax:
+      url: $(&#39;#movies-datatable&#39;).data(&#39;source&#39;)
+      type: &#39;POST&#39;
+    pagingType: &#39;full_numbers&#39;
+    columns: [
+      {data: &#39;id&#39;},
+      {data: &#39;name&#39;},
+      {data: &#39;year&#39;},
+      {data: &#39;actions&#39;, &quot;searchable&quot;: false, &quot;orderable&quot;: false}
+    ],
+    order: [1, &#39;asc&#39;],    
+        columnDefs: [
+            { class: &quot;text-center&quot;, &quot;targets&quot;: [4, 5] }
+        ],
+        language: {
+            &quot;zeroRecords&quot;: &quot;No se encontraron registros coincidentes - &lt;button id=&#39;miBoton&#39;&gt;Haz clic aquí&lt;/button&gt;&quot;
+    },
+    searching: true,
+    responsive: true
+    
+Listo!!! no te olvides de lo que has sufrido. Lee la documentacion completa.
+
+yadcf
+{
+    column_number: 7,
+    select_type: &#39;select2&#39;,
+    style_class: &#39;form-control form-control-sm&#39;,
+    filter_reset_button_text: false,
+    filter_default_label: &#39;United States of America&#39;,
+    data: gon.countries,
+    select_type_options: {
+        allowClear: true,
+    },
+
+},
+
+
+
+
+#
+</code></pre>
+<pre><code class="language-ruby"># SEARCH
+
+# Cuando vas a buscar lo que quieres buscar lo pones en el metodo view_columns y el ID si o si. Puedes tener otros campos pero solo esos van en ese metodo!
+def view_columns
+    @view_columns ||= {
+      id: { source: &#39;Package.id&#39; },
+      store: { source: &#39;Store.name&#39; },
+      carrier: { source: &#39;Carrier.name&#39; },
+      mail_type: { source: &#39;MailType.name&#39; },
+    }
+  end
+  
+# Tienes que asegurarte que el modelo de la relacion que quieres buscar esta incluido dentro de la consulta SQL con join mejor no usese include:
+Package
+      .left_joins(:package_inventory)
+      .left_joins(:store)
+      .left_joins(mail_type: :carrier)
+      .where(account_id: User.current.account.id)
+
+# y en el JS le pones asi (opcional):
+searching: true,
+columns: [
+      {data: &#39;extra_id&#39;, &quot;searchable&quot;: false, &quot;orderable&quot;: false},
+      {data: &#39;name&#39;, &quot;searchable&quot;: true, &quot;orderable&quot;: true},
+      {data: &#39;warehouse&#39;, &quot;searchable&quot;: true, &quot;orderable&quot;: true},
+    ],
+</code></pre>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

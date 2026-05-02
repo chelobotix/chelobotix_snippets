@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Turbo Frame · Ruby on Rails · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Ruby on Rails</span>
+    <span class="sep">/</span>
+    <span class="current">Turbo Frame</span></nav>
+  <main><h1>Turbo Frame</h1>
+<pre><code class="language-ruby">#view
+&lt;%= form_tag search_crypto_path, data: { turbo_action: &quot;replace&quot; }, method: :get do %&gt;
+....
+
+&lt;%= render &#39;users/crypto&#39;, crypto: @crypto %&gt;
+
+#controller
+render(
+        turbo_stream: turbo_stream.replace(
+          &#39;response&#39;,
+          partial: &#39;users/crypto&#39;,
+          locals: { crypto: @crypto }
+        )
+      )
+      
+#partial
+&lt;%= turbo_frame_tag &#39;response&#39; do %&gt;
+...
+&lt;% end %&gt;
+</code></pre>
+<pre><code class="language-ruby"># Source index
+&lt;div class=&quot;border-[2px] border-black m-3 p-3&quot;&gt;
+  &lt;h2 class=&quot;text-2xl&quot;&gt;Basic&lt;/h2&gt;
+  &lt;%= turbo_frame_tag &quot;about_turbo_frame&quot; do %&gt;
+    &lt;%= link_to &#39;About&#39;, about_path, class: &quot;text-lime-500 text-xl&quot; %&gt;
+  &lt;% end %&gt;
+&lt;/div&gt;
+
+
+# Target about
+&lt;%= turbo_frame_tag &quot;about_turbo_frame&quot; do %&gt;
+  &lt;div&gt;information about this page&lt;/div&gt;
+&lt;% end %&gt;
+
+</code></pre>
+<pre><code class="language-ruby"># index
+&lt;div class=&quot;border-[2px] border-black m-3 p-3&quot;&gt;
+  &lt;h2 class=&quot;text-2xl&quot;&gt;Nested&lt;/h2&gt;
+  &lt;%= link_to &quot;Update square 2&quot;, about_path, data: { turbo_frame: &#39;square2&#39; }, class:&quot;text-indigo-500 text-xl&quot; %&gt;
+  &lt;%= turbo_frame_tag &quot;square2&quot; do %&gt;
+    &lt;div&gt;Square 1&lt;/div&gt;
+  &lt;% end %&gt;
+&lt;/div&gt;
+
+# about
+&lt;%= turbo_frame_tag &quot;square2&quot; do %&gt;
+  &lt;div class=&quot;bg-lime-700 text-white w-[150px]&quot;&gt;Square 2&lt;/div&gt;
+&lt;% end %&gt;
+</code></pre>
+<pre><code class="language-ruby"># index
+&lt;div class=&quot;border-[2px] border-black m-3 p-3 flex flex-col gap-5&quot;&gt;
+  &lt;h2 class=&quot;text-2xl&quot;&gt;De ida y vuelta&lt;/h2&gt;
+  &lt;%= turbo_frame_tag &quot;idayvuelta&quot; do %&gt;
+    &lt;%= link_to &quot;Open Form&quot;, idayvuelta_path, class: &quot;bg-lime-500 text-white p-3&quot;  %&gt;
+  &lt;% end %&gt;
+  &lt;/div&gt;
+  
+# idayvuelta
+&lt;%= turbo_frame_tag &quot;idayvuelta&quot; do %&gt;
+    &lt;%= form_with scope: :test, url: processidayvuelta_path do |f| %&gt;
+      &lt;%= f.text_field :text, required: true, class: &#39;w-50&#39; %&gt;
+      &lt;%= f.submit &quot;Send&quot;, class: &#39;px-5&#39; %&gt;
+    &lt;% end %&gt;
+&lt;% end %&gt;
+
+#controller
+
+def idayvuelta; end
+
+def processidayvuelta
+redirect_to(root_path, notice: &#39;Quote was successfully updated.&#39;)
+end
+</code></pre>
+<pre><code class="language-coffeescript"># If the quote is persisted and its id is 1:
+dom_id(@quote) # =&gt; &quot;quote_1&quot;
+
+# If the quote is a new record:
+dom_id(Quote.new) # =&gt; &quot;new_quote&quot;
+
+# Note that the dom_id can also take an optional prefix argument
+# We will use this later in the tutorial
+dom_id(Quote.new, &quot;prefix&quot;) # &quot;prefix_new_quote&quot;
+
+
+#Equivalence (all are the same)
+&lt;%= turbo_frame_tag &quot;quote_#{@quote.id}&quot; do %&gt;
+  ...
+
+&lt;%= turbo_frame_tag dom_id(@quote) do %&gt;
+  ...
+
+&lt;%= turbo_frame_tag @quote %&gt;
+  ...
+</code></pre>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

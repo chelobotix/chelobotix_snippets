@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SSH Key · Terminal Shell · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Terminal Shell</span>
+    <span class="sep">/</span>
+    <span class="current">SSH Key</span></nav>
+  <main><h1>SSH Key</h1>
+<pre><code class="language-shell"># VER LAS CLAVES
+ls -la ~/.ssh
+</code></pre>
+<pre><code class="language-shell"># GENERAR NUEVA CLAVE
+# ed25519 no es el nombr e sino el algoritmo
+ssh-keygen -t ed25519 -C &quot;tu_correo@example.com&quot;
+</code></pre>
+<pre><code class="language-shell"># CONFIGURAR CLAVES
+nano ~/.ssh/config
+
+# Configuración para GitHub
+Host github.com
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_ed25519_github
+
+# Configuración para GitLab
+Host gitlab.com
+  HostName gitlab.com
+  User git
+  IdentityFile ~/.ssh/id_ed25519_gitlab
+
+</code></pre>
+<p>Entiendo que necesitas generar una nueva llave SSH para tu cuenta de GitLab asociada al repositorio de <strong>Vitawallet</strong>, asegurándote de que esta llave sea distinta de otra llave SSH que ya usas para otra cuenta de GitLab con un repositorio diferente. Además, quieres que la llave tenga una referencia al nombre &quot;vitawallet&quot; para diferenciarla, y necesitas un flujo completo, desde la generación hasta la comprobación de que ambas llaves funcionan para realizar operaciones como <code>pull</code> y <code>push</code>. Dado tu contexto (aplicación Rails en Docker, pruebas con Selenium, RubyMine, y optimizaciones como <strong>jemalloc</strong>), te proporcionaré una respuesta detallada siguiendo el formato solicitado, adaptada a tu nivel de experiencia como desarrollador Junior que aspira a alcanzar el nivel Mid.</p>
+<hr>
+<h3><strong>NIVEL DE LA PREGUNTA: Junior</strong></h3>
+<p><strong>Explicación de por qué se considera de este nivel</strong>:
+Generar y configurar llaves SSH para GitLab requiere conocimientos básicos de Git, comandos de terminal, y conceptos de autenticación segura. Es una tarea común para desarrolladores Junior que están aprendiendo a gestionar repositorios remotos. Sin embargo, manejar múltiples llaves SSH para diferentes cuentas de GitLab añade una capa de complejidad intermedia, como configurar el archivo <code>~/.ssh/config</code>, lo que se alinea con tu objetivo de alcanzar el nivel Mid. No involucra temas avanzados como gestionar llaves en entornos de CI/CD o automatización compleja, que serían más propios de un nivel Senior.</p>
+<hr>
+<h3><strong>EXPLICACIÓN Y JUSTIFICACIÓN DE LA RESPUESTA</strong></h3>
+<h4><strong>Contexto: Llaves SSH en GitLab</strong></h4>
+<p>Las llaves SSH permiten autenticarte con GitLab sin necesidad de ingresar tu nombre de usuario y contraseña en cada operación Git (<code>clone</code>, <code>pull</code>, <code>push</code>). Una llave SSH consta de:</p>
+<ul>
+<li><strong>Llave privada</strong>: Se almacena en tu máquina y debe protegerse.</li>
+<li><strong>Llave pública</strong>: Se registra en GitLab y se asocia a tu cuenta.</li>
+</ul>
+<p>Tu caso requiere:</p>
+<ol>
+<li>Generar una nueva llave SSH con una referencia a &quot;vitawallet&quot; (por ejemplo, nombrarla <code>id_ed25519_vitawallet</code>) para tu cuenta de GitLab asociada al repositorio de Vitawallet.</li>
+<li>Configurar el archivo <code>~/.ssh/config</code> para asociar cada llave SSH con la cuenta y repositorio correctos, evitando conflictos con tu otra llave SSH (que llamaremos <code>id_ed25519_other</code> para el otro repositorio).</li>
+<li>Asegurar que ambas llaves funcionen para realizar operaciones Git en sus respectivos repositorios.</li>
+<li>Comprobar que todo está configurado correctamente.</li>
+</ol>
+<h4><strong>Por qué necesitamos un archivo <code>~/.ssh/config</code></strong></h4>
+<p>Cuando tienes múltiples llaves SSH, GitLab no sabe automáticamente cuál usar para cada repositorio. El archivo <code>~/.ssh/config</code> permite especificar qué llave privada usar para cada host (por ejemplo, <code>gitlab.com</code> para Vitawallet y otro host o alias para el otro repositorio). Usaremos alias de host para diferenciar las conexiones y asociarlas a las llaves correctas.</p>
+<h4><strong>Flujo general</strong></h4>
+<ol>
+<li>Generar una nueva llave SSH para Vitawallet.</li>
+<li>Añadir la llave pública a tu cuenta de GitLab para Vitawallet.</li>
+<li>Configurar el archivo <code>~/.ssh/config</code> para manejar ambas llaves.</li>
+<li>Añadir la llave privada al agente SSH (<code>ssh-agent</code>).</li>
+<li>Configurar el repositorio local de Vitawallet para usar la URL SSH correcta.</li>
+<li>Comprobar que puedes realizar <code>pull</code> y <code>push</code> en el repositorio de Vitawallet.</li>
+<li>Verificar que la otra llave SSH sigue funcionando para el otro repositorio.</li>
+</ol>
+<h4><strong>Asunciones</strong></h4>
+<ul>
+<li>Estás usando un sistema basado en Unix (Linux, macOS, o WSL en Windows), ya que mencionaste Docker y <strong>jemalloc</strong>.</li>
+<li>Tienes Git instalado y acceso a la terminal.</li>
+<li>Tus cuentas de GitLab son:<ul>
+<li><strong>Cuenta A</strong>: Para el repositorio de Vitawallet (por ejemplo, <code>user_vitawallet@gitlab.com</code>).</li>
+<li><strong>Cuenta B</strong>: Para el otro repositorio (por ejemplo, <code>user_other@gitlab.com</code>).</li>
+</ul>
+</li>
+<li>Los repositorios son:<ul>
+<li><strong>Repositorio Vitawallet</strong>: <code>git@gitlab.com:user_vitawallet/vitawallet.git</code>.</li>
+<li><strong>Otro repositorio</strong>: <code>git@gitlab.com:user_other/other_repo.git</code>.</li>
+</ul>
+</li>
+<li>Si usas Windows, trabajarás en Git Bash o WSL para los comandos SSH.</li>
+</ul>
+<h4><strong>Justificación</strong></h4>
+<p>La solución usa el algoritmo <code>ed25519</code> (recomendado por GitLab por ser más seguro y compacto que RSA) y nombra las llaves de forma descriptiva (<code>id_ed25519_vitawallet</code> y <code>id_ed25519_other</code>) para evitar confusión. El archivo <code>~/.ssh/config</code> garantiza que cada llave se use solo para la cuenta y repositorio correctos. La comprobación final asegura que ambas llaves funcionan, integrándose con tu entorno Dockerizado (para ejecutar comandos Git) y RubyMine (para depuración).</p>
+<hr>
+<h3><strong>SOLUCIÓN: Código</strong></h3>
+<p>A continuación, te detallo cada paso del flujo, incluyendo comandos, configuraciones, y comprobaciones.</p>
+<h4><strong>Paso 1: Generar una nueva llave SSH para Vitawallet</strong></h4>
+<ol>
+<li><p><strong>Abrir la terminal</strong>:</p>
+<ul>
+<li>En Linux/macOS: Usa la terminal nativa.</li>
+<li>En Windows: Usa Git Bash o WSL (recomendado, dado tu uso de Docker).</li>
+</ul>
+</li>
+<li><p><strong>Generar la llave SSH</strong>:</p>
+<pre><code class="language-bash">ssh-keygen -t ed25519 -C &quot;vitawallet@your_email.com&quot; -f ~/.ssh/id_ed25519_vitawallet
+</code></pre>
+<ul>
+<li><strong>Explicación</strong>:<ul>
+<li><code>-t ed25519</code>: Usa el algoritmo <code>ed25519</code> (seguro y recomendado por GitLab).</li>
+<li><code>-C &quot;vitawallet@your_email.com&quot;</code>: Añade un comentario para identificar la llave (usa el correo asociado a tu cuenta de GitLab para Vitawallet).</li>
+<li><code>-f ~/.ssh/id_ed25519_vitawallet</code>: Especifica el nombre del archivo para la llave (<code>id_ed25519_vitawallet</code> para la privada, <code>id_ed25519_vitawallet.pub</code> para la pública).</li>
+</ul>
+</li>
+<li><strong>Prompts</strong>:<ul>
+<li><strong>Archivo</strong>: Se autocompleta con <code>~/.ssh/id_ed25519_vitawallet</code> (presiona Enter).</li>
+<li><strong>Passphrase</strong>: Por simplicidad, presiona Enter para no usar passphrase (si usas una, deberás ingresarla en cada operación Git, a menos que uses <code>ssh-agent</code> con <code>keychain</code>).</li>
+</ul>
+</li>
+<li><strong>Resultado</strong>:<ul>
+<li>Se generan dos archivos en <code>~/.ssh/</code>:<ul>
+<li><code>id_ed25519_vitawallet</code>: Llave privada.</li>
+<li><code>id_ed25519_vitawallet.pub</code>: Llave pública.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>Verificar los archivos</strong>:</p>
+<pre><code class="language-bash">ls ~/.ssh/
+</code></pre>
+<ul>
+<li>Deberías ver <code>id_ed25519_vitawallet</code> y <code>id_ed25519_vitawallet.pub</code> (y probablemente los archivos de tu otra llave, como <code>id_ed25519_other</code> y <code>id_ed25519_other.pub</code>).</li>
+</ul>
+</li>
+<li><p><strong>Proteger los permisos</strong>:</p>
+<pre><code class="language-bash">chmod 600 ~/.ssh/id_ed25519_vitawallet
+chmod 644 ~/.ssh/id_ed25519_vitawallet.pub
+</code></pre>
+<ul>
+<li>Esto asegura que la llave privada sea legible solo por ti y la pública sea accesible.</li>
+</ul>
+</li>
+</ol>
+<h4><strong>Paso 2: Añadir la llave pública a tu cuenta de GitLab (Vitawallet)</strong></h4>
+<ol>
+<li><p><strong>Copiar la llave pública</strong>:</p>
+<pre><code class="language-bash">cat ~/.ssh/id_ed25519_vitawallet.pub
+</code></pre>
+<ul>
+<li>Copia el contenido (por ejemplo, <code>ssh-ed25519 AAAA... vitawallet@your_email.com</code>) al portapapeles.</li>
+<li>En Windows (Git Bash), puedes usar:<pre><code class="language-bash">clip &lt; ~/.ssh/id_ed25519_vitawallet.pub
+</code></pre>
+</li>
+</ul>
+</li>
+<li><p><strong>Iniciar sesión en GitLab</strong>:</p>
+<ul>
+<li>Ve a <a href="https://gitlab.com">https://gitlab.com</a> y accede con tu cuenta de Vitawallet (<code>user_vitawallet</code>).</li>
+</ul>
+</li>
+<li><p><strong>Añadir la llave SSH</strong>:</p>
+<ul>
+<li>Navega a <strong>Settings &gt; SSH Keys</strong> (o directamente a <code>https://gitlab.com/-/profile/keys</code>).</li>
+<li>Pega la llave pública en el campo <strong>Key</strong>.</li>
+<li>Asigna un <strong>Title</strong> descriptivo, como <code>Vitawallet Key</code>.</li>
+<li>(Opcional) Configura una <strong>Expiration date</strong> para mayor seguridad.</li>
+<li>Haz clic en <strong>Add key</strong>.</li>
+</ul>
+</li>
+<li><p><strong>Verificar que la llave se añadió</strong>:</p>
+<ul>
+<li>En <strong>Settings &gt; SSH Keys</strong>, deberías ver la llave con el título <code>Vitawallet Key</code>.</li>
+</ul>
+</li>
+</ol>
+<h4><strong>Paso 3: Configurar el archivo <code>~/.ssh/config</code> para múltiples llaves</strong></h4>
+<ol>
+<li><p><strong>Crear o editar el archivo <code>~/.ssh/config</code></strong>:</p>
+<pre><code class="language-bash">touch ~/.ssh/config
+chmod 600 ~/.ssh/config
+nano ~/.ssh/config  # O usa tu editor preferido (vim, code, etc.)
+</code></pre>
+</li>
+<li><p><strong>Añadir la configuración</strong>:
+Pega el siguiente contenido, ajustando los detalles según tus cuentas:</p>
+<pre><code class="language-text"># Cuenta de Vitawallet en GitLab
+Host gitlab-vitawallet
+    HostName gitlab.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_vitawallet
+    IdentitiesOnly yes
+
+# Otra cuenta en GitLab
+Host gitlab-other
+    HostName gitlab.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_other
+    IdentitiesOnly yes
+</code></pre>
+<ul>
+<li><strong>Explicación</strong>:<ul>
+<li><strong>Host</strong>: Alias para diferenciar las conexiones (<code>gitlab-vitawallet</code> y <code>gitlab-other</code>).</li>
+<li><strong>HostName</strong>: El dominio real (<code>gitlab.com</code> para ambas cuentas, ya que ambas están en GitLab SaaS).</li>
+<li><strong>User</strong>: Siempre <code>git</code> para conexiones SSH a GitLab.</li>
+<li><strong>IdentityFile</strong>: Ruta a la llave privada correspondiente.</li>
+<li><strong>IdentitiesOnly yes</strong>: Fuerza el uso de la llave especificada, evitando que SSH intente otras llaves.</li>
+</ul>
+</li>
+<li>Guarda y cierra el archivo (<code>Ctrl+O</code>, <code>Enter</code>, <code>Ctrl+X</code> en nano).</li>
+</ul>
+</li>
+<li><p><strong>Verificar los permisos</strong>:</p>
+<pre><code class="language-bash">ls -l ~/.ssh/config
+</code></pre>
+<ul>
+<li>Debería mostrar permisos <code>-rw-------</code> (solo tú puedes leer/escribir).</li>
+</ul>
+</li>
+</ol>
+<h4><strong>Paso 4: Iniciar el agente SSH y añadir las llaves</strong></h4>
+<ol>
+<li><p><strong>Iniciar el agente SSH</strong>:</p>
+<pre><code class="language-bash">eval &quot;$(ssh-agent -s)&quot;
+</code></pre>
+<ul>
+<li>Esto inicia el agente SSH, que gestiona las llaves privadas en memoria.</li>
+</ul>
+</li>
+<li><p><strong>Añadir las llaves privadas</strong>:</p>
+<pre><code class="language-bash">ssh-add ~/.ssh/id_ed25519_vitawallet
+ssh-add ~/.ssh/id_ed25519_other
+</code></pre>
+<ul>
+<li>Verifica que las llaves se añadieron:<pre><code class="language-bash">ssh-add -l
+</code></pre>
+<ul>
+<li>Deberías ver ambas llaves (por ejemplo, <code>256 SHA256:... vitawallet@your_email.com</code> y la otra).</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>(Opcional) Hacer que las llaves se carguen automáticamente</strong>:</p>
+<ul>
+<li>En Linux/macOS, añade al archivo <code>~/.bashrc</code> o <code>~/.zshrc</code>:<pre><code class="language-bash">eval &quot;$(ssh-agent -s)&quot;
+ssh-add ~/.ssh/id_ed25519_vitawallet
+ssh-add ~/.ssh/id_ed25519_other
+</code></pre>
+</li>
+<li>Guarda y recarga la configuración:<pre><code class="language-bash">source ~/.bashrc  # O ~/.zshrc
+</code></pre>
+</li>
+</ul>
+</li>
+</ol>
+<h4><strong>Paso 5: Configurar el repositorio de Vitawallet</strong></h4>
+<ol>
+<li><p><strong>Clonar el repositorio (si no lo tienes)</strong>:</p>
+<ul>
+<li>Obtén la URL SSH del repositorio de Vitawallet desde GitLab:<ul>
+<li>Ve a tu repositorio (<code>https://gitlab.com/user_vitawallet/vitawallet</code>).</li>
+<li>Haz clic en <strong>Clone</strong> y copia la URL SSH (por ejemplo, <code>git@gitlab.com:user_vitawallet/vitawallet.git</code>).</li>
+</ul>
+</li>
+<li>Modifica la URL para usar el alias <code>gitlab-vitawallet</code>:<pre><code class="language-text">git@gitlab-vitawallet:user_vitawallet/vitawallet.git
+</code></pre>
+</li>
+<li>Clona el repositorio:<pre><code class="language-bash">git clone git@gitlab-vitawallet:user_vitawallet/vitawallet.git
+cd vitawallet
+</code></pre>
+</li>
+</ul>
+</li>
+<li><p><strong>Si ya tienes el repositorio clonado</strong>:</p>
+<ul>
+<li>Cambia la URL remota para usar el alias <code>gitlab-vitawallet</code>:<pre><code class="language-bash">cd /ruta/al/repositorio/vitawallet
+git remote set-url origin git@gitlab-vitawallet:user_vitawallet/vitawallet.git
+</code></pre>
+</li>
+<li>Verifica la URL:<pre><code class="language-bash">git remote -v
+</code></pre>
+<ul>
+<li>Deberías ver:<pre><code>origin  git@gitlab-vitawallet:user_vitawallet/vitawallet.git (fetch)
+origin  git@gitlab-vitawallet:user_vitawallet/vitawallet.git (push)
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>Configurar nombre y correo</strong>:</p>
+<ul>
+<li>Asegúrate de que el repositorio use el nombre y correo de tu cuenta de Vitawallet:<pre><code class="language-bash">git config user.name &quot;Your Vitawallet Name&quot;
+git config user.email &quot;vitawallet@your_email.com&quot;
+</code></pre>
+</li>
+</ul>
+</li>
+</ol>
+<h4><strong>Paso 6: Configurar el otro repositorio</strong></h4>
+<ol>
+<li><p><strong>Verificar o configurar la URL remota</strong>:</p>
+<ul>
+<li>Si ya tienes el otro repositorio clonado:<pre><code class="language-bash">cd /ruta/al/repositorio/other_repo
+git remote set-url origin git@gitlab-other:user_other/other_repo.git
+</code></pre>
+</li>
+<li>Verifica la URL:<pre><code class="language-bash">git remote -v
+</code></pre>
+<ul>
+<li>Deberías ver:<pre><code>origin  git@gitlab-other:user_other/other_repo.git (fetch)
+origin  git@gitlab-other:user_other/other_repo.git (push)
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>Configurar nombre y correo</strong>:</p>
+<ul>
+<li>Asegúrate de que el repositorio use el nombre y correo de tu otra cuenta:<pre><code class="language-bash">git config user.name &quot;Your Other Name&quot;
+git config user.email &quot;other@your_email.com&quot;
+</code></pre>
+</li>
+</ul>
+</li>
+</ol>
+<h4><strong>Paso 7: Comprobar que ambas llaves funcionan</strong></h4>
+<ol>
+<li><p><strong>Probar la conexión SSH para Vitawallet</strong>:</p>
+<pre><code class="language-bash">ssh -T git@gitlab-vitawallet
+</code></pre>
+<ul>
+<li>Deberías ver un mensaje como:<pre><code>Welcome to GitLab, @user_vitawallet!
+</code></pre>
+</li>
+<li>Si aparece un error como <code>Permission denied (publickey)</code>, revisa:<ul>
+<li>Que la llave pública está en GitLab.</li>
+<li>Que la llave privada está en <code>ssh-agent</code> (<code>ssh-add -l</code>).</li>
+<li>Que el archivo <code>~/.ssh/config</code> está correcto.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>Probar operaciones Git en el repositorio de Vitawallet</strong>:</p>
+<ul>
+<li>En el directorio del repositorio:<pre><code class="language-bash">cd /ruta/al/repositorio/vitawallet
+touch test.txt
+git add test.txt
+git commit -m &quot;Test commit for Vitawallet&quot;
+git push origin main
+</code></pre>
+</li>
+<li>Deberías ver que el <code>push</code> se completa sin pedir credenciales.</li>
+<li>Verifica en GitLab (<code>https://gitlab.com/user_vitawallet/vitawallet</code>) que el archivo <code>test.txt</code> está en el repositorio.</li>
+<li>Prueba un <code>pull</code>:<pre><code class="language-bash">git pull origin main
+</code></pre>
+<ul>
+<li>Debería funcionar sin errores.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>Probar la conexión SSH para el otro repositorio</strong>:</p>
+<pre><code class="language-bash">ssh -T git@gitlab-other
+</code></pre>
+<ul>
+<li>Deberías ver:<pre><code>Welcome to GitLab, @user_other!
+</code></pre>
+</li>
+</ul>
+</li>
+<li><p><strong>Probar operaciones Git en el otro repositorio</strong>:</p>
+<ul>
+<li>En el directorio del repositorio:<pre><code class="language-bash">cd /ruta/al/repositorio/other_repo
+touch test_other.txt
+git add test_other.txt
+git commit -m &quot;Test commit for other repo&quot;
+git push origin main
+</code></pre>
+</li>
+<li>Verifica en GitLab (<code>https://gitlab.com/user_other/other_repo</code>) que el archivo <code>test_other.txt</code> está en el repositorio.</li>
+<li>Prueba un <code>pull</code>:<pre><code class="language-bash">git pull origin main
+</code></pre>
+</li>
+</ul>
+</li>
+</ol>
+<h4><strong>Paso 8: Integración con tu entorno</strong></h4>
+<ul>
+<li><p><strong>Docker</strong>:</p>
+<ul>
+<li>Si trabajas dentro de un contenedor Docker (por ejemplo, el servicio <code>app</code> en tu <code>docker-compose.yml</code>), asegúrate de que los archivos <code>~/.ssh/</code> estén montados en el contenedor:<pre><code class="language-yaml"># docker-compose.yml
+services:
+  app:
+    image: ruby:3.2
+    volumes:
+      - ~/.ssh:/root/.ssh:ro  # Monta el directorio SSH
+    # ... resto de la configuración ...
+</code></pre>
+</li>
+<li>Ejecuta comandos Git dentro del contenedor:<pre><code class="language-bash">docker-compose exec app bash
+git clone git@gitlab-vitawallet:user_vitawallet/vitawallet.git
+</code></pre>
+</li>
+</ul>
+</li>
+<li><p><strong>RubyMine</strong>:</p>
+<ul>
+<li>Configura Git en RubyMine:<ul>
+<li>Ve a <code>File &gt; Settings &gt; Version Control &gt; Git</code>.</li>
+<li>Asegúrate de que <code>SSH executable</code> esté en <code>Native</code>.</li>
+</ul>
+</li>
+<li>Depura operaciones Git usando la pestaña <code>Git</code> en RubyMine para inspeccionar commits y remotos.</li>
+</ul>
+</li>
+<li><p><strong>Selenium</strong>:</p>
+<ul>
+<li>No es necesario para esta tarea, pero si usas Selenium para pruebas end-to-end, puedes verificar que los cambios empujados (<code>test.txt</code>) aparecen en una interfaz web relacionada con el repositorio.</li>
+</ul>
+</li>
+<li><p><strong>jemalloc</strong>:</p>
+<ul>
+<li>La optimización de memoria con <strong>jemalloc</strong> no afecta directamente las operaciones SSH/Git, pero asegura que tu contenedor <code>app</code> sea eficiente al clonar o trabajar con repositorios grandes.</li>
+</ul>
+</li>
+</ul>
+<h4><strong>Solución de problemas comunes</strong></h4>
+<ul>
+<li><strong>Error: <code>Permission denied (publickey)</code></strong>:<ul>
+<li>Verifica que la llave pública está en GitLab.</li>
+<li>Asegúrate de que <code>ssh-agent</code> tiene la llave (<code>ssh-add ~/.ssh/id_ed25519_vitawallet</code>).</li>
+<li>Comprueba que la URL remota usa el alias correcto (<code>git@gitlab-vitawallet:...</code>).</li>
+</ul>
+</li>
+<li><strong>SSH usa la llave equivocada</strong>:<ul>
+<li>Asegúrate de que <code>IdentitiesOnly yes</code> está en <code>~/.ssh/config</code>.</li>
+</ul>
+</li>
+<li><strong>Repositorio no clona</strong>:<ul>
+<li>Verifica la URL SSH en GitLab y que tienes permisos en el repositorio.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3><strong>PATRONES DE DISEÑO</strong></h3>
+<p><strong>Patrón recomendado: Adaptador (Adapter)</strong></p>
+<p>El archivo <code>~/.ssh/config</code> actúa como un adaptador, mapeando conexiones SSH a las llaves privadas correctas según el host alias (<code>gitlab-vitawallet</code> o <code>gitlab-other</code>).</p>
+<p><strong>Flujo lógico del patrón paso a paso</strong>:</p>
+<ol>
+<li><strong>Contexto</strong>: Necesitas usar múltiples llaves SSH para diferentes cuentas de GitLab.</li>
+<li><strong>Adaptador</strong>: El archivo <code>~/.ssh/config</code> traduce alias de host a configuraciones específicas (llave privada, hostname).</li>
+<li><strong>Implementación</strong>: Define alias (<code>gitlab-vitawallet</code>, <code>gitlab-other</code>) con las llaves correspondientes.</li>
+<li><strong>Beneficio</strong>: Permite que Git use la llave correcta automáticamente, sin intervención manual.</li>
+</ol>
+<hr>
+<h3><strong>CONSIDERACIONES DE SEGURIDAD</strong></h3>
+<h4><strong>Posibles vulnerabilidades</strong></h4>
+<ol>
+<li><p><strong>Exposición de la llave privada</strong>:</p>
+<ul>
+<li>Si <code>id_ed25519_vitawallet</code> se comparte o se almacena en un lugar inseguro, un atacante podría acceder a tu repositorio.</li>
+<li><strong>Mitigación</strong>: Mantén permisos estrictos (<code>chmod 600</code>) y nunca compartas la llave privada.</li>
+</ul>
+</li>
+<li><p><strong>Configuración incorrecta de <code>~/.ssh/config</code></strong>:</p>
+<ul>
+<li>Si omites <code>IdentitiesOnly yes</code>, SSH podría intentar usar la llave equivocada, causando errores de autenticación.</li>
+<li><strong>Mitigación</strong>: Incluye <code>IdentitiesOnly yes</code> en cada bloque de <code>~/.ssh/config</code>.</li>
+</ul>
+</li>
+<li><p><strong>Passphrase omitida</strong>:</p>
+<ul>
+<li>Sin passphrase, si alguien accede a tu máquina, podría usar la llave privada.</li>
+<li><strong>Mitigación</strong>: Considera usar una passphrase y <code>ssh-agent</code> con <code>keychain</code> para automatizar:<pre><code class="language-bash">sudo apt-get install keychain  # En Ubuntu
+echo &#39;/usr/bin/keychain --nogui ~/.ssh/id_ed25519_vitawallet&#39; &gt;&gt; ~/.bashrc
+</code></pre>
+</li>
+</ul>
+</li>
+<li><p><strong>Repositorios en contenedores Docker</strong>:</p>
+<ul>
+<li>Si montas <code>~/.ssh/</code> en un contenedor, asegúrate de que el contenedor sea seguro.</li>
+<li><strong>Mitigación</strong>: Usa volúmenes de solo lectura (<code>:ro</code>) y elimina contenedores innecesarios.</li>
+</ul>
+</li>
+</ol>
+<h4><strong>Mejores prácticas de seguridad</strong></h4>
+<ul>
+<li><strong>Proteger llaves privadas</strong>: Almacena copias de seguridad en un lugar seguro (por ejemplo, un administrador de contraseñas o un dispositivo cifrado).</li>
+<li><strong>Usar algoritmos seguros</strong>: Prefiere <code>ed25519</code> sobre RSA, como hicimos.</li>
+<li><strong>Revocar llaves comprometidas</strong>: Si sospechas que una llave está comprometida, elimínala de GitLab y genera una nueva.</li>
+<li><strong>Auditar accesos</strong>: Revisa regularmente las llaves SSH en <code>Settings &gt; SSH Keys</code> de tus cuentas de GitLab.</li>
+<li><strong>Integrar Brakeman</strong>: Aunque no está relacionado con SSH, ejecuta Brakeman en tu aplicación Rails para detectar otras vulnerabilidades:<pre><code class="language-bash">docker-compose exec app brakeman
+</code></pre>
+</li>
+</ul>
+<hr>
+<h3><strong>RUTA DE APRENDIZAJE</strong></h3>
+<p>Para alcanzar el nivel <strong>Mid</strong> como desarrollador Rails, profundiza en los siguientes temas relacionados con SSH y Git:</p>
+<ol>
+<li><p><strong>Gestión de llaves SSH</strong>:</p>
+<ul>
+<li>Aprende a usar <code>ssh-agent</code> y <code>keychain</code> para manejar passphrases.</li>
+<li>Estudia cómo configurar llaves SSH en entornos CI/CD (por ejemplo, GitLab CI).</li>
+</ul>
+</li>
+<li><p><strong>Configuración avanzada de Git</strong>:</p>
+<ul>
+<li>Explora <code>git config</code> para configuraciones por repositorio.</li>
+<li>Aprende a usar <code>core.sshCommand</code> para especificar llaves por repositorio:<pre><code class="language-bash">git config core.sshCommand &quot;ssh -i ~/.ssh/id_ed25519_vitawallet -F /dev/null&quot;
+</code></pre>
+</li>
+</ul>
+</li>
+<li><p><strong>Seguridad en desarrollo</strong>:</p>
+<ul>
+<li>Estudia cómo proteger credenciales en entornos Dockerizados.</li>
+<li>Aprende a usar herramientas como <code>vault</code> para gestionar secretos.</li>
+</ul>
+</li>
+<li><p><strong>Automatización con GitLab CI</strong>:</p>
+<ul>
+<li>Configura pipelines en GitLab CI que usen llaves SSH como <strong>Deploy Keys</strong> para clonar repositorios privados.</li>
+</ul>
+</li>
+</ol>
+<p><strong>Recursos recomendados</strong>:</p>
+<ul>
+<li><strong>GitLab Documentation</strong>: <a href="https://docs.gitlab.com/ee/user/ssh.html">Use SSH keys to communicate with GitLab</a><a href="https://docs.gitlab.com/user/ssh/"></a></li>
+<li><strong>Medium</strong>: <a href="https://medium.com/@chanceespinosa/managing-multiple-ssh-keys-for-github-and-gitlab-33f6c4e64657">Managing Multiple SSH Keys for GitHub and GitLab</a><a href="https://medium.com/%40chancedev093/managing-multiple-ssh-keys-for-github-and-gitlab-7d77604f8773"></a></li>
+<li><strong>Stack Overflow</strong>: <a href="https://stackoverflow.com/questions/55109209/ssh-key-per-project-in-gitlab">SSH key per project in GitLab</a><a href="https://stackoverflow.com/questions/55243273/ssh-key-per-project-in-gitlab"></a></li>
+<li><strong>Libro</strong>: <em>Pro Git</em> de Scott Chacon y Ben Straub.</li>
+</ul>
+<hr>
+<h3><strong>ROL: Ingeniero de software profesional</strong></h3>
+<p>Como ingeniero de software, he proporcionado un flujo completo para generar y configurar una nueva llave SSH para tu repositorio de Vitawallet en GitLab, asegurando que no interfiera con tu otra llave SSH para otra cuenta/recurso. La solución incluye comandos detallados, configuración del archivo <code>~/.ssh/config</code>, y comprobaciones para verificar que ambas llaves funcionan. Se integra con tu entorno Dockerizado (montando <code>~/.ssh/</code>), RubyMine (para Git), y considera optimizaciones como <strong>jemalloc</strong>. También he abordado consideraciones de seguridad y una ruta de aprendizaje para ayudarte a avanzar hacia el nivel Mid.</p>
+<p><strong>Recomendación final</strong>:</p>
+<ul>
+<li>Sigue los pasos exactamente como se describen, ajustando los nombres de usuario, correos, y URLs de repositorio.</li>
+<li>Ejecuta las comprobaciones (<code>ssh -T</code> y <code>git push/pull</code>) para confirmar que ambas llaves funcionan.</li>
+<li>Si usas Docker, monta el directorio <code>~/.ssh/</code> en tu contenedor para operaciones Git.</li>
+<li>Revisa las llaves en GitLab regularmente y considera añadir passphrases para mayor seguridad.</li>
+</ul>
+<p>Si encuentras errores (por ejemplo, <code>Permission denied</code>) o necesitas ayuda con configuraciones adicionales (como GitLab CI o pruebas Selenium para verificar cambios), comparte más detalles, ¡y lo resolveremos juntos!</p>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

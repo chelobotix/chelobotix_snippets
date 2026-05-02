@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vita Wallet · Vita Wallet · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Vita Wallet</span>
+    <span class="sep">/</span>
+    <span class="current">Vita Wallet</span></nav>
+  <main><h1>Vita Wallet</h1>
+<pre><code class="language-shell">GitLab: Google_Account -&gt; marcelo@vitawallet.io
+SSH: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGQST1Cs8aC95lOG3ZlzNKePYI9DkPqobkuqiLNUzL3l vitawallet@gitlab.com
+Access Token: consultar en local
+Feed Token: consultar en local
+Email token: consultar en local 
+</code></pre>
+<pre><code class="language-shell">
+# Esta tienes que usar
+git clone git@gitlab-vitawallet:VitaWallet/alejandra-web.git
+
+# En emergencias
+git clone https://marcelo143:consultar en local@gitlab.com/VitaWallet/alejandra-web.git
+</code></pre>
+<pre><code class="language-shell"># STAGE/QA
+https://admin.stage.vitawallet.io/login
+https://admin.qa.vitawallet.io/login
+
+https://qa.vitawallet.io/
+
+marcelo+admin@vitawallet.io
+consultar en local
+
+# ADMIN
+https://admin.vitawallet.io/
+marcelo+admin@vitawallet.io
+consultar en local
+
+
+# USERS
+marcelo+user1@vitawallet.io # Chile
+marcelo+user2@vitawallet.io # Argentina
+marcelo+user3@vitawallet.io # BTC USDT USD EUR DOLAR CLP
+marcelo+mexico@vitawallet.io # Mexico
+marcelo+admin@vitawallet.io # Admin
+marcelo+cripto1@vitawallet.io # btc usdt usdc usd clp ars col b2c
+marcelo+b2c_api@vitawallet.io # B2C API
+
+consultar en local
+
+# USERS QA 
+santiago+empre@vitawallet.io  # Empresa Chile consultar en local
+marcelo+empresa@vitawallet.io
+marcelo+user1@vitawallet.io # Chile
+marcelo+user2@vitawallet.io # Argentina
+
+# USERS STAGE
+marcelo+empre@vitawallet.io
+marcelo+user1@vitawallet.io # Chile
+marcelo+user_arg@vitawallet.io # Argentina
+derly+b2b13@vitawallet.io	consultar en local
+</code></pre>
+<pre><code class="language-shell"># ALEJANDRA WEB
+git clone https://gitlab.com/VitaWallet/alejandra-web.git
+
+[submodule &quot;src/dumdee&quot;]
+    path = src/dumdee
+    url = https://gitlab.com/VitaWallet/dumdee.git
+[submodule &quot;src/wallet&quot;]
+    path = src/wallet
+    url = https://gitlab.com/VitaWallet/wallet.git
+    
+git submodule update --init --recursive
+
+NODE 22.17.1
+</code></pre>
+<pre><code class="language-shell"># FINTOC
+https://dashboard.fintoc.com/
+soporte@vitawallet.io
+consultar en local
+
+RUT 41614850-3
+consultar en local
+</code></pre>
+<pre><code class="language-shell"># NO ADMIN PASSWORD AUTH
+
+# class V1::Admin::BaseController &lt; ApplicationController
+
+def check_admin!
+    # unless authenticate_user! &amp;&amp; current_user.admin? &amp;&amp; current_user.admin
+    #   raise Pundit::NotAuthorizedError, &quot;No estás autorizado para realizar esta acción&quot;
+    # end
+  end
+
+  def auth_user
+    current_user = User.find(1467)
+    # unless authenticate_user!
+    #   raise Pundit::NotAuthorizedError, &quot;No estás autorizado para realizar esta acción&quot;
+    # end
+
+    current_user.update(source_biometric: &#39;admin&#39;) if current_user.admin?
+  end
+  
+
+# 
+def check_permission(permission, target_id = nil, target_name = nil, field = nil, is_render = true)
+    current_user = User.find(1467)
+    current_user.role_id = 1
+    if current_user.active?
+      action = PermissionService.new(current_user, permission)
+      if action.has_access
+        create_action_log(permission, target_id, target_name, true, field)
+        true
+      else
+        create_action_log(permission, target_id, target_name, false, field)
+        render json: { :error =&gt; &quot;El usuario no posee permisos para realizar esa acción&quot;}, status: :unauthorized if is_render
+        return
+      end
+    else
+      render json: { :error =&gt; &quot;El usuario esta baneado, no puede realizar acciones en el sistema.&quot;}, status: :unauthorized if is_render
+      return
+    end
+  end
+</code></pre>
+<pre><code class="language-shell"># SIDEKIQ
+http://localhost:3000/api/sidekiq
+soporte@vitawallet.io
+consultar en local
+
+#En local
+docker compose run --rm --service-ports api bundle exec sidekiq 
+# le das ctrl c luego en otra terminal:
+docker exec -it my_container bash
+rails s -b 0.0.0.0
+</code></pre>
+<pre><code class="language-shell"># RE GENERAR SCHEMA
+rails db:schema:dump
+</code></pre>
+<pre><code class="language-shell"># COVERAGE
+open coverage/index.html
+</code></pre>
+<pre><code class="language-shell"># MERGE FROM MASTER
+git merge --no-ff master
+</code></pre>
+<pre><code class="language-shell"># GCLOUD
+gcloud cloud-shell ssh --authorize-session --project=vita-wallet-api-qa-2
+
+pass: consultar en local
+
+kep-stg
+kep-qa
+
+RAILS_ENV=qa rails c
+
+
+# Conexion:
+Esto poner en bash al final:
+alias kuc-qa=&#39;kubectl config use-context gke_vita-wallet-api-qa-2_us-central1_gke-vw-qa-management&#39;
+alias kuc-stg=&#39;kubectl config use-context gke_vita-serverless_us-central1_gke-vw-stg-management&#39;
+alias kgc=&#39;kubectl config get-contexts&#39;
+alias kgp=&#39;kubectl get pods --all-namespaces&#39;
+alias kep-qa=&quot;kuc-qa &amp;&amp; kubectl exec \$(kgp | grep api | awk &#39;{print \&quot;-n\&quot;, \$1, \&quot;-it\&quot;, \$2}&#39;) -- bash&quot;
+alias kep-stg=&quot;kuc-stg &amp;&amp; kubectl exec \$(kgp | grep api | awk &#39;{print \&quot;-n\&quot;, \$1, \&quot;-it\&quot;, \$2}&#39;) -- bash&quot;
+
+Luego ejecutar estos comandos:
+gcloud container clusters get-credentials gke-vw-qa-management \
+    --zone us-central1 \
+    --project vita-wallet-api-qa-2
+    
+gcloud container clusters get-credentials gke-vw-stg-management \
+    --zone us-central1 \
+    --project vita-serverless
+    
+    
+
+
+# Si no entra con kep-qa
+kubectl get pods --all-namespaces
+# elegir qa-api-vitawallet     vita-wallet-api-deployment-686f8b8d59-7vn6s
+kubectl exec -n qa-api-vitawallet -it vita-wallet-api-deployment-686f8b8d59-7vn6s -- bash
+
+
+
+
+.    
+</code></pre>
+<pre><code class="language-ruby"># Forzar actualizacion en el Front
+settings_headers = SettingsHeader.first
+if settings_headers.present?
+  settings_headers.update(x_residence_config: settings_headers.x_residence_config.to_i + 1)
+end
+
+
+x_rules: 1, -&gt; si cambia actualiza reglas de transferencia
+x_residence_config: 1, -&gt; si cambia actualiza los países de residencia
+x_settings: 1, -&gt; Si cambia hace una actualización general
+</code></pre>
+<pre><code class="language-ruby"># Concluir recarga
+# Bitso:
+p = PaymentOrder.last
+params = { &quot;payload&quot; =&gt; { &quot;amount&quot; =&gt; 47328, &quot;fid&quot; =&gt; &quot;pago4&quot;,  &quot;details&quot; =&gt; { &quot;payment_id&quot; =&gt; p.public_code, &quot;receive_clabe&quot; =&gt; p.provider_code  }  } }
+service = ::Bitso::Payin::UpdatePayment.new(params)
+service.call
+# Bind QR:
+p = PaymentOrder.last
+params = { &quot;Payload&quot; =&gt; { &quot;MensajePago&quot; =&gt; { &quot;EstadoTransaccion&quot; =&gt; &quot;ACREDITADO&quot;, &quot;ImporteBruto&quot; =&gt; &quot;120556&quot;, &quot;IdOrdenVentaQr&quot; =&gt; p
+.provider_code.gsub(&quot;vita-bind-&quot;, &quot;&quot;)  } } }
+service = ::Bind::UpdatePaymentOrderStatus.new(params)
+service.call
+# Bind Button:
+p = PaymentOrder.last
+params = { &quot;Payload&quot; =&gt; { &quot;MensajePago&quot; =&gt; { &quot;EstadoTransaccion&quot; =&gt; &quot;ACREDITADO&quot;, &quot;ImporteBruto&quot; =&gt; &quot;120556&quot;, &quot;IdentificadorOrdenVenta&quot; =&gt; p
+.provider_code.gsub(&quot;vita-bind-boton&quot;, &quot;&quot;)  } } }
+service = ::Bind::UpdatePaymentOrderStatus.new(params)
+service.call
+# Rendimento:
+p = PaymentOrder.last
+params = { &quot;pix&quot; =&gt; [ { &quot;pagador&quot; =&gt; { &quot;cnpj&quot; =&gt; p.payer.document  }, &quot;txid&quot; =&gt; p.provider_code, &quot;valor&quot; =&gt; &quot;650&quot;  }  ]  }
+service = ::Rendimento::PaymentOrder::UpdatePaymentOrderStatus.new(params)
+service.call (editado)
+</code></pre>
+<pre><code class="language-ruby"># BINANCE SMART CHAIN
+0x10d543e2e0355e36c5cab769df8d2d60abb77a73
+0x9702230a8ea53601f5cd2dc00fdbc13d4df4a8c7 # USDT
+</code></pre>
+<pre><code class="language-ruby"># BUSINESS CREDENTIALS
+u.x_login
+u.business_trans_key
+u.business_secret
+
+habilitar en la tabla business_permissions en base al endpoint que quieras de la tabla api_endpoints
+</code></pre>
+<pre><code class="language-js">// HOOKS
+Son logica de negocios, hay varios useEffect dentro o otros hooks conocidos
+</code></pre>
+<pre><code class="language-js">// PROVIDERS
+
+// Aca estan todas las llamadas al API. Todas las funciones se vinculan con el archivo APICALL que hace la verdadera llamada.
+// Si necesitas pasar un parametro para la url lo pasas como (id) hacia la variable d entorno que es una funcion, luego en la llamada a APICALL pasas un objeto con los datos:
+const postRefund = async (id) =&gt; {
+    return await apiCall({
+        authorization: true,
+        ...ENDPOINTS.ADMIN.BANK_MOVEMENTS.POST_REFUND(id),
+        data: {
+            id,
+        },
+    })
+};
+</code></pre>
+<pre><code class="language-js">// RESOURCES
+
+// Aca estan todas las vistas
+</code></pre>
+<pre><code class="language-js">// REACT ADMIN
+
+// Cuando vas a usar una varaible debes pasarla por render:
+&lt;FunctionField
+    label={&#39;Fecha de origen&#39;}
+    render={(record) =&gt; {
+        return moment.utc(record.transaction_date ? record.transaction_date : record.post_date).format(&#39;LL&#39;);
+    }}
+/&gt;
+
+// ***  La logica para saber que es record se encuentra en: src/Providers/Rest/handlers
+API (GET /admin/bank_movements)
+        ↓
+responseHandler.js (transforma los datos si es necesario)
+        ↓
+React Admin &lt;List&gt; y &lt;Datagrid&gt;
+        ↓
+Cada campo recibe un objeto como &#39;record&#39;
+</code></pre>
+<pre><code class="language-js">// RUTAS
+src/Resources/index.js
+</code></pre>
+<pre><code class="language-js">// PASOS CREAR UNA NUEVA VISTA
+
+// Aca mapeas el nombre de tu vista con el endpoint que quieres llamar
+Users/marceloalarcon/Documents/Programming/VitaWallet/barry/src/Helpers/ResourceHelper.js
+
+//MENU
+src/Components/Menu/index.js
+</code></pre>
+<pre><code class="language-js">// NUEVA VISTA
+Perfecto! Aquí tienes el flujo en formato Markdown (incluyendo los bloques de código correctamente formateados) para que puedas copiar y pegar donde quieras:
+🛠️ Guía para Implementar una Nueva Vista (Recurso) en el Admin
+1. Definir el recurso en el helper
+Archivo: src/Helpers/ResourceHelper.js
+Agrega el nombre del recurso en el objeto RESOURCES (clave en español, valor en inglés o el identificador que usas en la API).
+
+export const RESOURCES = {
+  // ... otros recursos ...
+  estados_de_los_movimientos_bancarios: &#39;bank_movements_histories&#39;,
+};
+
+
+2. Crear el handler de request
+Archivo: src/Providers/Rest/handlers/[nombreRecurso]/requestHandler.js
+Crea el archivo si no existe.
+Implementa la función para construir la URL y los parámetros necesarios para las peticiones a la API (GET, POST, etc).
+Usa API_URL y respeta la estructura de paginación, filtros y ordenamiento.
+
+import { GET_LIST } from &#39;react-admin&#39;;
+import { API_URL } from &#39;../../../../Config/env&#39;;
+
+const requestHandler = (type, params) =&gt; {
+  switch (type) {
+    case GET_LIST:
+      // Construcción de la URL con filtros, paginación, etc.
+      return { url, method: &#39;get&#39; };
+    default:
+      return {};
+  }
+};
+
+export default requestHandler;
+
+3. Crear el handler de response
+Archivo: src/Providers/Rest/handlers/[nombreRecurso]/responseHandler.js
+Crea el archivo si no existe.
+Implementa la función para transformar la respuesta de la API al formato que espera el frontend (normalmente un array de objetos y el total).
+
+const responseHandler = (response, type) =&gt; {
+  switch (type) {
+    default:
+      // Procesa y retorna los datos
+      return { data, total };
+  }
+};
+
+export default responseHandler;
+
+4. Registrar el handler en el index de handlers
+Archivo: src/Providers/Rest/handlers/index.js
+Importa y exporta el nuevo handler.
+
+export { default as BankMovementsStatusHandler } from &#39;./bankMovementsStatus&#39;;
+
+
+5. Crear los componentes de la vista
+Directorio: src/Resources/[NombreRecurso]/
+Archivos típicos:
+index.js: configuración del recurso para el admin (nombre, icono, permisos, etc).
+[NombreRecurso]List/index.js: componente principal de la lista (usualmente con &lt;List&gt;, &lt;Datagrid&gt;, etc).
+Filters/index.js: componente de filtros para la lista.
+Implementa la UI usando los componentes de react-admin y tus utilidades.
+Usa los helpers y constantes para traducir estados, mostrar fechas, etc.
+
+6. Registrar el recurso en el admin
+Archivo: Donde configuras los recursos del admin (usualmente en el archivo principal del admin, por ejemplo App.js o similar).
+Importa el recurso y agrégalo a la lista de recursos del admin.
+import BankMovementsStatus from &#39;./Resources/BankMovementsStatus&#39;;
+// ...
+&lt;Resource {...BankMovementsStatus} /&gt;
+
+7. Agregar endpoints en la configuración si es necesario
+Archivo: src/Config/env.js
+Si el recurso necesita endpoints específicos, agrégalos en el objeto ENDPOINTS.
+8. Probar la vista
+Verifica que la vista carga correctamente, que los filtros funcionan, que los datos se muestran bien y que la paginación/orden funciona.
+Ajusta los handlers si la API responde diferente a lo esperado.
+
+9. para requests se anaden aca: /Users/marceloalarcon/Documents/Programming/VitaWallet/barry/src/Providers/Rest/requestHandler.js
+
+Si el recurso tiene estados, tipos o categorías, agrégalos en src/Utils/index.js para mostrar los nombres en español o con formato adecuado.
+Resumen de archivos típicos a modificar/crear
+src/Helpers/ResourceHelper.js
+src/Providers/Rest/handlers/[nombreRecurso]/requestHandler.js
+src/Providers/Rest/handlers/[nombreRecurso]/responseHandler.js
+src/Providers/Rest/handlers/index.js
+src/Resources/[NombreRecurso]/index.js
+src/Resources/[NombreRecurso]/[NombreRecurso]List/index.js
+src/Resources/[NombreRecurso]/Filters/index.js
+src/Config/env.js (si aplica)
+Archivo principal del admin para registrar el recurso
+</code></pre>
+<pre><code class="language-json">{
+  &quot;editor.rulers&quot;: [120],
+  &quot;editor.tokenColorCustomizations&quot;: {
+    &quot;textMateRules&quot;: [
+      {
+        &quot;scope&quot;: &quot;variable.other.readwrite.instance.ruby&quot;,
+        &quot;settings&quot;: {
+          &quot;foreground&quot;: &quot;#e0a348&quot;
+        }
+      },
+      {
+        &quot;scope&quot;: &quot;variable.other.readwrite.class.ruby&quot;,
+        &quot;settings&quot;: {
+          &quot;foreground&quot;: &quot;#e0a348&quot;
+        }
+      }
+    ]
+  }
+}
+</code></pre>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

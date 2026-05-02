@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forms · Angular · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Angular</span>
+    <span class="sep">/</span>
+    <span class="current">Forms</span></nav>
+  <main><h1>Forms</h1>
+<pre><code class="language-ts">// TEMPLATES
+
+// NGMODEL WAY
+// HTML
+&lt;form #form=&quot;ngForm&quot; (ngSubmit)=&quot;onSubmit(form)&quot;&gt;
+  &lt;input id=&quot;email&quot; type=&quot;email&quot; name=&quot;email&quot; ngModel #emailControl=&quot;ngModel&quot;/&gt;
+&lt;/form&gt;
+//TS
+onSubmit(formData: NgForm) {
+  const email = formData.form.value.email
+  const password = formData.form.value.password
+}
+
+
+
+//
+</code></pre>
+<pre><code class="language-ts">// VALIDATIONS CSS
+&lt;input id=&quot;email&quot; type=&quot;email&quot; name=&quot;email&quot; ngModel required  email /&gt; //validara que el campo sea un email
+//CSS classes added for validation
+ng-pristine = no input
+ng-invalid = input invalid
+ng-valid = input valid
+ng-touched = user selected the input at least one time
+//css style:
+input.ng-invalid.ng-touched.ng-dirty {
+  background-color: #fbdcd6;
+  border-color: #f84e2c;
+}
+
+
+//VALIDATIONS HTML
+&lt;input id=&quot;email&quot; type=&quot;email&quot; name=&quot;email&quot; ngModel #emailControl=&quot;ngModel&quot;/&gt;
+@if (emailControl.touched &amp;&amp; emailControl.dirty &amp;&amp; emailControl.invalid) {
+  &lt;p class=&quot;control-error&quot;&gt;
+    Invalid values detected, please check your input.
+  &lt;/p&gt;
+}
+
+
+
+//
+</code></pre>
+<pre><code class="language-ts">// RESET FORM (reactive)
+clearForm() {
+  this.formData.reset()
+}
+</code></pre>
+<pre><code class="language-ts">
+//UPDATE FORM FIELD
+formData.controls[&#39;password&#39;]?.setValue(&quot;12345&quot;)
+</code></pre>
+<pre><code class="language-ts">//VIEW_CHILD
+export class LoginComponent {
+  private form = viewChild.required&lt;NgForm&gt;(&#39;formData&#39;)
+  private destroyRef = inject(DestroyRef)
+
+  constructor() {
+    afterNextRender(() =&gt; {
+      const subscription = this.form().valueChanges?.subscribe({
+        next: (value) =&gt; {
+          console.log(value)
+        }
+      })
+
+      this.destroyRef.onDestroy(() =&gt; {
+        subscription?.unsubscribe();
+      })
+
+    })
+
+    }
+</code></pre>
+<pre><code class="language-ts">// ATTACH IMAGE OR FILE
+// TS
+imagePreview: string | ArrayBuffer | null = null
+
+form = new FormGroup({
+    image: new FormControl&lt;File | null&gt;(null, { validators: [Validators.required] }),
+  })
+  
+onSubmit() {
+  if (this.form.value.image &amp;&amp; this.form.value.image instanceof File) {
+    formData.append(&#39;post[image]&#39;, this.form.value.image, this.form.value.image.name)
+  }
+
+}
+  
+onFileSelected(event: any) {
+  const file: File = event.target.files[0]
+  if (file) {
+    this.form.patchValue({
+      image: file,
+    })
+    // Opcional: si quieres mostrar una vista previa de la imagen
+    const reader = new FileReader()
+    reader.onload = (e: any) =&gt; {
+      this.imagePreview = e.target.result
+    }
+    reader.readAsDataURL(file)
+  }
+}
+
+// HTML
+&lt;form [formGroup]=&quot;form&quot; (ngSubmit)=&quot;onSubmit()&quot; class=&quot;container&quot;&gt;
+  &lt;div&gt;
+    &lt;input type=&quot;file&quot; (change)=&quot;onFileSelected($event)&quot; accept=&quot;image/*&quot; /&gt;
+  &lt;/div&gt;
+
+  &lt;button type=&quot;submit&quot; class=&quot;button&quot;&gt;Login&lt;/button&gt;
+&lt;/form&gt;
+</code></pre>
+<blockquote>
+<p><a href="https://guides.rubyonrails.org/form_helpers.html">https://guides.rubyonrails.org/form_helpers.html</a></p>
+</blockquote>
+<pre><code class="language-ts">//TS
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from &#39;@angular/forms&#39;
+
+@Component({
+    imports: [
+      ReactiveFormsModule,
+  ],
+})
+export class LoginComponent {
+  formData = new FormGroup({
+    email: new FormControl(&#39;&#39;, {
+      validators: [Validators.required, Validators.email],
+    }),
+    password: new FormControl(&#39;&#39;, {
+      validators: [Validators.required, Validators.minLength(6)],
+    }),
+    image: new FormControl&lt;File | null&gt;(null, {})
+  })
+
+  onSubmit() {
+    console.log(this.formData.value.email)
+    if (this.formData.valid) {
+      console.log(&#39;valid!&#39;)
+    }
+  }
+  
+  onReset() {
+     this.formData.reset();
+  }
+}
+//HTML
+&lt;form [formGroup]=&quot;formData&quot; (ngSubmit)=&quot;onSubmit()&quot;&gt;
+  &lt;h2&gt;Login&lt;/h2&gt;
+
+  &lt;div class=&quot;control-row&quot;&gt;
+    &lt;div class=&quot;control no-margin&quot;&gt;
+      &lt;label for=&quot;email&quot;&gt;Email&lt;/label&gt;
+      &lt;input id=&quot;email&quot; type=&quot;email&quot; formControlName=&quot;email&quot; /&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;control no-margin&quot;&gt;
+      &lt;label for=&quot;password&quot;&gt;Password&lt;/label&gt;
+      &lt;input id=&quot;password&quot; type=&quot;password&quot; formControlName=&quot;password&quot; /&gt;
+    &lt;/div&gt;
+    
+    &lt;div class=&quot;control-row&quot; formGroupName=&quot;address&quot;&gt;
+      ...address inputs
+    &lt;/div&gt;
+
+    &lt;button type=&quot;submit&quot; class=&quot;button&quot;&gt;Login&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/form&gt;
+
+
+
+//
+</code></pre>
+<pre><code class="language-ts">// AGRUPAR FORMS
+//TS
+formData = new FormGroup({
+  address: new FormGroup({
+    addressStreet: new FormControl(&#39;&#39;, {
+      validators: [Validators.required],
+    }),
+    addressNumber: new FormControl(&#39;&#39;, {
+      validators: [Validators.required],
+    })
+  })
+})
+//HTML
+&lt;div class=&quot;control-row&quot; formGroupName=&quot;address&quot;&gt;
+  &lt;input type=&quot;text&quot; id=&quot;street&quot; name=&quot;street&quot; formControlName=&quot;addressStreet&quot; /&gt;
+  &lt;input type=&quot;text&quot; id=&quot;street&quot; name=&quot;street&quot; formControlName=&quot;addressNumber&quot; /&gt;
+&lt;/div&gt;
+
+
+
+//
+</code></pre>
+<pre><code class="language-ts">//FORM ARRAY (se usa para check boxes)
+//TS
+formData = new FormGroup({
+  source: new FormArray([
+      new FormControl(false, [Validators.required]),
+      new FormControl(false, [Validators.required]),
+      new FormControl(false, [Validators.required]),
+    ]),
+})
+//HTML
+&lt;fieldset formArrayName=&quot;source&quot;&gt;
+  &lt;input
+    type=&quot;checkbox&quot;
+    id=&quot;google&quot;
+    name=&quot;acquisition&quot;
+    value=&quot;google&quot;
+    formControlName=&quot;0&quot;
+  /&gt;
+  &lt;input
+    type=&quot;checkbox&quot;
+    id=&quot;facebook&quot;
+    name=&quot;acquisition&quot;
+    value=&quot;facebook&quot;
+    formControlName=&quot;1&quot;
+  /&gt;
+&lt;/fieldset&gt;
+
+
+
+
+//
+</code></pre>
+<pre><code class="language-ts">// DETECTAR CAMBIOS
+//TS
+export class MyPostComponent implements OnInit{
+    formData = new FormGroup({
+    search: new FormControl&lt;any&gt;(&#39;&#39;,{}),
+  })
+
+  ngOnInit(): void {
+    this.formData.controls[&#39;search&#39;].valueChanges.pipe(
+      debounceTime(1000),
+      tap((response) =&gt; console.log(response))
+    ).subscribe();
+  }
+
+}
+
+//HTML
+&lt;form [formGroup]=&quot;formData&quot;&gt;
+  &lt;input formControlName=&quot;search&quot;&gt;
+&lt;/form&gt;
+
+
+
+
+//
+</code></pre>
+<pre><code class="language-js">// ACTUALIZAR EL VALOR DE UN CAMPO DINAMICAMENTE
+formData = new FormGroup({
+    body: new FormControl(&#39;&#39;, {
+      validators: [Validators.required],
+    }),
+  })
+  
+//aca  
+this.formData.patchValue({
+      body: &quot;nuevo valor&quot;,
+    })
+</code></pre>
+<pre><code class="language-js">// MARCAR TODOS LOS CAMPOS TOUCHED
+submitForm() {
+  if (this.formData.invalid) {
+    this.formData.markAllAsTouched();
+    return;
+  }
+  // Lógica de envío
+  console.log(this.formData.value);
+}
+</code></pre>
+<pre><code class="language-ts">//CSS STATES
+pristine:
+
+    Descripción: Indica que el control no ha sido modificado por el usuario.
+    Uso: Se usa para determinar si un control ha sido tocado o cambiado. Útil para mostrar mensajes de error solo después de que el usuario haya interactuado con el campo.
+
+dirty:
+
+    Descripción: Indica que el control ha sido modificado por el usuario.
+    Uso: Se usa para saber si el valor del control ha cambiado desde su valor inicial. Útil para habilitar o deshabilitar el botón de envío o mostrar mensajes de validación.
+
+touched:
+
+    Descripción: Indica que el control ha sido visitado (es decir, ha recibido el foco y luego ha sido desenfocado).
+    Uso: Se usa para mostrar mensajes de error o validación solo después de que el usuario haya interactuado con el campo, evitando mostrar mensajes de error antes de que el usuario haya tenido la oportunidad de ingresar datos.
+
+untouched:
+
+    Descripción: Indica que el control no ha sido visitado.
+    Uso: Se usa para diferenciar entre campos que han sido visitados y aquellos que no. A menudo se usa en combinación con touched para mostrar mensajes de error solo después de que el campo ha sido tocado.
+
+valid:
+
+    Descripción: Indica que el control cumple con todas las validaciones establecidas.
+    Uso: Se usa para determinar si el control es válido y puede ser útil para habilitar el botón de envío del formulario o para mostrar mensajes de validación.
+
+invalid:
+
+    Descripción: Indica que el control no cumple con alguna de las validaciones establecidas.
+    Uso: Se usa para mostrar mensajes de error y para evitar el envío de datos no válidos.
+
+pending:
+
+    Descripción: Indica que el control está en espera de una validación asíncrona.
+    Uso: Se usa para manejar casos en los que una validación asíncrona (como una verificación de disponibilidad de nombre de usuario) está en curso.
+
+disabled:
+
+    Descripción: Indica que el control está deshabilitado.
+    Uso: Se usa para evitar que el usuario interactúe con el campo, por ejemplo, cuando se está realizando alguna operación que impide modificar el campo.
+
+enabled:
+
+    Descripción: Indica que el control está habilitado.
+    Uso: Se usa para permitir la interacción del usuario con el campo.
+</code></pre>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

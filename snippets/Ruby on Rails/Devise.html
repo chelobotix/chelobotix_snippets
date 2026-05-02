@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Devise · Ruby on Rails · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Ruby on Rails</span>
+    <span class="sep">/</span>
+    <span class="current">Devise</span></nav>
+  <main><h1>Devise</h1>
+<pre><code class="language-ruby"># Controller
+before_action :authenticate_user!
+
+# Helpers
+user_signed_in?
+current_user
+user_session
+User.current
+reset_session
+sign_in(User.find(8))
+
+# Gem with bootstrap styling
+gem &#39;devise-bootstrap-views&#39;, &#39;~&gt; 1.0&#39;
+
+
+#
+</code></pre>
+<pre><code class="language-ruby"># Para anadir un campo en application_controller (username)
+before_action :configure_permitted_parameters, if: :devise_controller?
+
+  protected
+
+  def configure_permitted_parameters
+    devise_parameter_sanitizer.permit(:sign_up, keys: [:username])
+    devise_parameter_sanitizer.permit(:account_update, keys: [:username])
+  end
+  
+ 
+ 
+#
+</code></pre>
+<pre><code class="language-ruby"># Devise Invitable
+# acepto la invitacion
+user.invitation_accepted?
+
+
+
+#
+</code></pre>
+<pre><code class="language-ruby"># REDIRECT inactive user
+# applicationController
+before_action :redirect_inactive_user, unless: :devise_controller?
+
+def redirect_inactive_user
+    path = inactive_users_index_home_index_path
+    redirect_to(path) if user_signed_in? &amp;&amp; !current_user.active &amp;&amp; request.path != path
+end
+
+
+
+#
+</code></pre>
+<pre><code class="language-ruby"># Anadir un dato al cookie de session devise
+# initializer/warden_callbak.rb
+Warden::Manager.after_authentication do |user, auth, opts|
+  auth.raw_session[&#39;jwt&#39;] = &quot;1234&quot;
+end
+
+
+
+#
+</code></pre>
+<pre><code class="language-ruby">
+# NO AUTENTICAR ESTA ACTION
+skip_before_action :authenticate_user!, only: [:nova]
+
+
+
+#
+</code></pre>
+<pre><code class="language-ruby"># ROUTES overwrite session or registration
+rails g devise:controllers users -c sessions registrations
+# esto generara los controladores y debes cambiar la route para que use estos:
+devise_for :users, controllers: {
+    sessions: &#39;users/sessions&#39;
+    passwords: &#39;users/passwords&#39;
+}
+# o mas avanzado
+Rails.application.routes.draw do
+  devise_for :users, path: &#39;&#39;, path_names: {
+    sign_in: &#39;login&#39;,
+    sign_out: &#39;logout&#39;,
+    registration: &#39;signup&#39;
+  },
+  controllers: {
+    sessions: &#39;users/sessions&#39;,
+    registrations: &#39;users/registrations&#39;
+  }
+end
+
+
+
+#
+</code></pre>
+<pre><code class="language-ruby"># Email regex
+Devise.email_regexp
+#o
+validates :email, presence: true, format: { with: Devise.email_regexp }
+valid_email_regex = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i
+
+
+
+#
+</code></pre>
+<pre><code class="language-ruby"># PASSWORD RECOVERY ACTION (recuperar  password)
+class Users::PasswordsController &lt; Devise::PasswordsController
+  # PUT /resource/password
+  def update
+    super
+  end
+  
+  def after_sending_reset_password_instructions_path_for(resource_name)
+    puts Rainbow(&#39;============ TEST! ============&#39;).bg(:yellow)
+  end
+end
+
+
+devise_for :users, controllers: {
+    sessions: &#39;users/sessions&#39;
+    passwords: &#39;users/passwords&#39;
+}
+
+
+
+#
+</code></pre>
+<pre><code class="language-ruby"># OVERWRITE AUTHENTICATE_USER
+def authenticate_user!(options={})
+  super(options)
+end  
+
+
+
+#
+</code></pre>
+<pre><code class="language-ruby"># AFTER SUCCEFULL SIGN IN
+def after_sign_in_path_for(resource)
+  puts &#39;dum&#39;
+  super    
+end
+</code></pre>
+<pre><code class="language-ruby"># anular las rutas de autentificacion, por ejemplo si usas NOVA
+devise_for :users, skip: :sessions
+</code></pre>
+<pre><code class="language-ruby"># Destroy session rails 7 con turbo
+&lt;%= link_to &#39;Logout&#39;, destroy_user_session_path, data: { turbo_method: :delete, turbo_confirm: &#39;Are you sure?&#39; } %&gt;
+</code></pre>
+<pre><code class="language-ruby"># PASSWORD MANAGMENT
+# Desde consola:
+
+# Verificar el password
+user&amp;.valid_password?(&quot;secret123&quot;)
+
+# Modificar hash de password
+require &quot;bcrypt&quot;
+
+cost = Devise.stretches
+hash = BCrypt::Password.create(&quot;111111&quot;, cost: cost)
+
+u = User.find(102)
+u.update_column(:encrypted_password, hash.to_s)
+</code></pre>
+<blockquote>
+<ol>
+<li>bundle add devise</li>
+<li>rails generate devise:install</li>
+<li>rails generate devise User</li>
+<li>rails generate devise:views</li>
+<li>el re tutorial! <a href="https://sdrmike.medium.com/rails-7-api-only-app-with-devise-and-jwt-for-authentication-1397211fb97c">https://sdrmike.medium.com/rails-7-api-only-app-with-devise-and-jwt-for-authentication-1397211fb97c</a></li>
+</ol>
+</blockquote>
+<pre><code class="language-ruby">1. Remove gem devise
+2. Delete routes: devise_for :users
+3. Remove from models (tipicamente esta en User)
+devise :invitable, :database_authenticatable, :registerable, :recoverable, :rememberable, :trackable, :validatable
+4. Remove views/devise
+
+
+
+Extra Xenvio steps
+5. Crear los metodos de Devise en applicationController
+helper_method :current_user, :user_signed_in?
+ 
+def authenticate_user!
+    puts &#39;Aca se autentificara el TOKEN&#39;
+end
+
+def current_user
+    User.find(6)
+end
+  
+def user_signed_in?
+    true
+end
+
+6. remplazar los links de devise
+layout:
+line 42 = link_to fa_icon(&#39;user&#39;, text: &#39;Profile&#39;), root_path, class: &#39;dropdown-item&#39;
+line 49 = link_to fa_icon(&#39;sign-out&#39;, text: &#39;Sign out&#39;), destroy_user_session_path, method: :delete, class: &#39;dropdown-item&#39;
+</code></pre>
+<pre><code class="language-ruby">Configuring devise for APIs
+Marc Busqué edited this page on Feb 2, 2023 · 4 revisions
+Controllers
+Responding to json
+In order for devise to know it can respond to json format, you need to instruct the controller layer. Usually, you will add the following in ApplicationController:
+
+respond_to :json
+If you are inheriting from ActionController::API, first you will need to bring that functionality back:
+
+include ActionController::MimeResponds
+Overriding controllers
+Overriding devise controllers should be the last option to consider. However, if this is necessary, some devise actions yield the user in the crucial moment so that an override can call super and just perform the needed action with it.
+
+For example, if you need to override SessionsController just to assign the user as an instance variable for the view, it is enough to do:
+
+class MyApplicationSessionsController &lt; Devise::SessionsController
+  def create
+    super { |resource| @resource = resource }
+  end
+end
+Then, don&#39;t forget in your routes:
+
+devise_for :users, controllers: { sessions: &#39;my_application_sessions&#39; }
+Routes
+Defaulting to json as format
+If you want devise routes to use json as default format (that is, you don&#39;t need to add .json at the end of the URLs), use defaults as the following:
+
+devise_for :users, defaults: { format: :json }
+Views
+Validation errors format
+Devise uses responders. In order to adjust validation errors coming from devise (for instance, during a sign up) to our application standards, we need to define and use a responder, which will need to implement the json_resource_errors method. As it is included in the general responder, it has access to a resource instance variable which in our case will contain the user with its errors. For instance:
+
+module MyApplicationResponder
+  protected
+
+  def json_resource_errors
+    {
+      success: false,
+      errors: MyApplicationErrorFormatter.call(resource.errors)
+    }
+  end
+end
+Then, in the controller you have to use it:
+
+responders :my_application
+Authentication errors format
+When an authentication fails, the execution path exits our application and lands into the default devise failure application. It is responsible to render the error message.
+
+If we want to render with our own errors format standard, we should define and use a custom failure application. It is sufficient to just inherit from the devise one and overwrite the http_auth_body method. From there, i18n_message contains the error message.
+
+For example:
+
+class MyApplicationFailureApp &lt; Devise::FailureApp
+  def http_auth_body
+    return super unless request_format == :json
+    {
+      sucess: false,
+      message: i18n_message
+    }.to_json
+  end
+end
+Now, in config/initializers/devise.rb we need to config Warden (the engine on top of devise) to use it:
+
+config.warden do |manager|
+  manager.failure_app = MyApplicationFailureApp
+end
+</code></pre>
+<blockquote>
+<p><a href="https://github.com/waiting-for-dev/devise-jwt/wiki/Configuring-devise-for-APIs">https://github.com/waiting-for-dev/devise-jwt/wiki/Configuring-devise-for-APIs</a>
+<a href="https://sdrmike.medium.com/rails-7-api-only-app-with-devise-and-jwt-for-authentication-1397211fb97c">https://sdrmike.medium.com/rails-7-api-only-app-with-devise-and-jwt-for-authentication-1397211fb97c</a></p>
+</blockquote>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

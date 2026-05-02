@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SERVICE Ruby on Rails · Ruby on Rails · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Ruby on Rails</span>
+    <span class="sep">/</span>
+    <span class="current">SERVICE Ruby on Rails</span></nav>
+  <main><h1>SERVICE Ruby on Rails</h1>
+<pre><code class="language-ruby"># BASE MY_SERVICE SERVICE
+module MyService
+    class Base
+      include ResultUtils::BaseService
+
+      attr_reader :shipment
+      private :shipment
+
+      def initialize(shipment:, dependencies:)
+        @shipment = shipment
+        @sub_service1 = dependencies[:sub_service1]
+        @sub_service2 = dependencies[:sub_service2]
+        @is_flow_completed = true
+      end
+
+      def call
+        perform_flow
+
+        set_as_valid! if is_flow_completed
+        
+      rescue StandardError =&gt; e # Esto es para recuperar de algun error en la Transaction
+        set_as_invalid!
+        set_errors({ service: e.message, code: 500, details: e.message })
+      end
+
+      private
+
+      def perform_flow
+        ActiveRecord::Base.transaction do
+          flow = [:sub_service_1, :sub_service_2]
+
+          flow.each do |step|
+            send(step)
+            break unless is_flow_completed
+          end
+        end
+      end
+
+      def sub_service_1
+        service = @sub_service1.new(shipment:)
+        service.call
+
+        mark_as_invalid(service.errors) unless service.valid?
+      end
+
+      def sub_service_2
+        service = @sub_service2.new(shipment:)
+        service.call
+
+        mark_as_invalid(service.errors) unless service.valid?
+      end
+
+      def mark_as_invalid(errors)
+        @is_flow_completed = false
+        set_as_invalid!
+        set_errors(errors)
+        
+        # Esto es si quieres lanzar rollback manual
+        # Rails.logger.info &#39;☢️ &gt;&gt;&gt;&gt;&gt;-----&gt;  Forcing rollback manually&#39;
+        # raise(ActiveRecord::Rollback)
+      end
+    end
+  end
+</code></pre>
+<pre><code class="language-ruby"># SUB_SERVICE
+module MyService
+  class SubService1
+    include ResultUtils::BaseService
+
+    attr_reader :shipment
+    private :shipment
+
+    ALLOWED_STATES = %i[shipped].freeze
+    private_constant :ALLOWED_STATES
+
+    def initialize(shipment:)
+      @shipment = shipment
+    end
+
+    def call
+      perfom
+      set_as_valid!
+
+    rescue ::Errors::StandardServiceError =&gt; e
+      set_as_invalid!
+      set_errors({ service: e.message, code: e.code, details: e.details })
+    end
+
+    private
+
+    def perfom
+      unless ALLOWED_STATES.include?(shipment.aasm_state.to_sym)
+        raise_service_error(:INVALID_SHIPMENT_STATE, &quot;Shipment state #{shipment.aasm_state} is not allowed&quot;) # =&gt;Shared
+      end
+    end
+  end
+end
+</code></pre>
+<pre><code class="language-ruby"># SHARED
+module MyService
+  module Shared
+    def raise_service_error(code, details)
+      raise ::Errors::StandardServiceError.new(
+        message: self.class.name,
+        code: ErrorCodes::CODES[code],
+        details: details
+      )
+    end
+  end
+end
+</code></pre>
+<pre><code class="language-ruby"># ERROR CODES
+module MY_SERVICE
+  module ErrorCodes
+      CODES = {
+        INVALID_SHIPMENT_STATE: 1001,
+        MISSING_SHIPPING_METHOD_CONFIG: 1002,
+        NO_RECORD_FOUND: 1003,
+        JSON_SCHEMA_VALIDATION_ERROR: 1004,
+        USER_ROLE_ERROR: 1005,
+        MISSING_MERCHANT: 1006,
+        MISSING_MERCHANT_ADDRESS: 1007,
+      }.freeze
+  end
+end
+</code></pre>
+<pre><code class="language-ruby"># DEPENDENCIES
+module MyService
+  class &lt;&lt; self
+    def base_dependencies
+      {
+        sub_service1: SubService1,
+        sub_service2: SubService2,
+      }
+    end
+  end
+end
+</code></pre>
+<pre><code class="language-ruby"># **** OTHERS:
+</code></pre>
+<pre><code class="language-ruby"># CUSTOM ERROR StandardServiceError
+module Errors
+  class StandardServiceError &lt; StandardError
+    attr_reader :code, :details
+
+    def initialize(message:, code:, details:)
+      @code = code
+      @details = details
+      super(message)
+    end
+  end
+end
+</code></pre>
+<pre><code class="language-ruby"># BASE SERVICE
+module ResultUtils
+  module BaseService
+    attr_reader :errors, :valid
+
+    def valid?
+      @valid
+    end
+
+  private
+
+    def set_as_invalid!
+      @valid = false
+    end
+
+    def set_as_valid!
+      @valid = true
+    end
+
+    def set_errors(errors)
+      Rails.logger.error(
+        &quot;[#{self.class.name}] Service error - code: #{errors[:code]}, details: #{errors[:details]}&quot;
+      ) unless Rails.env.test?   
+         
+      @errors = errors
+    end
+  end
+end
+</code></pre>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

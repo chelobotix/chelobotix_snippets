@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ruby Install · Ruby · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Ruby</span>
+    <span class="sep">/</span>
+    <span class="current">Ruby Install</span></nav>
+  <main><h1>Ruby Install</h1>
+<pre><code class="language-shell">xcode-select --install
+brew install openssl@1.1
+rvm install 3.2.2 --with-openssl-dir=$(brew --prefix openssl@1.1)
+rvm install 2.7.7 --with-openssl-dir=$(brew --prefix openssl@1.1)
+
+
+#remove brew
+/bin/bash -c &quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)&quot;
+
+curl -O https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh
+
+
+# Linker OPENSSL
+echo &#39;export PATH=&quot;$(brew --prefix)/opt/opessl@1.1/bin:$PATH&quot;&#39; &gt;&gt; ~/.zprofile
+openssl version
+
+# Others
+-
+BUNDLE_BUILD__NOKOGIRI: &quot;--use-system-libraries&quot;
+BUNDLE_BUILD__PG: &quot;--with-pg-config=/Applications/Postgres.app/Contents/Versions/16/bin/pg_config&quot;
+BUNDLE_BUILD__OPENSSL: &quot;--with-openssl-dir=/usr/local/opt/openssl@1.1&quot;
+
+
+#FOG
+[fog][DEPRECATION] Unable to load Fog
+gem &#39;fog-core&#39;, &#39;2.1.0&#39;
+
+#AJAX DATATABLE
+gem &#39;ajax-datatables-rails&#39;, &#39;~&gt; 1.0.0&#39;
+
+# Ransack
+gem &#39;ransack&#39;, &#39;~&gt;2.1.1&#39;
+# BUNDLE WHY
+bundle plugin install bundler-why --source https://rubygems.org
+
+# Nokogiri
+gem install nokogiri -v 1.8.5 -- \
+--use-system-libraries \
+--with-xslt-dir=/usr/local/opt/libxslt \
+--with-xml2-dir=/usr/local/opt/libxml2 \
+--with-cflags=&quot;-Wno-incompatible-function-pointer-types&quot;
+
+
+# PG
+gem install pg -v 1.1.3 -- --with-pg-config=/Applications/Postgres.app/Contents/Versions/16/bin/pg_config --with-cflags=&quot;-Wno-incompatible-function-pointer-types&quot;
+
+
+# OPEN SSL
+Desisntalar si o si openssl3
+gem install openssl -v 2.2.0 -- --with-openssl-dir=/usr/local/opt/openssl@1.1 --with-cflags=&quot;-Wno-incompatible-function-pointer-types&quot;
+
+
+--with-cflags=&quot;-Wno-error=implicit-function-declaration&quot;
+
+
+# gem install byebug -v 10.0.2
+brew install llvm@12
+export CC=$(brew --prefix llvm@12)/bin/clang
+restart terminal 
+gem install byebug -v 10.0.2
+
+
+# puma (4.3.1)
+gem install puma -v 4.3.1 -- --with-cflags=&quot;-Wno-error=implicit-function-declaration&quot;
+
+
+# ovirt-engine-sdk
+gem install ovirt-engine-sdk -v 4.2.5 -- --with-cflags=&quot;-Wno-incompatible-function-pointer-types&quot;
+</code></pre>
+<pre><code class="language-ruby">export CC=$(brew --prefix llvm@12)/bin/clang
+</code></pre>
+<p>Nivel de la Pregunta: Mid</p>
+<p>Explicación Detallada:</p>
+<p>El error que estás experimentando sugiere que Ruby no se compiló correctamente con soporte para OpenSSL. Esto es un problema común, especialmente en sistemas macOS, y más aún en los nuevos Mac con chips M1/M2. Vamos a resolverlo paso a paso:</p>
+<ol>
+<li><p>Primero, asegúrate de que OpenSSL esté instalado a través de Homebrew:</p>
+<pre><code class="language-bash">brew install openssl@1.1
+</code></pre>
+</li>
+<li><p>Ahora, necesitamos decirle a RVM dónde encontrar OpenSSL. Agrega estas líneas a tu archivo <code>~/.zshrc</code> o <code>~/.bash_profile</code>:</p>
+<pre><code class="language-bash">export LDFLAGS=&quot;-L/opt/homebrew/opt/openssl@1.1/lib&quot;
+export CPPFLAGS=&quot;-I/opt/homebrew/opt/openssl@1.1/include&quot;
+export PKG_CONFIG_PATH=&quot;/opt/homebrew/opt/openssl@1.1/lib/pkgconfig&quot;
+</code></pre>
+</li>
+<li><p>Recarga tu perfil de shell:</p>
+<pre><code class="language-bash">source ~/.zshrc  # o source ~/.bash_profile
+</code></pre>
+</li>
+<li><p>Ahora, vamos a reinstalar Ruby 3.0.3 con RVM, especificando explícitamente el uso de OpenSSL:</p>
+<pre><code class="language-bash">rvm remove 3.0.3
+rvm install 3.0.3 --with-openssl-dir=/opt/homebrew/opt/openssl@1.1
+</code></pre>
+</li>
+<li><p>Una vez que Ruby se haya reinstalado, selecciónalo:</p>
+<pre><code class="language-bash">rvm use 3.0.3
+</code></pre>
+</li>
+<li><p>Ahora, actualiza Bundler a la versión requerida:</p>
+<pre><code class="language-bash">gem install bundler:2.3.4
+</code></pre>
+</li>
+<li><p>Finalmente, intenta ejecutar <code>bundle</code> nuevamente.</p>
+</li>
+</ol>
+<p>Si aún tienes problemas, puedes intentar lo siguiente:</p>
+<ol start="8">
+<li><p>Verifica que estás usando la versión correcta de Ruby:</p>
+<pre><code class="language-bash">ruby -v
+</code></pre>
+</li>
+<li><p>Comprueba que OpenSSL está disponible para Ruby:</p>
+<pre><code class="language-ruby">ruby -ropenssl -e &quot;puts OpenSSL::OPENSSL_VERSION&quot;
+</code></pre>
+</li>
+</ol>
+<p>Riesgos de Seguridad:</p>
+<ul>
+<li>Asegúrate de mantener OpenSSL actualizado para evitar vulnerabilidades de seguridad conocidas.</li>
+<li>Utiliza siempre fuentes HTTPS en tu Gemfile para prevenir ataques de intermediario.</li>
+</ul>
+<p>Seguimiento del Progreso:
+Este tipo de problema de configuración es común en el desarrollo de Ruby, especialmente en nuevas arquitecturas como Apple Silicon. Resolver estos problema</p>
+<pre><code class="language-bash"># Primero te conectas con el usuario de tu mac
+/Applications/Postgres.app/Contents/Versions/16/bin/psql -U shipedge
+
+# Creas el usuario X5
+CREATE USER x5;
+ALTER USER x5 WITH createdb;
+ALTER USER x5 WITH superuser;
+ALTER USER x5 WITH login;
+
+# Te conectas a postgres DB
+/Applications/Postgres.app/Contents/Versions/16/bin/psql -U shipedge -d postgres
+# Creas la tabla
+CREATE DATABASE x5_development;
+
+
+# importas el fixture
+/Applications/Postgres.app/Contents/Versions/16/bin/psql -U x5 x5_development &lt; /Users/shipedge/Documents/Programming/Shipedge/Dbs/nuevo.sql
+</code></pre>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

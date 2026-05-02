@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Time and Date · Go · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Go</span>
+    <span class="sep">/</span>
+    <span class="current">Time and Date</span></nav>
+  <main><h1>Time and Date</h1>
+<pre><code class="language-go">02 representa el día.
+01 representa el mes.
+2006 representa el año.
+
+Element	Possible values
+Year	&quot;2006&quot;, &quot;06&quot;
+Month	&quot;Jan&quot;, &quot;January&quot;, &quot;01&quot;, &quot;1&quot;
+Day of the week	&quot;Mon&quot;, &quot;Monday&quot;
+Day of the month	&quot;2&quot;, &quot;_2&quot;, &quot;02&quot;
+Day of the year	&quot;__2&quot;, &quot;002&quot;
+Hour	&quot;15&quot;, &quot;3&quot;, &quot;03&quot; (PM or AM)
+Minute	&quot;4&quot;, &quot;04&quot;
+Second	&quot;5&quot;, &quot;05&quot;
+AM/PM mark	&quot;PM&quot;
+</code></pre>
+<pre><code class="language-go">// TODAY
+now := time.Now()
+    layout := &quot;02-01-2006&quot;
+    today := now.Format(layout)
+    fmt.Println(today) // =&gt; 23-01-2025
+</code></pre>
+<pre><code class="language-go">// OPERATIONS
+newDate := now.AddDate(-1, 0, 0) //ano, mes, dia
+</code></pre>
+<pre><code class="language-go">// SINCE
+start := time.Now()
+elapsed := time.Since(start)
+</code></pre>
+<pre><code class="language-go">// FUTURE
+time.Now().Add(24 * time.Hour) //24 horas desde ahora
+</code></pre>
+<pre><code class="language-go">// PARSE DATE
+// &quot;2006-01-02&quot; Formato estándar: Año-Mes-Día
+sd := r.Form.Get(&quot;start_date&quot;)
+
+
+layout := &quot;2006-01-02&quot;
+
+startDate, err := time.Parse(layout, sd)
+
+if err!= nil{
+    helpers.ServerError(w, err)
+}
+</code></pre>
+<pre><code class="language-go">// UNPARSED
+d := time.Date(2025, 12, 30, 12, 0, 0, 0, time.UTC)
+d1 := d.Format(&quot;2006-01-02&quot;) // =&gt; 2025-12-30
+</code></pre>
+<pre><code class="language-go">// FOR LOOP
+for currentDate.Before(endDate) || currentDate.Equal(endDate) {
+}
+
+//
+</code></pre>
+<pre><code class="language-go">// COMPARE
+date1.Before(date2) // true si date1 &lt; date2
+date1.After(date2) // true si date1 &gt; date2
+date1.Equal(date2) // true si date1 == date2
+
+</code></pre>
+<pre><code class="language-go">// EXTRAER FECHA
+year, month, day := date1.Date()
+
+// con layout
+actualDate := Date1.Format(&quot;01/2006&quot;)
+
+// Si necesitas los valores separados
+year, month, day := b.interestCalculation.StartDate.Date()
+monthStr := fmt.Sprintf(&quot;%02d&quot;, month)
+yearStr := fmt.Sprintf(&quot;%d&quot;, year)
+</code></pre>
+<pre><code class="language-go">// TIME ZONE
+currentTime := time.Now().UTC()
+
+
+loc := time.UTC
+dateLayout = &quot;2006-01-02&quot;
+myDate, err := time.ParseInLocation(dateLayout, unmarshalled.EndDate, loc)
+</code></pre>
+<blockquote>
+<p><a href="https://www.pauladamsmith.com/blog/2011/05/go_time.html">https://www.pauladamsmith.com/blog/2011/05/go_time.html</a>
+<a href="https://www.bytesizego.com/blog/golang-time">https://www.bytesizego.com/blog/golang-time</a></p>
+</blockquote>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

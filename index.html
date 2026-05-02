@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chelobotix Snippets</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      padding: 48px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    header { margin-bottom: 32px; }
+    header h1 { font-size: 28px; font-weight: 700; color: #f0f6fc; margin-bottom: 8px; }
+    header p { color: #8b949e; font-size: 14px; }
+    .badge {
+      display: inline-block;
+      margin-top: 12px;
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 12px;
+      color: #8b949e;
+    }
+
+    /* Search */
+    .search-wrap { position: relative; margin-bottom: 28px; }
+    .search-icon {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #484f58;
+      pointer-events: none;
+      width: 16px;
+      height: 16px;
+    }
+    .search-input {
+      width: 100%;
+      padding: 11px 70px 11px 40px;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      color: #e6edf3;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-input::placeholder { color: #484f58; }
+    .search-input:focus { border-color: #58a6ff; }
+    .search-kbd {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-size: 11px;
+      color: #8b949e;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    /* Search results */
+    #search-results { display: none; }
+    #search-results.visible { display: block; }
+    .results-meta { font-size: 12px; color: #8b949e; margin-bottom: 12px; }
+    .results-grid {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 8px;
+    }
+    .results-grid li a {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 10px 14px;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      color: #58a6ff;
+      text-decoration: none;
+      font-size: 13px;
+      transition: all 0.15s;
+    }
+    .results-grid li a:hover { background: #21262d; border-color: #58a6ff; }
+    .result-cat { font-size: 11px; color: #8b949e; }
+    mark { background: transparent; color: #f0f6fc; font-weight: 700; }
+    .no-results { color: #8b949e; font-size: 14px; padding: 24px 0; text-align: center; }
+
+    /* Accordion */
+    details.category {
+      border: 1px solid #21262d;
+      border-radius: 8px;
+      margin-bottom: 6px;
+      overflow: hidden;
+    }
+    details.category > summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 18px;
+      cursor: pointer;
+      background: #161b22;
+      user-select: none;
+      list-style: none;
+      transition: background 0.15s;
+    }
+    details.category > summary::-webkit-details-marker { display: none; }
+    details.category > summary::marker { display: none; content: ''; }
+    details.category > summary:hover { background: #1c2128; }
+    details.category[open] > summary { background: #1c2128; border-bottom: 1px solid #21262d; }
+    .summary-left { display: flex; align-items: center; gap: 10px; }
+    .cat-arrow {
+      color: #8b949e;
+      font-size: 9px;
+      transition: transform 0.2s;
+      display: inline-block;
+    }
+    details[open] .cat-arrow { transform: rotate(90deg); }
+    .cat-name { font-size: 15px; font-weight: 600; color: #f0f6fc; }
+    .cat-count {
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 2px 9px;
+      font-size: 11px;
+      color: #8b949e;
+    }
+    .cat-body { padding: 16px 18px; }
+    .snippets-grid {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 7px;
+    }
+    .snippets-grid li a {
+      display: block;
+      padding: 8px 12px;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      color: #58a6ff;
+      text-decoration: none;
+      font-size: 13px;
+      transition: all 0.15s;
+    }
+    .snippets-grid li a:hover {
+      background: #21262d;
+      border-color: #58a6ff;
+      color: #79c0ff;
+      transform: translateY(-1px);
+    }
+    .subcategory { margin-top: 16px; }
+    .subcategory h3 {
+      font-size: 11px;
+      font-weight: 600;
+      color: #8b949e;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #21262d;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Chelobotix Snippets</h1>
+    <p>Colección personal de snippets de ingeniería de software.</p>
+    <span class="badge">438 snippets &middot; 28 categorías</span>
+  </header>
+
+  <div class="search-wrap">
+    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input id="search" class="search-input" type="text" placeholder="Buscar snippets… (Ctrl+K)" autocomplete="off" spellcheck="false">
+    <span class="search-kbd" id="kbd-hint">Ctrl+K</span>
+  </div>
+
+  <div id="search-results">
+    <p class="results-meta" id="results-meta"></p>
+    <ul class="results-grid" id="results-list"></ul>
+    <p class="no-results" id="no-results" style="display:none">Sin resultados para esta búsqueda.</p>
+  </div>
+
+  <div id="categories">
+    <details class="category">
+      <summary>
+        <div class="summary-left">
+          <span class="cat-arrow">&#9654;</span>
+          <span class="cat-name">Angular</span>
+        </div>
+        <span class="cat-count">31</span>
+      </summary>
+      <div class="cat-body">
+          <ul class="snippets-grid">
+            <li><a href="snippets/Angular/Angular-CSS.html">Angular CSS</a></li>
+            <li><a href="snippets/Angular/Basic-Angular.html">Basic Angular</a></li>
+            <li><a href="snippets/Angular/Bootstrap-Angular.html">Bootstrap Angular</a></li>
+            <li><a href="snippets/Angular/breakpoint-Observer.html">breakpoint Observer</a></li>
+            <li><a href="snippets/Angular/Change-Detection.html">Change Detection</a></li>
+            <li><a href="snippets/Angular/Components.html">Components</a></li>
+            <li><a href="snippets/Angular/Defer-Views.html">Defer Views</a></li>
+            <li><a href="snippets/Angular/Directives.html">Directives</a></li>
+            <li><a href="snippets/Angular/Environment.html">Environment</a></li>
+            <li><a href="snippets/Angular/Events.html">Events</a></li>
+            <li><a href="snippets/Angular/Forms.html">Forms</a></li>
+            <li><a href="snippets/Angular/Http-requests.html">Http requests</a></li>
+            <li><a href="snippets/Angular/Input-vs-Signal.html">Input vs Signal</a></li>
+            <li><a href="snippets/Angular/Interceptor.html">Interceptor</a></li>
+            <li><a href="snippets/Angular/IONIC.html">IONIC</a></li>
+            <li><a href="snippets/Angular/Key-Event.html">Key Event</a></li>
+            <li><a href="snippets/Angular/Light-Box-JS.html">Light Box JS</a></li>
+            <li><a href="snippets/Angular/Loader-Signal-vs-RxJs-Observable.html">Loader Signal vs RxJs Observable</a></li>
+            <li><a href="snippets/Angular/Masquito.html">Masquito</a></li>
+            <li><a href="snippets/Angular/ng-content-CSS.html">ng content CSS</a></li>
+            <li><a href="snippets/Angular/ngClass.html">ngClass</a></li>
+            <li><a href="snippets/Angular/Observable-Event.html">Observable Event</a></li>
+            <li><a href="snippets/Angular/Observables.html">Observables</a></li>
+            <li><a href="snippets/Angular/Pipes.html">Pipes</a></li>
+            <li><a href="snippets/Angular/primeng.html">primeng</a></li>
+            <li><a href="snippets/Angular/Routes.html">Routes</a></li>
+            <li><a href="snippets/Angular/Sanitizer.html">Sanitizer</a></li>
+            <li><a href="snippets/Angular/Services.html">Services</a></li>
+            <li><a href="snippets/Angular/Signals.html">Signals</a></li>
+            <li><a href="snippets/Angular/Two-Way-Binding.html">Two Way Binding</a></li>
+            <li><a href="snippets/Angular/WebStorm-Rubymine.html">WebStorm Rubymine</a></li>
+          </ul>
+      </div>
+    </details>
+    <details class="category">
+      <summary>
+        <div class="summary-left">
+          <span class="cat-arrow">&#9654;</span>
+          <span class="cat-name">CSS</span>
+        </div>
+        <span class="cat-count">9</span>
+      </summary>
+      <div class="cat-body">
+          <ul class="snippets-grid">
+            <li><a href="snippets/CSS/Always.html">Always</a></li>
+            <li><a href="snippets/CSS/Border-with-no-space-outline.html">Border with no space outline</a></li>
+            <li><a href="snippets/CSS/Css-Tricks.html">Css Tricks</a></li>
+            <li><a href="snippets/CSS/Divider.html">Divider</a></li>
+            <li><a href="snippets/CSS/Ellipse.html">Ellipse</a></li>
+            <li><a href="snippets/CSS/media-query.html">media query</a></li>
+            <li><a href="snippets/CSS/Spin-animation.html">Spin animation</a></li>
+            <li><a href="snippets/CSS/Styled-Componets-Basic.html">Styled Componets Basic</a></li>
+            <li><a href="snippets/CSS/Styled-Componets-Theme-Provider.html">Styled Componets Theme Provider</a></li>
+          </ul>
+      </div>
+    </details>
+    <details class="category">
+      <summary>
+        <div class="summary-left">
+          <span class="cat-arrow">&#9654;</span>
+          <span class="cat-name">DevOps</span>
+        </div>
+        <span class="cat-count">1</span>
+      </summary>
+      <div class="cat-body">
+          <ul class="snippets-grid">
+            <li><a href="snippets/DevOps/Jenkins.html">Jenkins</a></li>
+          </ul>
+      </div>
+    </details>
+    <details class="category">
+      <summary>
+        <div class="summary-left">
+          <span class="cat-arrow">&#9654;</span>
+          <span class="cat-name">Docker</span>
+        </div>
+        <span class="cat-count">1</span>
+      </summary>
+      <div class="cat-body">
+          <ul class="snippets-grid">
+            <li><a href="snippets/Docker/Docker-Basic.html">Docker Basic</a></li>
+          </ul>
+      </div>
+    </details>
+    <details class="category">
+      <summary>
+        <div class="summary-left">
+          <span class="cat-arrow">&#9654;</span>
+          <span class="cat-name">Git</span>
+        </div>
+        <span class="cat-count">22</span>
+      </summary>
+      <div class="cat-body">
+          <ul class="snippets-grid">
+            <li><a href="snippets/Git/Bisect.html">Bisect</a></li>
+            <li><a href="snippets/Git/Cherry-Pick.html">Cherry Pick</a></li>
+            <li><a href="snippets/Git/Clone-specific-branch.html">Clone specific branch</a></li>
+            <li><a href="snippets/Git/Cursor.html">Cursor</a></li>
+            <li><a href="snippets/Git/Delete-Branch.html">Delete Branch</a></li>
+            <li><a href="snippets/Git/Delete-last-commit-(local).html">Delete last commit (local)</a></li>
+            <li><a href="snippets/Git/Delete-Untracked.html">Delete Untracked</a></li>
+            <li><a href="snippets/Git/Difference.html">Difference</a></li>
+            <li><a href="snippets/Git/Forzar-push.html">Forzar push</a></li>
+            <li><a href="snippets/Git/Merge.html">Merge</a></li>
+            <li><a href="snippets/Git/Rebase-Squash.html">Rebase Squash</a></li>
+            <li><a href="snippets/Git/Rebase-_Squash.html">Rebase - Squash</a></li>
+            <li><a href="snippets/Git/Remove-cached.html">Remove cached</a></li>
+            <li><a href="snippets/Git/Remove-Folder.html">Remove Folder</a></li>
+            <li><a href="snippets/Git/Rename-branch.html">Rename branch</a></li>
+            <li><a href="snippets/Git/Reset.html">Reset</a></li>
+            <li><a href="snippets/Git/Restore-file-from-MASTER-or-other-Branch.html">Restore file from MASTER or other Branch</a></li>
+            <li><a href="snippets/Git/Search-_Find-in-all-branchs.html">Search - Find in all branchs</a></li>
+            <li><a href="snippets/Git/Stash.html">Stash</a></li>
+            <li><a href="snippets/Git/Uncommitted-work-to-a-new-Branch.html">Uncommitted work to a new Branch</a></li>
+            <li><a href="snippets/Git/Usar-Multiples-SSH.html">Usar Multiples SSH</a></li>
+            <li><a href="snippets/Git/VOLVER-HEAD-DESPUES-DE-MERGE.html">VOLVER HEAD DESPUES DE MERGE</a></li>
+          </ul>
+      </div>
+    </details>
+    <details class="category">
+      <summary>
+        <div class="summary-left">
+          <span class="cat-arrow">&#9654;</span>
+          <span class="cat-name">Go</span>
+        </div>
+        <span class="cat-count">41</span>
+      </summary>
+      <div class="cat-body">
+          <ul class="snippets-grid">
+            <li><a href="snippets/Go/Basic-Go.html">Basic Go</a></li>
+            <li><a href="snippets/Go/Concurrency-GO.html">Concurrency GO</a></li>
+            <li><a href="snippets/Go/Config-GO.html">Config GO</a></li>
+            <li><a href="snippets/Go/DB-DATABASE-connect.html">DB DATABASE connect</a></li>
+            <li><a href="snippets/Go/Debug-GO.html">Debug GO</a></li>
+            <li><a href="snippets/Go/DELVE-DLV-GO-DEBUGGER.html">DELVE DLV GO DEBUGGER</a></li>
+            <li><a href="snippets/Go/ECHO-FRAMEWORK.html">ECHO FRAMEWORK</a></li>
+            <li><a href="snippets/Go/Events-Rails-Instrumentation-API.html">Events Rails Instrumentation API</a></li>
+            <li><a href="snippets/Go/Fiber-Basic.html">Fiber Basic</a></li>
+            <li><a href="snippets/Go/Fiber-Middleware.html">Fiber Middleware</a></li>
+            <li><a href="snippets/Go/Forms.html">Forms</a></li>
+            <li><a href="snippets/Go/Generics-Go.html">Generics Go</a></li>
+            <li><a href="snippets/Go/Go-Air.html">Go Air</a></li>
+            <li><a href="snippets/Go/golangci-lint-Go-Linter.html">golangci lint Go Linter</a></li>
+            <li><a href="snippets/Go/Gorm.html">Gorm</a></li>
+            <li><a href="snippets/Go/Gotodenv.html">Gotodenv</a></li>
+            <li><a href="snippets/Go/Http-requests.html">Http requests</a></li>
+            <li><a href="snippets/Go/Install-GO.html">Install GO</a></li>
+            <li><a href="snippets/Go/Interfaces-GO.html">Interfaces GO</a></li>
+            <li><a href="snippets/Go/JSON-GO-MARSHALL-UNMARSHALL.html">JSON GO MARSHALL UNMARSHALL</a></li>
+            <li><a href="snippets/Go/JSON.html">JSON</a></li>
+            <li><a href="snippets/Go/MailHog.html">MailHog</a></li>
+            <li><a href="snippets/Go/Middleware.html">Middleware</a></li>
+            <li><a href="snippets/Go/Packages-Libraries.html">Packages Libraries</a></li>
+            <li><a href="snippets/Go/Patterns-GO.html">Patterns GO</a></li>
+            <li><a href="snippets/Go/Pointers-Go-(Punteros).html">Pointers Go (Punteros)</a></li>
+            <li><a href="snippets/Go/Project-Structure-Go.html">Project Structure Go</a></li>
+            <li><a href="snippets/Go/Queries.html">Queries</a></li>
+            <li><a href="snippets/Go/Requests-GO.html">Requests GO</a></li>
+            <li><a href="snippets/Go/Routes.html">Routes</a></li>
+            <li><a href="snippets/Go/Shopspring-Decima-Go.html">Shopspring Decima Go</a></li>
+            <li><a href="snippets/Go/Soda-Pop-Migrations.html">Soda Pop Migrations</a></li>
+            <li><a href="snippets/Go/Test-GO-2.html">Test GO 2</a></li>
+            <li><a href="snippets/Go/Test-GO.html">Test GO</a></li>
+            <li><a href="snippets/Go/Time-and-Date.html">Time and Date</a></li>
+            <li><a href="snippets/Go/untitled-snippet-2.html">untitled snippet 2</a></li>
+            <li><a href="snippets/Go/untitled-snippet-3.html">untitled snippet 3</a></li>
+            <li><a href="snippets/Go/untitled-snippet.html">untitled snippet</a></li>
+            <li><a href="snippets/Go/Validations-GO-VALIDATOR.html">Validations GO VALIDATOR</a></li>
+            <li><a href="snippets/Go/Web-Application-Go.html">Web Application Go</a></li>
+            <li><a href="snippets/Go/ZAP.html">ZAP</a></li>
+          </ul>
+      </div>
+    </details>
+    <details class="category">
+      <summary>
+        <div class="summary-left">
+          <span class="cat-arrow">&#9654;</span>
+          <span class="cat-name">GRails</span>
+        </div>
+        <span class="cat-count">10</span>
+      </summary>
+      <div class="cat-body">
+          <ul class="snippets-grid">
+            <li><a href="snippets/GRails/Comandos-_GRAILS.html">Comandos - GRAILS</a></li>
+            <li><a href="snippets/GRails/CRUD-_GRAILS.html">CRUD - GRAILS</a></li>
+            <li><a href="snippets/GRails/ENUM-_GRAILS.html">ENUM - GRAILS</a></li>
+            <li><a href="snippets/GRails/Generate-_Migrations-_GRAILS.html">Generate - Migrations - GRAILS</a></li>
+            <li><a href="snippets/GRails/HOT-RELOAD-_GRAILS.html">HOT RELOAD - GRAILS</a></li>
+            <li><a href="snippets/GRails/Routes-_GRAILS.html">Routes - GRAILS</a></li>
+            <li><a href="snippets/GRails/SERVICE-_GRAILS.html">SERVICE - GRAILS</a></li>
+            <li><a href="snippets/GRails/TESTS-_GRAILS.html">TESTS - GRAILS</a></li>
+            <li><a href="snippets/GRails/TRAITS-_GRAILS.html">TRAITS - GRAILS</a></li>
+            <li><a href="snippets/GRails/View-Helpers-_GRAILS.html">View Helpers - GRAILS</a></li>
+          </ul>
+      </div>
+    </details>
+    <details class="category">
+      <summary>
+        <div class="summary-left">
+          <span class="cat-arrow">&#9654;</span>
+          <span class="cat-name">Groovy</span>
+        </div>
+        <span class="cat-count">5</span>
+      </summary>
+      <div class="cat-body">
+          <ul class="snippets-grid">
+            <li><a href="snippets/Groovy/Asistencia-_Groovy-_GRails.html">Asistencia - Groovy - GRails</a></li>
+            <li><a href="snippets/Groovy/EXCEPTION-_GROOBY.html">EXCEPTION - GROOBY</a></li>
+            <li><a href="snippets/Groovy/LOOPS-_GRAILS.html">LOOPS - GRAILS</a></li>
+            <li><a href="snippets/Groovy/MyConfig-_GRAILS.html">MyConfig - GRAILS</a></li>
+            <li><a href="snippets/Groovy/untitled-snippet.html">untitled snippet</a></li>
+          </ul>
+      </div>
+    </details>
+    <details class="category">
+      <summary>
+        <div class="summary-left">
+          <span class="cat-arrow">&#9654;</span>
+          <span class="cat-name">IA</span>
+        </div>
+        <span class="cat-count">1</span>
+      </summary>
+      <div class="cat-body">
+          <ul class="snippets-grid">
+            <li><a href="snippets/IA/CLAUDE.html">CLAUDE</a></li>
+          </ul>
+      </div>
+    </details>
+    <details class="category">
+      <summary>
+        <div class="summary-left">
+          <span class="cat-arrow">&#9654;</span>
+          <span class="cat-name">Javascript</span>
+        </div>
+        <span class="cat-count">21</span>
+      </summary>
+      <div class="cat-body">
+          <ul class="snippets-grid">
+            <li><a href="snippets/Javascript/Async-Types.html">Async Types</a></li>
+            <li><a href="snippets/Javascript/Call(),-Bind()-Apply().html">Call(), Bind() Apply()</a></li>
+            <li><a href="snippets/Javascript/Closure.html">Closure</a></li>
+            <li><a href="snippets/Javascript/Coffee.html">Coffee</a></li>
+            <li><a href="snippets/Javascript/Falsy-values.html">Falsy values</a></li>
+            <li><a href="snippets/Javascript/Fetch.html">Fetch</a></li>
+            <li><a href="snippets/Javascript/Get-JSON-at-same-level-(local).html">Get JSON at same level (local)</a></li>
+            <li><a href="snippets/Javascript/Local-Storage-JS.html">Local Storage JS</a></li>
+            <li><a href="snippets/Javascript/Lodash.html">Lodash</a></li>
+            <li><a href="snippets/Javascript/Max-value-in-array.html">Max value in array</a></li>
+            <li><a href="snippets/Javascript/NVM-Node.html">NVM Node</a></li>
+            <li><a href="snippets/Javascript/Object-has-a-given-property-in-javascript.html">Object has a given property in javascript</a></li>
+            <li><a href="snippets/Javascript/Promise.html">Promise</a></li>
+            <li><a href="snippets/Javascript/Prototype.html">Prototype</a></li>
+            <li><a href="snippets/Javascript/Remove-a-part-of-a-string-javascript.html">Remove a part of a string javascript</a></li>
+            <li><a href="snippets/Javascript/Remove-all-duplicates-from-an-array-of-objects.html">Remove all duplicates from an array of objects</a></li>
+            <li><a href="snippets/Javascript/Returns-the-query-string-from-the-current-URL.html">Returns the query string from the current URL</a></li>
+            <li><a href="snippets/Javascript/This.html">This</a></li>
+            <li><a href="snippets/Javascript/typeof.html">typeof</a></li>
+            <li><a href="snippets/Javascript/var-vs-let.html">var vs let</a></li>
+            <li><a href="snippets/Javascript/Window-Open-Link.html">Window Open Link</a></li>
+          </ul>
+      </div>
+    </details>
+    <details class="category">
+      <summary>
+        <div class="summary-left">
+          <span class="cat-arrow">&#9654;</span>
+          <span class="cat-name">Jquery</span>
+        </div>
+        <span class="cat-count">2</span>
+      </summary>
+      <div class="cat-body">
+          <ul class="snippets-grid">
+            <li><a href="snippets/Jquery/dd.html">dd</a></li>
+            <li><a href="snippets/Jquery/jQuery-Tricks.html">jQuery Tricks</a></li>
+          </ul>
+      </div>
+    </details>
+    <details class="category">
+      <summary>
+        <div class="summary-left">
+          <span class="cat-arrow">&#9654;</span>
+          <span class="cat-name">Linux</span>
+        </div>
+        <span class="cat-count">3</span>
+      </summary>
+      <div class="cat-body">
+          <ul class="snippets-grid">
+            <li><a href="snippets/Linux/CURL.html">CURL</a></li>
+            <li><a href="snippets/Linux/Linked-files-_Enlaces-Simbolicos-shared.html">Linked files - Enlaces Simbolicos shared</a></li>
+            <li><a href="snippets/Linux/Shell-_Terminal-_Basic.html">Shell - Terminal - Basic</a></li>
+          </ul>
+      </div>
+    </details>
+    <details class="category">
+      <summary>
+        <div class="summary-left">
+          <span class="cat-arrow">&#9654;</span>
+          <span class="cat-name">Phyton</span>
+        </div>
+        <span class="cat-count">3</span>
+      </summary>
+      <div class="cat-body">
+          <ul class="snippets-grid">
+            <li><a href="snippets/Phyton/Llama3-open-web-ui.html">Llama3 open web ui</a></li>
+            <li><a href="snippets/Phyton/String-Phyton.html">String Phyton</a></li>
+            <li><a href="snippets/Phyton/Virtual-Enviroment-Python.html">Virtual Enviroment Python</a></li>
+          </ul>
+      </div>
+    </details>
+    <details class="category">
+      <summary>
+        <div class="summary-left">
+          <span class="cat-arrow">&#9654;</span>
+          <span class="cat-name">Postgres</span>
+        </div>
+        <span class="cat-count">2</span>
+      </summary>
+      <div class="cat-body">
+          <ul class="snippets-grid">
+            <li><a href="snippets/Postgres/Binary-tree-Query.html">Binary tree Query</a></li>
+            <li><a href="snippets/Postgres/Postgres-Terminal.html">Postgres Terminal</a></li>
+          </ul>
+      </div>
+    </details>
+    <details class="category">
+      <summary>
+        <div class="summary-left">
+          <span class="cat-arrow">&#9654;</span>
+          <span class="cat-name">Prompts</span>
+        </div>
+        <span class="cat-count">1</span>
+      </summary>
+      <div class="cat-body">
+          <ul class="snippets-grid">
+            <li><a href="snippets/Prompts/DeepSeek-Mid-Level.html">DeepSeek Mid Level</a></li>
+          </ul>
+      </div>
+    </details>
+    <details class="category">
+      <summary>
+        <div class="summary-left">
+          <span class="cat-arrow">&#9654;</span>
+          <span class="cat-name">React</span>
+        </div>
+        <span class="cat-count">17</span>
+      </summary>
+      <div class="cat-body">
+          <ul class="snippets-grid">
+            <li><a href="snippets/React/Fetch-React.html">Fetch React</a></li>
+            <li><a href="snippets/React/Filter-Multiple-Parameters.html">Filter Multiple Parameters</a></li>
+            <li><a href="snippets/React/First-Render.html">First Render</a></li>
+            <li><a href="snippets/React/Frame-motion.html">Frame motion</a></li>
+            <li><a href="snippets/React/How-do-I-access-Material-ui's-theme-in-Styled-Component.html">How do I access Material ui's theme in Styled Component</a></li>
+            <li><a href="snippets/React/Mui-Material-Media-Query.html">Mui Material Media Query</a></li>
+            <li><a href="snippets/React/Mui-Material-Theme-Provider.html">Mui Material Theme Provider</a></li>
+            <li><a href="snippets/React/Public-Folder.html">Public Folder</a></li>
+            <li><a href="snippets/React/React-Select.html">React Select</a></li>
+            <li><a href="snippets/React/Scroll-Event.html">Scroll Event</a></li>
+            <li><a href="snippets/React/Single-Page-Application-(SPA)-Routing-Netlify.html">Single Page Application (SPA) Routing Netlify</a></li>
+            <li><a href="snippets/React/Sleep-Dormir.html">Sleep Dormir</a></li>
+            <li><a href="snippets/React/Tailwind.html">Tailwind</a></li>
+            <li><a href="snippets/React/TextField-Style-Mui-Material.html">TextField Style Mui Material</a></li>
+            <li><a href="snippets/React/useDetectScreenSize-custom-hook.html">useDetectScreenSize custom hook</a></li>
+            <li><a href="snippets/React/UUID.html">UUID</a></li>
+            <li><a href="snippets/React/Vite-Debug.html">Vite Debug</a></li>
+          </ul>
+      </div>
+    </details>
+    <details class="category">
+      <summary>
+        <div class="summary-left">
+          <span class="cat-arrow">&#9654;</span>
+          <span class="cat-name">React Router</span>
+        </div>
+        <span class="cat-count">3</span>
+      </summary>
+      <div class="cat-body">
+          <ul class="snippets-grid">
+            <li><a href="snippets/React Router/Basic.html">Basic</a></li>
+            <li><a href="snippets/React Router/Navigate.html">Navigate</a></li>
+            <li><a href="snippets/React Router/Read-from-Query-String.html">Read from Query String</a></li>
+          </ul>
+      </div>
+    </details>
+    <details class="category">
+      <summary>
+        <div class="summary-left">
+          <span class="cat-arrow">&#9654;</span>
+          <span class="cat-name">Redis</span>
+        </div>
+        <span class="cat-count">2</span>
+      </summary>
+      <div class="cat-body">
+          <ul class="snippets-grid">
+            <li><a href="snippets/Redis/Redis-commands-redis-cli.html">Redis commands redis cli</a></li>
+            <li><a href="snippets/Redis/Redis-Golang.html">Redis Golang</a></li>
+          </ul>
+      </div>
+    </details>
+    <details class="category">
+      <summary>
+        <div class="summary-left">
+          <span class="cat-arrow">&#9654;</span>
+          <span class="cat-name">Redux</span>
+        </div>
+        <span class="cat-count">7</span>
+      </summary>
+      <div class="cat-body">
+          <ul class="snippets-grid">
+            <li><a href="snippets/Redux/Basic-Reducer.html">Basic Reducer</a></li>
+            <li><a href="snippets/Redux/Dispatch-UseEffect.html">Dispatch UseEffect</a></li>
+            <li><a href="snippets/Redux/Flag-Redux.html">Flag Redux</a></li>
+            <li><a href="snippets/Redux/More-complex-State.html">More complex State</a></li>
+            <li><a href="snippets/Redux/Redux-Component.html">Redux Component</a></li>
+            <li><a href="snippets/Redux/Redux-Typescript.html">Redux Typescript</a></li>
+            <li><a href="snippets/Redux/Store-JS.html">Store JS</a></li>
+          </ul>
+      </div>
+    </details>
+    <details class="category">
+      <summary>
+        <div class="summary-left">
+          <span class="cat-arrow">&#9654;</span>
+          <span class="cat-name">Ruby</span>
+        </div>
+        <span class="cat-count">31</span>
+      </summary>
+      <div class="cat-body">
+          <ul class="snippets-grid">
+            <li><a href="snippets/Ruby/All.html">All</a></li>
+            <li><a href="snippets/Ruby/arg-options-kwargs.html">arg options kwargs</a></li>
+            <li><a href="snippets/Ruby/Array-Ruby.html">Array Ruby</a></li>
+            <li><a href="snippets/Ruby/Block-Ruby.html">Block Ruby</a></li>
+            <li><a href="snippets/Ruby/Breaking-nested-loop.html">Breaking nested loop</a></li>
+            <li><a href="snippets/Ruby/Destruction-Splat-Operators.html">Destruction Splat Operators</a></li>
+            <li><a href="snippets/Ruby/ENUMERATOR-LAZY.html">ENUMERATOR LAZY</a></li>
+            <li><a href="snippets/Ruby/Equal.html">Equal</a></li>
+            <li><a href="snippets/Ruby/Exceptions-Rescue-Begin.html">Exceptions Rescue Begin</a></li>
+            <li><a href="snippets/Ruby/Hook.html">Hook</a></li>
+            <li><a href="snippets/Ruby/Include-VS-Extend-VS-Prepend-(MODULE).html">Include VS Extend VS Prepend (MODULE)</a></li>
+            <li><a href="snippets/Ruby/integer-max-and-min.html">integer max and min</a></li>
+            <li><a href="snippets/Ruby/Lambda-_Proc.html">Lambda - Proc</a></li>
+            <li><a href="snippets/Ruby/Max-by.html">Max by</a></li>
+            <li><a href="snippets/Ruby/Mixin.html">Mixin</a></li>
+            <li><a href="snippets/Ruby/Module.html">Module</a></li>
+            <li><a href="snippets/Ruby/PAGINACION-CURSOR-RUBY-_PAGINATION.html">PAGINACION CURSOR RUBY - PAGINATION</a></li>
+            <li><a href="snippets/Ruby/partition.html">partition</a></li>
+            <li><a href="snippets/Ruby/Reduce-_Inject.html">Reduce - Inject</a></li>
+            <li><a href="snippets/Ruby/Ruby-Debug.html">Ruby Debug</a></li>
+            <li><a href="snippets/Ruby/Ruby-Install.html">Ruby Install</a></li>
+            <li><a href="snippets/Ruby/Sanitize.html">Sanitize</a></li>
+            <li><a href="snippets/Ruby/Spaceship-Operator-=.html">Spaceship Operator =</a></li>
+            <li><a href="snippets/Ruby/STRUCT-RUBY.html">STRUCT RUBY</a></li>
+            <li><a href="snippets/Ruby/Super.html">Super</a></li>
+            <li><a href="snippets/Ruby/Swapping-Variable-Values.html">Swapping Variable Values</a></li>
+            <li><a href="snippets/Ruby/Symbol-to-Proc.html">Symbol to Proc</a></li>
+            <li><a href="snippets/Ruby/Type-of-an-object.html">Type of an object</a></li>
+            <li><a href="snippets/Ruby/untitled-snippet-2.html">untitled snippet 2</a></li>
+            <li><a href="snippets/Ruby/untitled-snippet-3.html">untitled snippet 3</a></li>
+            <li><a href="snippets/Ruby/untitled-snippet.html">untitled snippet</a></li>
+          </ul>
+      </div>
+    </details>
+    <details class="category">
+      <summary>
+        <div class="summary-left">
+          <span class="cat-arrow">&#9654;</span>
+          <span class="cat-name">Ruby on Rails</span>
+        </div>
+        <span class="cat-count">174</span>
+      </summary>
+      <div class="cat-body">
+          <ul class="snippets-grid">
+            <li><a href="snippets/Ruby on Rails/Aasm-state.html">Aasm state</a></li>
+            <li><a href="snippets/Ruby on Rails/act-as-paranoid-_soft-delete.html">act as paranoid - soft delete</a></li>
+            <li><a href="snippets/Ruby on Rails/Act-as-Taggable.html">Act as Taggable</a></li>
+            <li><a href="snippets/Ruby on Rails/Action-Cable-Web-sockets.html">Action Cable Web sockets</a></li>
+            <li><a href="snippets/Ruby on Rails/Active-Model-Serializers.html">Active Model Serializers</a></li>
+            <li><a href="snippets/Ruby on Rails/Active-Record-Callbacks.html">Active Record Callbacks</a></li>
+            <li><a href="snippets/Ruby on Rails/Active-Snapshot.html">Active Snapshot</a></li>
+            <li><a href="snippets/Ruby on Rails/Active-Storage.html">Active Storage</a></li>
+            <li><a href="snippets/Ruby on Rails/ACTIVE-SUPPORT-Rails.html">ACTIVE SUPPORT Rails</a></li>
+            <li><a href="snippets/Ruby on Rails/Activity-Notification.html">Activity Notification</a></li>
+            <li><a href="snippets/Ruby on Rails/Add-data-to-join-table-third-table-many-to-many.html">Add data to join table third table many to many</a></li>
+            <li><a href="snippets/Ruby on Rails/AJAX.html">AJAX</a></li>
+            <li><a href="snippets/Ruby on Rails/API-SWAGGER.html">API SWAGGER</a></li>
+            <li><a href="snippets/Ruby on Rails/asdf.html">asdf</a></li>
+            <li><a href="snippets/Ruby on Rails/Base64.html">Base64</a></li>
+            <li><a href="snippets/Ruby on Rails/Basic-application.haml.html">Basic application.haml</a></li>
+            <li><a href="snippets/Ruby on Rails/BCrypt.html">BCrypt</a></li>
+            <li><a href="snippets/Ruby on Rails/before_action-.html">before action </a></li>
+            <li><a href="snippets/Ruby on Rails/binsetup-Rails-Setup.html">binsetup Rails Setup</a></li>
+            <li><a href="snippets/Ruby on Rails/Build.html">Build</a></li>
+            <li><a href="snippets/Ruby on Rails/Bundle.html">Bundle</a></li>
+            <li><a href="snippets/Ruby on Rails/Cache-Ruby-on-Rails.html">Cache Ruby on Rails</a></li>
+            <li><a href="snippets/Ruby on Rails/Caching-with-Instance-Variables-Memoization.html">Caching with Instance Variables Memoization</a></li>
+            <li><a href="snippets/Ruby on Rails/Callbacks-Rails.html">Callbacks Rails</a></li>
+            <li><a href="snippets/Ruby on Rails/Can-Can-Can.html">Can Can Can</a></li>
+            <li><a href="snippets/Ruby on Rails/Clave-Publica-y-Privada-SSL.html">Clave Publica y Privada SSL</a></li>
+            <li><a href="snippets/Ruby on Rails/Clear-sass-or-css.html">Clear sass or css</a></li>
+            <li><a href="snippets/Ruby on Rails/Commands-Rails.html">Commands Rails</a></li>
+            <li><a href="snippets/Ruby on Rails/Concerns.html">Concerns</a></li>
+            <li><a href="snippets/Ruby on Rails/Conditional-algorithm.html">Conditional algorithm</a></li>
+            <li><a href="snippets/Ruby on Rails/Console.html">Console</a></li>
+            <li><a href="snippets/Ruby on Rails/Convention.html">Convention</a></li>
+            <li><a href="snippets/Ruby on Rails/Cookies.html">Cookies</a></li>
+            <li><a href="snippets/Ruby on Rails/CORS-configure.html">CORS configure</a></li>
+            <li><a href="snippets/Ruby on Rails/Credentials.html">Credentials</a></li>
+            <li><a href="snippets/Ruby on Rails/CRUD-RAILS.html">CRUD RAILS</a></li>
+            <li><a href="snippets/Ruby on Rails/CSRF.html">CSRF</a></li>
+            <li><a href="snippets/Ruby on Rails/CSV.html">CSV</a></li>
+            <li><a href="snippets/Ruby on Rails/CURRENT-CLASS-_ActiveSupportCurrentAttributes.html">CURRENT CLASS - ActiveSupportCurrentAttributes</a></li>
+            <li><a href="snippets/Ruby on Rails/Datatables.html">Datatables</a></li>
+            <li><a href="snippets/Ruby on Rails/DB-Schema.html">DB Schema</a></li>
+            <li><a href="snippets/Ruby on Rails/Delegator-_Forwardable.html">Delegator - Forwardable</a></li>
+            <li><a href="snippets/Ruby on Rails/Devise.html">Devise</a></li>
+            <li><a href="snippets/Ruby on Rails/Div_for.html">Div for</a></li>
+            <li><a href="snippets/Ruby on Rails/Dropdown-Rails.html">Dropdown Rails</a></li>
+            <li><a href="snippets/Ruby on Rails/Enviroment-Variables.html">Enviroment Variables</a></li>
+            <li><a href="snippets/Ruby on Rails/Escape-Javascript.html">Escape Javascript</a></li>
+            <li><a href="snippets/Ruby on Rails/ExecJSProgramError.html">ExecJSProgramError</a></li>
+            <li><a href="snippets/Ruby on Rails/Favicon.html">Favicon</a></li>
+            <li><a href="snippets/Ruby on Rails/Files.html">Files</a></li>
+            <li><a href="snippets/Ruby on Rails/Filtering-Sensitive-data-on-rails.html">Filtering Sensitive data on rails</a></li>
+            <li><a href="snippets/Ruby on Rails/Fixture.html">Fixture</a></li>
+            <li><a href="snippets/Ruby on Rails/Flash.html">Flash</a></li>
+            <li><a href="snippets/Ruby on Rails/Fly.io.html">Fly.io</a></li>
+            <li><a href="snippets/Ruby on Rails/Fontawesome-4.html">Fontawesome 4</a></li>
+            <li><a href="snippets/Ruby on Rails/Forms.html">Forms</a></li>
+            <li><a href="snippets/Ruby on Rails/Gems.html">Gems</a></li>
+            <li><a href="snippets/Ruby on Rails/Generate-Rails.html">Generate Rails</a></li>
+            <li><a href="snippets/Ruby on Rails/Gon.html">Gon</a></li>
+            <li><a href="snippets/Ruby on Rails/Grape.html">Grape</a></li>
+            <li><a href="snippets/Ruby on Rails/Guard-Hash.html">Guard Hash</a></li>
+            <li><a href="snippets/Ruby on Rails/HAML.html">HAML</a></li>
+            <li><a href="snippets/Ruby on Rails/Hash-Ruby.html">Hash Ruby</a></li>
+            <li><a href="snippets/Ruby on Rails/Helpers-and-Tricks-Rails.html">Helpers and Tricks Rails</a></li>
+            <li><a href="snippets/Ruby on Rails/Hostname.html">Hostname</a></li>
+            <li><a href="snippets/Ruby on Rails/Httparty.html">Httparty</a></li>
+            <li><a href="snippets/Ruby on Rails/Importmap.html">Importmap</a></li>
+            <li><a href="snippets/Ruby on Rails/Injeccion-de-Dependencias-_Dependency-Injection.html">Injeccion de Dependencias - Dependency Injection</a></li>
+            <li><a href="snippets/Ruby on Rails/Interface-Ruby.html">Interface Ruby</a></li>
+            <li><a href="snippets/Ruby on Rails/javascript-from-action-railsujs.html">javascript from action railsujs</a></li>
+            <li><a href="snippets/Ruby on Rails/Javascript-JS-script-Rails.html">Javascript JS script Rails</a></li>
+            <li><a href="snippets/Ruby on Rails/Javascript-Rails.html">Javascript Rails</a></li>
+            <li><a href="snippets/Ruby on Rails/JBuilder.html">JBuilder</a></li>
+            <li><a href="snippets/Ruby on Rails/Jobs-Workers.html">Jobs Workers</a></li>
+            <li><a href="snippets/Ruby on Rails/Json-Schema.html">Json Schema</a></li>
+            <li><a href="snippets/Ruby on Rails/JSON.html">JSON</a></li>
+            <li><a href="snippets/Ruby on Rails/Jsonapi-Serializer.html">Jsonapi Serializer</a></li>
+            <li><a href="snippets/Ruby on Rails/JSONAPIResource.html">JSONAPIResource</a></li>
+            <li><a href="snippets/Ruby on Rails/JSONAPIResources.html">JSONAPIResources</a></li>
+            <li><a href="snippets/Ruby on Rails/JWT.html">JWT</a></li>
+            <li><a href="snippets/Ruby on Rails/Kill-Puma.html">Kill Puma</a></li>
+            <li><a href="snippets/Ruby on Rails/Lazybox.html">Lazybox</a></li>
+            <li><a href="snippets/Ruby on Rails/Leter-opener-gem.html">Leter opener gem</a></li>
+            <li><a href="snippets/Ruby on Rails/Log.html">Log</a></li>
+            <li><a href="snippets/Ruby on Rails/Lograge.html">Lograge</a></li>
+            <li><a href="snippets/Ruby on Rails/Mail-SMTP.html">Mail SMTP</a></li>
+            <li><a href="snippets/Ruby on Rails/Mailer.html">Mailer</a></li>
+            <li><a href="snippets/Ruby on Rails/Marshal-Ruby.html">Marshal Ruby</a></li>
+            <li><a href="snippets/Ruby on Rails/META-PROGRAMMING-RUBY.html">META PROGRAMMING RUBY</a></li>
+            <li><a href="snippets/Ruby on Rails/Middleware.html">Middleware</a></li>
+            <li><a href="snippets/Ruby on Rails/Min-Max-Clamp.html">Min Max Clamp</a></li>
+            <li><a href="snippets/Ruby on Rails/Mock-Model.html">Mock Model</a></li>
+            <li><a href="snippets/Ruby on Rails/Model-_Scopes.html">Model - Scopes</a></li>
+            <li><a href="snippets/Ruby on Rails/Multiple-selection.html">Multiple selection</a></li>
+            <li><a href="snippets/Ruby on Rails/Nested-Attributes-(model).html">Nested Attributes (model)</a></li>
+            <li><a href="snippets/Ruby on Rails/NetHTTP-URI-RUBY.html">NetHTTP URI RUBY</a></li>
+            <li><a href="snippets/Ruby on Rails/nil-vs.-empty-vs.-blank-in-Ruby.html">nil vs. empty vs. blank in Ruby</a></li>
+            <li><a href="snippets/Ruby on Rails/Noticed-Notifications.html">Noticed Notifications</a></li>
+            <li><a href="snippets/Ruby on Rails/Numbers.html">Numbers</a></li>
+            <li><a href="snippets/Ruby on Rails/OAuth-2.0-and-OpenID.html">OAuth 2.0 and OpenID</a></li>
+            <li><a href="snippets/Ruby on Rails/Optimistic-Pessimistic-Locking-Race-ConditionPesimista.html">Optimistic Pessimistic Locking Race ConditionPesimista</a></li>
+            <li><a href="snippets/Ruby on Rails/PaperTrail.html">PaperTrail</a></li>
+            <li><a href="snippets/Ruby on Rails/Patterns-Ruby-(BEHAVIORALS).html">Patterns Ruby (BEHAVIORALS)</a></li>
+            <li><a href="snippets/Ruby on Rails/Patterns-Ruby-(CREATIONALS).html">Patterns Ruby (CREATIONALS)</a></li>
+            <li><a href="snippets/Ruby on Rails/Patterns-Ruby-(STRUCTURALS).html">Patterns Ruby (STRUCTURALS)</a></li>
+            <li><a href="snippets/Ruby on Rails/Patterns-RUBY.html">Patterns RUBY</a></li>
+            <li><a href="snippets/Ruby on Rails/PERFORMANCE-Ruby-on-rails.html">PERFORMANCE Ruby on rails</a></li>
+            <li><a href="snippets/Ruby on Rails/Pipeline-Gem.html">Pipeline Gem</a></li>
+            <li><a href="snippets/Ruby on Rails/pluralize.html">pluralize</a></li>
+            <li><a href="snippets/Ruby on Rails/Polling-API.html">Polling API</a></li>
+            <li><a href="snippets/Ruby on Rails/PostMessage.html">PostMessage</a></li>
+            <li><a href="snippets/Ruby on Rails/Prettier-Rails-ERB.html">Prettier Rails ERB</a></li>
+            <li><a href="snippets/Ruby on Rails/Provide.html">Provide</a></li>
+            <li><a href="snippets/Ruby on Rails/Pry.html">Pry</a></li>
+            <li><a href="snippets/Ruby on Rails/Radio-button-witn-image.html">Radio button witn image</a></li>
+            <li><a href="snippets/Ruby on Rails/Rail-Genius.html">Rail Genius</a></li>
+            <li><a href="snippets/Ruby on Rails/Rails-Bootstrap.html">Rails Bootstrap</a></li>
+            <li><a href="snippets/Ruby on Rails/RAILS-COMMANDS.html">RAILS COMMANDS</a></li>
+            <li><a href="snippets/Ruby on Rails/Rails-css.html">Rails css</a></li>
+            <li><a href="snippets/Ruby on Rails/Rails-Database-commands.html">Rails Database commands</a></li>
+            <li><a href="snippets/Ruby on Rails/Rails-Enviroment.html">Rails Enviroment</a></li>
+            <li><a href="snippets/Ruby on Rails/Rails-Genius.html">Rails Genius</a></li>
+            <li><a href="snippets/Ruby on Rails/Rainbow.html">Rainbow</a></li>
+            <li><a href="snippets/Ruby on Rails/Rake-Tasks.html">Rake Tasks</a></li>
+            <li><a href="snippets/Ruby on Rails/Redirect.html">Redirect</a></li>
+            <li><a href="snippets/Ruby on Rails/Regex.html">Regex</a></li>
+            <li><a href="snippets/Ruby on Rails/Relations.html">Relations</a></li>
+            <li><a href="snippets/Ruby on Rails/Requests-RAILS.html">Requests RAILS</a></li>
+            <li><a href="snippets/Ruby on Rails/Response-Rails.html">Response Rails</a></li>
+            <li><a href="snippets/Ruby on Rails/Rolify.html">Rolify</a></li>
+            <li><a href="snippets/Ruby on Rails/Routes.html">Routes</a></li>
+            <li><a href="snippets/Ruby on Rails/RSPEC.html">RSPEC</a></li>
+            <li><a href="snippets/Ruby on Rails/Rubocop-config-file.html">Rubocop config file</a></li>
+            <li><a href="snippets/Ruby on Rails/Ruby-Class.html">Ruby Class</a></li>
+            <li><a href="snippets/Ruby on Rails/Ruby-LP-Rubocop.html">Ruby LP Rubocop</a></li>
+            <li><a href="snippets/Ruby on Rails/Rubymone-problem-intellij.html">Rubymone problem intellij</a></li>
+            <li><a href="snippets/Ruby on Rails/rvm.html">rvm</a></li>
+            <li><a href="snippets/Ruby on Rails/Sandi-Metz.html">Sandi Metz</a></li>
+            <li><a href="snippets/Ruby on Rails/Seed.html">Seed</a></li>
+            <li><a href="snippets/Ruby on Rails/SERVICE-Ruby-on-Rails.html">SERVICE Ruby on Rails</a></li>
+            <li><a href="snippets/Ruby on Rails/Service-Vs-Lib-vs-Class.html">Service Vs Lib vs Class</a></li>
+            <li><a href="snippets/Ruby on Rails/Sessions.html">Sessions</a></li>
+            <li><a href="snippets/Ruby on Rails/SHA-256.html">SHA 256</a></li>
+            <li><a href="snippets/Ruby on Rails/Sidekiq.html">Sidekiq</a></li>
+            <li><a href="snippets/Ruby on Rails/Simple-Form.html">Simple Form</a></li>
+            <li><a href="snippets/Ruby on Rails/Singleton.html">Singleton</a></li>
+            <li><a href="snippets/Ruby on Rails/SINLGETON-CLASS-Ruby-on-rails.html">SINLGETON CLASS Ruby on rails</a></li>
+            <li><a href="snippets/Ruby on Rails/sleep.html">sleep</a></li>
+            <li><a href="snippets/Ruby on Rails/SORT-RUBY.html">SORT RUBY</a></li>
+            <li><a href="snippets/Ruby on Rails/Soundex-Ruby-on-Rails.html">Soundex Ruby on Rails</a></li>
+            <li><a href="snippets/Ruby on Rails/SQL-Rails-ORM.html">SQL Rails ORM</a></li>
+            <li><a href="snippets/Ruby on Rails/Stimulus.html">Stimulus</a></li>
+            <li><a href="snippets/Ruby on Rails/Store-accessors.html">Store accessors</a></li>
+            <li><a href="snippets/Ruby on Rails/Stream-Live.html">Stream Live</a></li>
+            <li><a href="snippets/Ruby on Rails/Stress-test-heavy-loan-test.html">Stress test heavy loan test</a></li>
+            <li><a href="snippets/Ruby on Rails/String-Text-Convert-RUBY.html">String Text Convert RUBY</a></li>
+            <li><a href="snippets/Ruby on Rails/Strong-Params.html">Strong Params</a></li>
+            <li><a href="snippets/Ruby on Rails/Tap-Ruby-on-Rails.html">Tap Ruby on Rails</a></li>
+            <li><a href="snippets/Ruby on Rails/Threads.html">Threads</a></li>
+            <li><a href="snippets/Ruby on Rails/Time-and-Date.html">Time and Date</a></li>
+            <li><a href="snippets/Ruby on Rails/Tricks.html">Tricks</a></li>
+            <li><a href="snippets/Ruby on Rails/TURBO-basic.html">TURBO basic</a></li>
+            <li><a href="snippets/Ruby on Rails/Turbo-Frame.html">Turbo Frame</a></li>
+            <li><a href="snippets/Ruby on Rails/Turbo-Stream.html">Turbo Stream</a></li>
+            <li><a href="snippets/Ruby on Rails/untitled-snippet-2.html">untitled snippet 2</a></li>
+            <li><a href="snippets/Ruby on Rails/untitled-snippet.html">untitled snippet</a></li>
+            <li><a href="snippets/Ruby on Rails/Validations.html">Validations</a></li>
+            <li><a href="snippets/Ruby on Rails/Variable-de-Entorno-ENV.html">Variable de Entorno ENV</a></li>
+            <li><a href="snippets/Ruby on Rails/View-Component.html">View Component</a></li>
+            <li><a href="snippets/Ruby on Rails/Virtual-Attributes.html">Virtual Attributes</a></li>
+            <li><a href="snippets/Ruby on Rails/Webhook.html">Webhook</a></li>
+            <li><a href="snippets/Ruby on Rails/White-list.html">White list</a></li>
+            <li><a href="snippets/Ruby on Rails/Will_paginate.html">Will paginate</a></li>
+            <li><a href="snippets/Ruby on Rails/YAML.html">YAML</a></li>
+          </ul>
+      </div>
+    </details>
+    <details class="category">
+      <summary>
+        <div class="summary-left">
+          <span class="cat-arrow">&#9654;</span>
+          <span class="cat-name">Shipedge</span>
+        </div>
+        <span class="cat-count">2</span>
+      </summary>
+      <div class="cat-body">
+          <ul class="snippets-grid">
+            <li><a href="snippets/Shipedge/credentials-XENVIO.html">credentials XENVIO</a></li>
+            <li><a href="snippets/Shipedge/Nova-Sphere.html">Nova Sphere</a></li>
+          </ul>
+      </div>
+    </details>
+    <details class="category">
+      <summary>
+        <div class="summary-left">
+          <span class="cat-arrow">&#9654;</span>
+          <span class="cat-name">SQL</span>
+        </div>
+        <span class="cat-count">4</span>
+      </summary>
+      <div class="cat-body">
+          <ul class="snippets-grid">
+            <li><a href="snippets/SQL/JOIN.html">JOIN</a></li>
+            <li><a href="snippets/SQL/ORDER-BY.html">ORDER BY</a></li>
+            <li><a href="snippets/SQL/SQL-USEFULL-QUERIES.html">SQL USEFULL QUERIES</a></li>
+            <li><a href="snippets/SQL/WHERE.html">WHERE</a></li>
+          </ul>
+      </div>
+    </details>
+    <details class="category">
+      <summary>
+        <div class="summary-left">
+          <span class="cat-arrow">&#9654;</span>
+          <span class="cat-name">TanStack</span>
+        </div>
+        <span class="cat-count">1</span>
+      </summary>
+      <div class="cat-body">
+          <ul class="snippets-grid">
+            <li><a href="snippets/TanStack/TanStack-React-Query-Basic.html">TanStack React Query Basic</a></li>
+          </ul>
+      </div>
+    </details>
+    <details class="category">
+      <summary>
+        <div class="summary-left">
+          <span class="cat-arrow">&#9654;</span>
+          <span class="cat-name">Terminal Shell</span>
+        </div>
+        <span class="cat-count">9</span>
+      </summary>
+      <div class="cat-body">
+          <ul class="snippets-grid">
+            <li><a href="snippets/Terminal Shell/Curl.html">Curl</a></li>
+            <li><a href="snippets/Terminal Shell/Github.html">Github</a></li>
+            <li><a href="snippets/Terminal Shell/GITLAB-TOKEN-RENEW.html">GITLAB TOKEN RENEW</a></li>
+            <li><a href="snippets/Terminal Shell/ngrok.html">ngrok</a></li>
+            <li><a href="snippets/Terminal Shell/Oracle.html">Oracle</a></li>
+            <li><a href="snippets/Terminal Shell/Permisos.html">Permisos</a></li>
+            <li><a href="snippets/Terminal Shell/RAILSWAY.com.html">RAILSWAY.com</a></li>
+            <li><a href="snippets/Terminal Shell/SSH-Key.html">SSH Key</a></li>
+            <li><a href="snippets/Terminal Shell/WashUp.html">WashUp</a></li>
+          </ul>
+      </div>
+    </details>
+    <details class="category">
+      <summary>
+        <div class="summary-left">
+          <span class="cat-arrow">&#9654;</span>
+          <span class="cat-name">TypeScript</span>
+        </div>
+        <span class="cat-count">29</span>
+      </summary>
+      <div class="cat-body">
+          <ul class="snippets-grid">
+            <li><a href="snippets/TypeScript/Array-of-Objects-Type.html">Array of Objects Type</a></li>
+            <li><a href="snippets/TypeScript/Callback.html">Callback</a></li>
+            <li><a href="snippets/TypeScript/Children.html">Children</a></li>
+            <li><a href="snippets/TypeScript/Enum.html">Enum</a></li>
+            <li><a href="snippets/TypeScript/Events.html">Events</a></li>
+            <li><a href="snippets/TypeScript/From-const-to-type.html">From const to type</a></li>
+            <li><a href="snippets/TypeScript/Generics.html">Generics</a></li>
+            <li><a href="snippets/TypeScript/Get-return-type-of-a-function.html">Get return type of a function</a></li>
+            <li><a href="snippets/TypeScript/Interface.html">Interface</a></li>
+            <li><a href="snippets/TypeScript/Iterate-Object-Properties-(key)-with-Type-Checking.html">Iterate Object Properties (key) with Type Checking</a></li>
+            <li><a href="snippets/TypeScript/keyof.html">keyof</a></li>
+            <li><a href="snippets/TypeScript/Know-all-properties-of-Nested-types.html">Know all properties of Nested types</a></li>
+            <li><a href="snippets/TypeScript/Local-Storage-Typescript.html">Local Storage Typescript</a></li>
+            <li><a href="snippets/TypeScript/Object-with-properties-that-match-the-keys-of-an-interface.html">Object with properties that match the keys of an interface</a></li>
+            <li><a href="snippets/TypeScript/Omit.html">Omit</a></li>
+            <li><a href="snippets/TypeScript/Partial.html">Partial</a></li>
+            <li><a href="snippets/TypeScript/React-Props-Functional-Component.html">React Props Functional Component</a></li>
+            <li><a href="snippets/TypeScript/React-Types.html">React Types</a></li>
+            <li><a href="snippets/TypeScript/Record.html">Record</a></li>
+            <li><a href="snippets/TypeScript/Remove-a-Key-from-a-state-Object-in-React.html">Remove a Key from a state Object in React</a></li>
+            <li><a href="snippets/TypeScript/Return-JSX-function.html">Return JSX function</a></li>
+            <li><a href="snippets/TypeScript/String-Query-Validation.html">String Query Validation</a></li>
+            <li><a href="snippets/TypeScript/Tuple.html">Tuple</a></li>
+            <li><a href="snippets/TypeScript/Type-assertions-(also-known-as-Type-Casting).html">Type assertions (also known as Type Casting)</a></li>
+            <li><a href="snippets/TypeScript/Type-Object-must-have-a-Symbol.iterator-method-that-returns-an-iterator.html">Type Object must have a Symbol.iterator method that returns an iterator</a></li>
+            <li><a href="snippets/TypeScript/Type.html">Type</a></li>
+            <li><a href="snippets/TypeScript/untitled-snippet.html">untitled snippet</a></li>
+            <li><a href="snippets/TypeScript/useClickAway.html">useClickAway</a></li>
+            <li><a href="snippets/TypeScript/useRef.html">useRef</a></li>
+          </ul>
+      </div>
+    </details>
+    <details class="category">
+      <summary>
+        <div class="summary-left">
+          <span class="cat-arrow">&#9654;</span>
+          <span class="cat-name">Uncategorized</span>
+        </div>
+        <span class="cat-count">5</span>
+      </summary>
+      <div class="cat-body">
+          <ul class="snippets-grid">
+            <li><a href="snippets/Uncategorized/ORM-_GRAILS.html">ORM - GRAILS</a></li>
+            <li><a href="snippets/Uncategorized/Patterns-Ruby-(CREATIONALS).html">Patterns Ruby (CREATIONALS)</a></li>
+            <li><a href="snippets/Uncategorized/React-Icons.html">React Icons</a></li>
+            <li><a href="snippets/Uncategorized/Required-keyword-argument.html">Required keyword argument</a></li>
+            <li><a href="snippets/Uncategorized/Rosetta-2.html">Rosetta 2</a></li>
+          </ul>
+      </div>
+    </details>
+    <details class="category">
+      <summary>
+        <div class="summary-left">
+          <span class="cat-arrow">&#9654;</span>
+          <span class="cat-name">Vita Wallet</span>
+        </div>
+        <span class="cat-count">1</span>
+      </summary>
+      <div class="cat-body">
+          <ul class="snippets-grid">
+            <li><a href="snippets/Vita Wallet/Vita-Wallet.html">Vita Wallet</a></li>
+          </ul>
+      </div>
+    </details>
+  </div>
+
+  <script>
+    const ALL = [{"title":"Angular CSS","href":"snippets/Angular/Angular-CSS.html","category":"Angular"},{"title":"Basic Angular","href":"snippets/Angular/Basic-Angular.html","category":"Angular"},{"title":"Bootstrap Angular","href":"snippets/Angular/Bootstrap-Angular.html","category":"Angular"},{"title":"breakpoint Observer","href":"snippets/Angular/breakpoint-Observer.html","category":"Angular"},{"title":"Change Detection","href":"snippets/Angular/Change-Detection.html","category":"Angular"},{"title":"Components","href":"snippets/Angular/Components.html","category":"Angular"},{"title":"Defer Views","href":"snippets/Angular/Defer-Views.html","category":"Angular"},{"title":"Directives","href":"snippets/Angular/Directives.html","category":"Angular"},{"title":"Environment","href":"snippets/Angular/Environment.html","category":"Angular"},{"title":"Events","href":"snippets/Angular/Events.html","category":"Angular"},{"title":"Forms","href":"snippets/Angular/Forms.html","category":"Angular"},{"title":"Http requests","href":"snippets/Angular/Http-requests.html","category":"Angular"},{"title":"Input vs Signal","href":"snippets/Angular/Input-vs-Signal.html","category":"Angular"},{"title":"Interceptor","href":"snippets/Angular/Interceptor.html","category":"Angular"},{"title":"IONIC","href":"snippets/Angular/IONIC.html","category":"Angular"},{"title":"Key Event","href":"snippets/Angular/Key-Event.html","category":"Angular"},{"title":"Light Box JS","href":"snippets/Angular/Light-Box-JS.html","category":"Angular"},{"title":"Loader Signal vs RxJs Observable","href":"snippets/Angular/Loader-Signal-vs-RxJs-Observable.html","category":"Angular"},{"title":"Masquito","href":"snippets/Angular/Masquito.html","category":"Angular"},{"title":"ng content CSS","href":"snippets/Angular/ng-content-CSS.html","category":"Angular"},{"title":"ngClass","href":"snippets/Angular/ngClass.html","category":"Angular"},{"title":"Observable Event","href":"snippets/Angular/Observable-Event.html","category":"Angular"},{"title":"Observables","href":"snippets/Angular/Observables.html","category":"Angular"},{"title":"Pipes","href":"snippets/Angular/Pipes.html","category":"Angular"},{"title":"primeng","href":"snippets/Angular/primeng.html","category":"Angular"},{"title":"Routes","href":"snippets/Angular/Routes.html","category":"Angular"},{"title":"Sanitizer","href":"snippets/Angular/Sanitizer.html","category":"Angular"},{"title":"Services","href":"snippets/Angular/Services.html","category":"Angular"},{"title":"Signals","href":"snippets/Angular/Signals.html","category":"Angular"},{"title":"Two Way Binding","href":"snippets/Angular/Two-Way-Binding.html","category":"Angular"},{"title":"WebStorm Rubymine","href":"snippets/Angular/WebStorm-Rubymine.html","category":"Angular"},{"title":"Always","href":"snippets/CSS/Always.html","category":"CSS"},{"title":"Border with no space outline","href":"snippets/CSS/Border-with-no-space-outline.html","category":"CSS"},{"title":"Css Tricks","href":"snippets/CSS/Css-Tricks.html","category":"CSS"},{"title":"Divider","href":"snippets/CSS/Divider.html","category":"CSS"},{"title":"Ellipse","href":"snippets/CSS/Ellipse.html","category":"CSS"},{"title":"media query","href":"snippets/CSS/media-query.html","category":"CSS"},{"title":"Spin animation","href":"snippets/CSS/Spin-animation.html","category":"CSS"},{"title":"Styled Componets Basic","href":"snippets/CSS/Styled-Componets-Basic.html","category":"CSS"},{"title":"Styled Componets Theme Provider","href":"snippets/CSS/Styled-Componets-Theme-Provider.html","category":"CSS"},{"title":"Jenkins","href":"snippets/DevOps/Jenkins.html","category":"DevOps"},{"title":"Docker Basic","href":"snippets/Docker/Docker-Basic.html","category":"Docker"},{"title":"Bisect","href":"snippets/Git/Bisect.html","category":"Git"},{"title":"Cherry Pick","href":"snippets/Git/Cherry-Pick.html","category":"Git"},{"title":"Clone specific branch","href":"snippets/Git/Clone-specific-branch.html","category":"Git"},{"title":"Cursor","href":"snippets/Git/Cursor.html","category":"Git"},{"title":"Delete Branch","href":"snippets/Git/Delete-Branch.html","category":"Git"},{"title":"Delete last commit (local)","href":"snippets/Git/Delete-last-commit-(local).html","category":"Git"},{"title":"Delete Untracked","href":"snippets/Git/Delete-Untracked.html","category":"Git"},{"title":"Difference","href":"snippets/Git/Difference.html","category":"Git"},{"title":"Forzar push","href":"snippets/Git/Forzar-push.html","category":"Git"},{"title":"Merge","href":"snippets/Git/Merge.html","category":"Git"},{"title":"Rebase Squash","href":"snippets/Git/Rebase-Squash.html","category":"Git"},{"title":"Rebase - Squash","href":"snippets/Git/Rebase-_Squash.html","category":"Git"},{"title":"Remove cached","href":"snippets/Git/Remove-cached.html","category":"Git"},{"title":"Remove Folder","href":"snippets/Git/Remove-Folder.html","category":"Git"},{"title":"Rename branch","href":"snippets/Git/Rename-branch.html","category":"Git"},{"title":"Reset","href":"snippets/Git/Reset.html","category":"Git"},{"title":"Restore file from MASTER or other Branch","href":"snippets/Git/Restore-file-from-MASTER-or-other-Branch.html","category":"Git"},{"title":"Search - Find in all branchs","href":"snippets/Git/Search-_Find-in-all-branchs.html","category":"Git"},{"title":"Stash","href":"snippets/Git/Stash.html","category":"Git"},{"title":"Uncommitted work to a new Branch","href":"snippets/Git/Uncommitted-work-to-a-new-Branch.html","category":"Git"},{"title":"Usar Multiples SSH","href":"snippets/Git/Usar-Multiples-SSH.html","category":"Git"},{"title":"VOLVER HEAD DESPUES DE MERGE","href":"snippets/Git/VOLVER-HEAD-DESPUES-DE-MERGE.html","category":"Git"},{"title":"Basic Go","href":"snippets/Go/Basic-Go.html","category":"Go"},{"title":"Concurrency GO","href":"snippets/Go/Concurrency-GO.html","category":"Go"},{"title":"Config GO","href":"snippets/Go/Config-GO.html","category":"Go"},{"title":"DB DATABASE connect","href":"snippets/Go/DB-DATABASE-connect.html","category":"Go"},{"title":"Debug GO","href":"snippets/Go/Debug-GO.html","category":"Go"},{"title":"DELVE DLV GO DEBUGGER","href":"snippets/Go/DELVE-DLV-GO-DEBUGGER.html","category":"Go"},{"title":"ECHO FRAMEWORK","href":"snippets/Go/ECHO-FRAMEWORK.html","category":"Go"},{"title":"Events Rails Instrumentation API","href":"snippets/Go/Events-Rails-Instrumentation-API.html","category":"Go"},{"title":"Fiber Basic","href":"snippets/Go/Fiber-Basic.html","category":"Go"},{"title":"Fiber Middleware","href":"snippets/Go/Fiber-Middleware.html","category":"Go"},{"title":"Forms","href":"snippets/Go/Forms.html","category":"Go"},{"title":"Generics Go","href":"snippets/Go/Generics-Go.html","category":"Go"},{"title":"Go Air","href":"snippets/Go/Go-Air.html","category":"Go"},{"title":"golangci lint Go Linter","href":"snippets/Go/golangci-lint-Go-Linter.html","category":"Go"},{"title":"Gorm","href":"snippets/Go/Gorm.html","category":"Go"},{"title":"Gotodenv","href":"snippets/Go/Gotodenv.html","category":"Go"},{"title":"Http requests","href":"snippets/Go/Http-requests.html","category":"Go"},{"title":"Install GO","href":"snippets/Go/Install-GO.html","category":"Go"},{"title":"Interfaces GO","href":"snippets/Go/Interfaces-GO.html","category":"Go"},{"title":"JSON GO MARSHALL UNMARSHALL","href":"snippets/Go/JSON-GO-MARSHALL-UNMARSHALL.html","category":"Go"},{"title":"JSON","href":"snippets/Go/JSON.html","category":"Go"},{"title":"MailHog","href":"snippets/Go/MailHog.html","category":"Go"},{"title":"Middleware","href":"snippets/Go/Middleware.html","category":"Go"},{"title":"Packages Libraries","href":"snippets/Go/Packages-Libraries.html","category":"Go"},{"title":"Patterns GO","href":"snippets/Go/Patterns-GO.html","category":"Go"},{"title":"Pointers Go (Punteros)","href":"snippets/Go/Pointers-Go-(Punteros).html","category":"Go"},{"title":"Project Structure Go","href":"snippets/Go/Project-Structure-Go.html","category":"Go"},{"title":"Queries","href":"snippets/Go/Queries.html","category":"Go"},{"title":"Requests GO","href":"snippets/Go/Requests-GO.html","category":"Go"},{"title":"Routes","href":"snippets/Go/Routes.html","category":"Go"},{"title":"Shopspring Decima Go","href":"snippets/Go/Shopspring-Decima-Go.html","category":"Go"},{"title":"Soda Pop Migrations","href":"snippets/Go/Soda-Pop-Migrations.html","category":"Go"},{"title":"Test GO 2","href":"snippets/Go/Test-GO-2.html","category":"Go"},{"title":"Test GO","href":"snippets/Go/Test-GO.html","category":"Go"},{"title":"Time and Date","href":"snippets/Go/Time-and-Date.html","category":"Go"},{"title":"untitled snippet 2","href":"snippets/Go/untitled-snippet-2.html","category":"Go"},{"title":"untitled snippet 3","href":"snippets/Go/untitled-snippet-3.html","category":"Go"},{"title":"untitled snippet","href":"snippets/Go/untitled-snippet.html","category":"Go"},{"title":"Validations GO VALIDATOR","href":"snippets/Go/Validations-GO-VALIDATOR.html","category":"Go"},{"title":"Web Application Go","href":"snippets/Go/Web-Application-Go.html","category":"Go"},{"title":"ZAP","href":"snippets/Go/ZAP.html","category":"Go"},{"title":"Comandos - GRAILS","href":"snippets/GRails/Comandos-_GRAILS.html","category":"GRails"},{"title":"CRUD - GRAILS","href":"snippets/GRails/CRUD-_GRAILS.html","category":"GRails"},{"title":"ENUM - GRAILS","href":"snippets/GRails/ENUM-_GRAILS.html","category":"GRails"},{"title":"Generate - Migrations - GRAILS","href":"snippets/GRails/Generate-_Migrations-_GRAILS.html","category":"GRails"},{"title":"HOT RELOAD - GRAILS","href":"snippets/GRails/HOT-RELOAD-_GRAILS.html","category":"GRails"},{"title":"Routes - GRAILS","href":"snippets/GRails/Routes-_GRAILS.html","category":"GRails"},{"title":"SERVICE - GRAILS","href":"snippets/GRails/SERVICE-_GRAILS.html","category":"GRails"},{"title":"TESTS - GRAILS","href":"snippets/GRails/TESTS-_GRAILS.html","category":"GRails"},{"title":"TRAITS - GRAILS","href":"snippets/GRails/TRAITS-_GRAILS.html","category":"GRails"},{"title":"View Helpers - GRAILS","href":"snippets/GRails/View-Helpers-_GRAILS.html","category":"GRails"},{"title":"Asistencia - Groovy - GRails","href":"snippets/Groovy/Asistencia-_Groovy-_GRails.html","category":"Groovy"},{"title":"EXCEPTION - GROOBY","href":"snippets/Groovy/EXCEPTION-_GROOBY.html","category":"Groovy"},{"title":"LOOPS - GRAILS","href":"snippets/Groovy/LOOPS-_GRAILS.html","category":"Groovy"},{"title":"MyConfig - GRAILS","href":"snippets/Groovy/MyConfig-_GRAILS.html","category":"Groovy"},{"title":"untitled snippet","href":"snippets/Groovy/untitled-snippet.html","category":"Groovy"},{"title":"CLAUDE","href":"snippets/IA/CLAUDE.html","category":"IA"},{"title":"Async Types","href":"snippets/Javascript/Async-Types.html","category":"Javascript"},{"title":"Call(), Bind() Apply()","href":"snippets/Javascript/Call(),-Bind()-Apply().html","category":"Javascript"},{"title":"Closure","href":"snippets/Javascript/Closure.html","category":"Javascript"},{"title":"Coffee","href":"snippets/Javascript/Coffee.html","category":"Javascript"},{"title":"Falsy values","href":"snippets/Javascript/Falsy-values.html","category":"Javascript"},{"title":"Fetch","href":"snippets/Javascript/Fetch.html","category":"Javascript"},{"title":"Get JSON at same level (local)","href":"snippets/Javascript/Get-JSON-at-same-level-(local).html","category":"Javascript"},{"title":"Local Storage JS","href":"snippets/Javascript/Local-Storage-JS.html","category":"Javascript"},{"title":"Lodash","href":"snippets/Javascript/Lodash.html","category":"Javascript"},{"title":"Max value in array","href":"snippets/Javascript/Max-value-in-array.html","category":"Javascript"},{"title":"NVM Node","href":"snippets/Javascript/NVM-Node.html","category":"Javascript"},{"title":"Object has a given property in javascript","href":"snippets/Javascript/Object-has-a-given-property-in-javascript.html","category":"Javascript"},{"title":"Promise","href":"snippets/Javascript/Promise.html","category":"Javascript"},{"title":"Prototype","href":"snippets/Javascript/Prototype.html","category":"Javascript"},{"title":"Remove a part of a string javascript","href":"snippets/Javascript/Remove-a-part-of-a-string-javascript.html","category":"Javascript"},{"title":"Remove all duplicates from an array of objects","href":"snippets/Javascript/Remove-all-duplicates-from-an-array-of-objects.html","category":"Javascript"},{"title":"Returns the query string from the current URL","href":"snippets/Javascript/Returns-the-query-string-from-the-current-URL.html","category":"Javascript"},{"title":"This","href":"snippets/Javascript/This.html","category":"Javascript"},{"title":"typeof","href":"snippets/Javascript/typeof.html","category":"Javascript"},{"title":"var vs let","href":"snippets/Javascript/var-vs-let.html","category":"Javascript"},{"title":"Window Open Link","href":"snippets/Javascript/Window-Open-Link.html","category":"Javascript"},{"title":"dd","href":"snippets/Jquery/dd.html","category":"Jquery"},{"title":"jQuery Tricks","href":"snippets/Jquery/jQuery-Tricks.html","category":"Jquery"},{"title":"CURL","href":"snippets/Linux/CURL.html","category":"Linux"},{"title":"Linked files - Enlaces Simbolicos shared","href":"snippets/Linux/Linked-files-_Enlaces-Simbolicos-shared.html","category":"Linux"},{"title":"Shell - Terminal - Basic","href":"snippets/Linux/Shell-_Terminal-_Basic.html","category":"Linux"},{"title":"Llama3 open web ui","href":"snippets/Phyton/Llama3-open-web-ui.html","category":"Phyton"},{"title":"String Phyton","href":"snippets/Phyton/String-Phyton.html","category":"Phyton"},{"title":"Virtual Enviroment Python","href":"snippets/Phyton/Virtual-Enviroment-Python.html","category":"Phyton"},{"title":"Binary tree Query","href":"snippets/Postgres/Binary-tree-Query.html","category":"Postgres"},{"title":"Postgres Terminal","href":"snippets/Postgres/Postgres-Terminal.html","category":"Postgres"},{"title":"DeepSeek Mid Level","href":"snippets/Prompts/DeepSeek-Mid-Level.html","category":"Prompts"},{"title":"Fetch React","href":"snippets/React/Fetch-React.html","category":"React"},{"title":"Filter Multiple Parameters","href":"snippets/React/Filter-Multiple-Parameters.html","category":"React"},{"title":"First Render","href":"snippets/React/First-Render.html","category":"React"},{"title":"Frame motion","href":"snippets/React/Frame-motion.html","category":"React"},{"title":"How do I access Material ui's theme in Styled Component","href":"snippets/React/How-do-I-access-Material-ui's-theme-in-Styled-Component.html","category":"React"},{"title":"Mui Material Media Query","href":"snippets/React/Mui-Material-Media-Query.html","category":"React"},{"title":"Mui Material Theme Provider","href":"snippets/React/Mui-Material-Theme-Provider.html","category":"React"},{"title":"Public Folder","href":"snippets/React/Public-Folder.html","category":"React"},{"title":"React Select","href":"snippets/React/React-Select.html","category":"React"},{"title":"Scroll Event","href":"snippets/React/Scroll-Event.html","category":"React"},{"title":"Single Page Application (SPA) Routing Netlify","href":"snippets/React/Single-Page-Application-(SPA)-Routing-Netlify.html","category":"React"},{"title":"Sleep Dormir","href":"snippets/React/Sleep-Dormir.html","category":"React"},{"title":"Tailwind","href":"snippets/React/Tailwind.html","category":"React"},{"title":"TextField Style Mui Material","href":"snippets/React/TextField-Style-Mui-Material.html","category":"React"},{"title":"useDetectScreenSize custom hook","href":"snippets/React/useDetectScreenSize-custom-hook.html","category":"React"},{"title":"UUID","href":"snippets/React/UUID.html","category":"React"},{"title":"Vite Debug","href":"snippets/React/Vite-Debug.html","category":"React"},{"title":"Basic","href":"snippets/React Router/Basic.html","category":"React Router"},{"title":"Navigate","href":"snippets/React Router/Navigate.html","category":"React Router"},{"title":"Read from Query String","href":"snippets/React Router/Read-from-Query-String.html","category":"React Router"},{"title":"Redis commands redis cli","href":"snippets/Redis/Redis-commands-redis-cli.html","category":"Redis"},{"title":"Redis Golang","href":"snippets/Redis/Redis-Golang.html","category":"Redis"},{"title":"Basic Reducer","href":"snippets/Redux/Basic-Reducer.html","category":"Redux"},{"title":"Dispatch UseEffect","href":"snippets/Redux/Dispatch-UseEffect.html","category":"Redux"},{"title":"Flag Redux","href":"snippets/Redux/Flag-Redux.html","category":"Redux"},{"title":"More complex State","href":"snippets/Redux/More-complex-State.html","category":"Redux"},{"title":"Redux Component","href":"snippets/Redux/Redux-Component.html","category":"Redux"},{"title":"Redux Typescript","href":"snippets/Redux/Redux-Typescript.html","category":"Redux"},{"title":"Store JS","href":"snippets/Redux/Store-JS.html","category":"Redux"},{"title":"All","href":"snippets/Ruby/All.html","category":"Ruby"},{"title":"arg options kwargs","href":"snippets/Ruby/arg-options-kwargs.html","category":"Ruby"},{"title":"Array Ruby","href":"snippets/Ruby/Array-Ruby.html","category":"Ruby"},{"title":"Block Ruby","href":"snippets/Ruby/Block-Ruby.html","category":"Ruby"},{"title":"Breaking nested loop","href":"snippets/Ruby/Breaking-nested-loop.html","category":"Ruby"},{"title":"Destruction Splat Operators","href":"snippets/Ruby/Destruction-Splat-Operators.html","category":"Ruby"},{"title":"ENUMERATOR LAZY","href":"snippets/Ruby/ENUMERATOR-LAZY.html","category":"Ruby"},{"title":"Equal","href":"snippets/Ruby/Equal.html","category":"Ruby"},{"title":"Exceptions Rescue Begin","href":"snippets/Ruby/Exceptions-Rescue-Begin.html","category":"Ruby"},{"title":"Hook","href":"snippets/Ruby/Hook.html","category":"Ruby"},{"title":"Include VS Extend VS Prepend (MODULE)","href":"snippets/Ruby/Include-VS-Extend-VS-Prepend-(MODULE).html","category":"Ruby"},{"title":"integer max and min","href":"snippets/Ruby/integer-max-and-min.html","category":"Ruby"},{"title":"Lambda - Proc","href":"snippets/Ruby/Lambda-_Proc.html","category":"Ruby"},{"title":"Max by","href":"snippets/Ruby/Max-by.html","category":"Ruby"},{"title":"Mixin","href":"snippets/Ruby/Mixin.html","category":"Ruby"},{"title":"Module","href":"snippets/Ruby/Module.html","category":"Ruby"},{"title":"PAGINACION CURSOR RUBY - PAGINATION","href":"snippets/Ruby/PAGINACION-CURSOR-RUBY-_PAGINATION.html","category":"Ruby"},{"title":"partition","href":"snippets/Ruby/partition.html","category":"Ruby"},{"title":"Reduce - Inject","href":"snippets/Ruby/Reduce-_Inject.html","category":"Ruby"},{"title":"Ruby Debug","href":"snippets/Ruby/Ruby-Debug.html","category":"Ruby"},{"title":"Ruby Install","href":"snippets/Ruby/Ruby-Install.html","category":"Ruby"},{"title":"Sanitize","href":"snippets/Ruby/Sanitize.html","category":"Ruby"},{"title":"Spaceship Operator =","href":"snippets/Ruby/Spaceship-Operator-=.html","category":"Ruby"},{"title":"STRUCT RUBY","href":"snippets/Ruby/STRUCT-RUBY.html","category":"Ruby"},{"title":"Super","href":"snippets/Ruby/Super.html","category":"Ruby"},{"title":"Swapping Variable Values","href":"snippets/Ruby/Swapping-Variable-Values.html","category":"Ruby"},{"title":"Symbol to Proc","href":"snippets/Ruby/Symbol-to-Proc.html","category":"Ruby"},{"title":"Type of an object","href":"snippets/Ruby/Type-of-an-object.html","category":"Ruby"},{"title":"untitled snippet 2","href":"snippets/Ruby/untitled-snippet-2.html","category":"Ruby"},{"title":"untitled snippet 3","href":"snippets/Ruby/untitled-snippet-3.html","category":"Ruby"},{"title":"untitled snippet","href":"snippets/Ruby/untitled-snippet.html","category":"Ruby"},{"title":"Aasm state","href":"snippets/Ruby on Rails/Aasm-state.html","category":"Ruby on Rails"},{"title":"act as paranoid - soft delete","href":"snippets/Ruby on Rails/act-as-paranoid-_soft-delete.html","category":"Ruby on Rails"},{"title":"Act as Taggable","href":"snippets/Ruby on Rails/Act-as-Taggable.html","category":"Ruby on Rails"},{"title":"Action Cable Web sockets","href":"snippets/Ruby on Rails/Action-Cable-Web-sockets.html","category":"Ruby on Rails"},{"title":"Active Model Serializers","href":"snippets/Ruby on Rails/Active-Model-Serializers.html","category":"Ruby on Rails"},{"title":"Active Record Callbacks","href":"snippets/Ruby on Rails/Active-Record-Callbacks.html","category":"Ruby on Rails"},{"title":"Active Snapshot","href":"snippets/Ruby on Rails/Active-Snapshot.html","category":"Ruby on Rails"},{"title":"Active Storage","href":"snippets/Ruby on Rails/Active-Storage.html","category":"Ruby on Rails"},{"title":"ACTIVE SUPPORT Rails","href":"snippets/Ruby on Rails/ACTIVE-SUPPORT-Rails.html","category":"Ruby on Rails"},{"title":"Activity Notification","href":"snippets/Ruby on Rails/Activity-Notification.html","category":"Ruby on Rails"},{"title":"Add data to join table third table many to many","href":"snippets/Ruby on Rails/Add-data-to-join-table-third-table-many-to-many.html","category":"Ruby on Rails"},{"title":"AJAX","href":"snippets/Ruby on Rails/AJAX.html","category":"Ruby on Rails"},{"title":"API SWAGGER","href":"snippets/Ruby on Rails/API-SWAGGER.html","category":"Ruby on Rails"},{"title":"asdf","href":"snippets/Ruby on Rails/asdf.html","category":"Ruby on Rails"},{"title":"Base64","href":"snippets/Ruby on Rails/Base64.html","category":"Ruby on Rails"},{"title":"Basic application.haml","href":"snippets/Ruby on Rails/Basic-application.haml.html","category":"Ruby on Rails"},{"title":"BCrypt","href":"snippets/Ruby on Rails/BCrypt.html","category":"Ruby on Rails"},{"title":"before action ","href":"snippets/Ruby on Rails/before_action-.html","category":"Ruby on Rails"},{"title":"binsetup Rails Setup","href":"snippets/Ruby on Rails/binsetup-Rails-Setup.html","category":"Ruby on Rails"},{"title":"Build","href":"snippets/Ruby on Rails/Build.html","category":"Ruby on Rails"},{"title":"Bundle","href":"snippets/Ruby on Rails/Bundle.html","category":"Ruby on Rails"},{"title":"Cache Ruby on Rails","href":"snippets/Ruby on Rails/Cache-Ruby-on-Rails.html","category":"Ruby on Rails"},{"title":"Caching with Instance Variables Memoization","href":"snippets/Ruby on Rails/Caching-with-Instance-Variables-Memoization.html","category":"Ruby on Rails"},{"title":"Callbacks Rails","href":"snippets/Ruby on Rails/Callbacks-Rails.html","category":"Ruby on Rails"},{"title":"Can Can Can","href":"snippets/Ruby on Rails/Can-Can-Can.html","category":"Ruby on Rails"},{"title":"Clave Publica y Privada SSL","href":"snippets/Ruby on Rails/Clave-Publica-y-Privada-SSL.html","category":"Ruby on Rails"},{"title":"Clear sass or css","href":"snippets/Ruby on Rails/Clear-sass-or-css.html","category":"Ruby on Rails"},{"title":"Commands Rails","href":"snippets/Ruby on Rails/Commands-Rails.html","category":"Ruby on Rails"},{"title":"Concerns","href":"snippets/Ruby on Rails/Concerns.html","category":"Ruby on Rails"},{"title":"Conditional algorithm","href":"snippets/Ruby on Rails/Conditional-algorithm.html","category":"Ruby on Rails"},{"title":"Console","href":"snippets/Ruby on Rails/Console.html","category":"Ruby on Rails"},{"title":"Convention","href":"snippets/Ruby on Rails/Convention.html","category":"Ruby on Rails"},{"title":"Cookies","href":"snippets/Ruby on Rails/Cookies.html","category":"Ruby on Rails"},{"title":"CORS configure","href":"snippets/Ruby on Rails/CORS-configure.html","category":"Ruby on Rails"},{"title":"Credentials","href":"snippets/Ruby on Rails/Credentials.html","category":"Ruby on Rails"},{"title":"CRUD RAILS","href":"snippets/Ruby on Rails/CRUD-RAILS.html","category":"Ruby on Rails"},{"title":"CSRF","href":"snippets/Ruby on Rails/CSRF.html","category":"Ruby on Rails"},{"title":"CSV","href":"snippets/Ruby on Rails/CSV.html","category":"Ruby on Rails"},{"title":"CURRENT CLASS - ActiveSupportCurrentAttributes","href":"snippets/Ruby on Rails/CURRENT-CLASS-_ActiveSupportCurrentAttributes.html","category":"Ruby on Rails"},{"title":"Datatables","href":"snippets/Ruby on Rails/Datatables.html","category":"Ruby on Rails"},{"title":"DB Schema","href":"snippets/Ruby on Rails/DB-Schema.html","category":"Ruby on Rails"},{"title":"Delegator - Forwardable","href":"snippets/Ruby on Rails/Delegator-_Forwardable.html","category":"Ruby on Rails"},{"title":"Devise","href":"snippets/Ruby on Rails/Devise.html","category":"Ruby on Rails"},{"title":"Div for","href":"snippets/Ruby on Rails/Div_for.html","category":"Ruby on Rails"},{"title":"Dropdown Rails","href":"snippets/Ruby on Rails/Dropdown-Rails.html","category":"Ruby on Rails"},{"title":"Enviroment Variables","href":"snippets/Ruby on Rails/Enviroment-Variables.html","category":"Ruby on Rails"},{"title":"Escape Javascript","href":"snippets/Ruby on Rails/Escape-Javascript.html","category":"Ruby on Rails"},{"title":"ExecJSProgramError","href":"snippets/Ruby on Rails/ExecJSProgramError.html","category":"Ruby on Rails"},{"title":"Favicon","href":"snippets/Ruby on Rails/Favicon.html","category":"Ruby on Rails"},{"title":"Files","href":"snippets/Ruby on Rails/Files.html","category":"Ruby on Rails"},{"title":"Filtering Sensitive data on rails","href":"snippets/Ruby on Rails/Filtering-Sensitive-data-on-rails.html","category":"Ruby on Rails"},{"title":"Fixture","href":"snippets/Ruby on Rails/Fixture.html","category":"Ruby on Rails"},{"title":"Flash","href":"snippets/Ruby on Rails/Flash.html","category":"Ruby on Rails"},{"title":"Fly.io","href":"snippets/Ruby on Rails/Fly.io.html","category":"Ruby on Rails"},{"title":"Fontawesome 4","href":"snippets/Ruby on Rails/Fontawesome-4.html","category":"Ruby on Rails"},{"title":"Forms","href":"snippets/Ruby on Rails/Forms.html","category":"Ruby on Rails"},{"title":"Gems","href":"snippets/Ruby on Rails/Gems.html","category":"Ruby on Rails"},{"title":"Generate Rails","href":"snippets/Ruby on Rails/Generate-Rails.html","category":"Ruby on Rails"},{"title":"Gon","href":"snippets/Ruby on Rails/Gon.html","category":"Ruby on Rails"},{"title":"Grape","href":"snippets/Ruby on Rails/Grape.html","category":"Ruby on Rails"},{"title":"Guard Hash","href":"snippets/Ruby on Rails/Guard-Hash.html","category":"Ruby on Rails"},{"title":"HAML","href":"snippets/Ruby on Rails/HAML.html","category":"Ruby on Rails"},{"title":"Hash Ruby","href":"snippets/Ruby on Rails/Hash-Ruby.html","category":"Ruby on Rails"},{"title":"Helpers and Tricks Rails","href":"snippets/Ruby on Rails/Helpers-and-Tricks-Rails.html","category":"Ruby on Rails"},{"title":"Hostname","href":"snippets/Ruby on Rails/Hostname.html","category":"Ruby on Rails"},{"title":"Httparty","href":"snippets/Ruby on Rails/Httparty.html","category":"Ruby on Rails"},{"title":"Importmap","href":"snippets/Ruby on Rails/Importmap.html","category":"Ruby on Rails"},{"title":"Injeccion de Dependencias - Dependency Injection","href":"snippets/Ruby on Rails/Injeccion-de-Dependencias-_Dependency-Injection.html","category":"Ruby on Rails"},{"title":"Interface Ruby","href":"snippets/Ruby on Rails/Interface-Ruby.html","category":"Ruby on Rails"},{"title":"javascript from action railsujs","href":"snippets/Ruby on Rails/javascript-from-action-railsujs.html","category":"Ruby on Rails"},{"title":"Javascript JS script Rails","href":"snippets/Ruby on Rails/Javascript-JS-script-Rails.html","category":"Ruby on Rails"},{"title":"Javascript Rails","href":"snippets/Ruby on Rails/Javascript-Rails.html","category":"Ruby on Rails"},{"title":"JBuilder","href":"snippets/Ruby on Rails/JBuilder.html","category":"Ruby on Rails"},{"title":"Jobs Workers","href":"snippets/Ruby on Rails/Jobs-Workers.html","category":"Ruby on Rails"},{"title":"Json Schema","href":"snippets/Ruby on Rails/Json-Schema.html","category":"Ruby on Rails"},{"title":"JSON","href":"snippets/Ruby on Rails/JSON.html","category":"Ruby on Rails"},{"title":"Jsonapi Serializer","href":"snippets/Ruby on Rails/Jsonapi-Serializer.html","category":"Ruby on Rails"},{"title":"JSONAPIResource","href":"snippets/Ruby on Rails/JSONAPIResource.html","category":"Ruby on Rails"},{"title":"JSONAPIResources","href":"snippets/Ruby on Rails/JSONAPIResources.html","category":"Ruby on Rails"},{"title":"JWT","href":"snippets/Ruby on Rails/JWT.html","category":"Ruby on Rails"},{"title":"Kill Puma","href":"snippets/Ruby on Rails/Kill-Puma.html","category":"Ruby on Rails"},{"title":"Lazybox","href":"snippets/Ruby on Rails/Lazybox.html","category":"Ruby on Rails"},{"title":"Leter opener gem","href":"snippets/Ruby on Rails/Leter-opener-gem.html","category":"Ruby on Rails"},{"title":"Log","href":"snippets/Ruby on Rails/Log.html","category":"Ruby on Rails"},{"title":"Lograge","href":"snippets/Ruby on Rails/Lograge.html","category":"Ruby on Rails"},{"title":"Mail SMTP","href":"snippets/Ruby on Rails/Mail-SMTP.html","category":"Ruby on Rails"},{"title":"Mailer","href":"snippets/Ruby on Rails/Mailer.html","category":"Ruby on Rails"},{"title":"Marshal Ruby","href":"snippets/Ruby on Rails/Marshal-Ruby.html","category":"Ruby on Rails"},{"title":"META PROGRAMMING RUBY","href":"snippets/Ruby on Rails/META-PROGRAMMING-RUBY.html","category":"Ruby on Rails"},{"title":"Middleware","href":"snippets/Ruby on Rails/Middleware.html","category":"Ruby on Rails"},{"title":"Min Max Clamp","href":"snippets/Ruby on Rails/Min-Max-Clamp.html","category":"Ruby on Rails"},{"title":"Mock Model","href":"snippets/Ruby on Rails/Mock-Model.html","category":"Ruby on Rails"},{"title":"Model - Scopes","href":"snippets/Ruby on Rails/Model-_Scopes.html","category":"Ruby on Rails"},{"title":"Multiple selection","href":"snippets/Ruby on Rails/Multiple-selection.html","category":"Ruby on Rails"},{"title":"Nested Attributes (model)","href":"snippets/Ruby on Rails/Nested-Attributes-(model).html","category":"Ruby on Rails"},{"title":"NetHTTP URI RUBY","href":"snippets/Ruby on Rails/NetHTTP-URI-RUBY.html","category":"Ruby on Rails"},{"title":"nil vs. empty vs. blank in Ruby","href":"snippets/Ruby on Rails/nil-vs.-empty-vs.-blank-in-Ruby.html","category":"Ruby on Rails"},{"title":"Noticed Notifications","href":"snippets/Ruby on Rails/Noticed-Notifications.html","category":"Ruby on Rails"},{"title":"Numbers","href":"snippets/Ruby on Rails/Numbers.html","category":"Ruby on Rails"},{"title":"OAuth 2.0 and OpenID","href":"snippets/Ruby on Rails/OAuth-2.0-and-OpenID.html","category":"Ruby on Rails"},{"title":"Optimistic Pessimistic Locking Race ConditionPesimista","href":"snippets/Ruby on Rails/Optimistic-Pessimistic-Locking-Race-ConditionPesimista.html","category":"Ruby on Rails"},{"title":"PaperTrail","href":"snippets/Ruby on Rails/PaperTrail.html","category":"Ruby on Rails"},{"title":"Patterns Ruby (BEHAVIORALS)","href":"snippets/Ruby on Rails/Patterns-Ruby-(BEHAVIORALS).html","category":"Ruby on Rails"},{"title":"Patterns Ruby (CREATIONALS)","href":"snippets/Ruby on Rails/Patterns-Ruby-(CREATIONALS).html","category":"Ruby on Rails"},{"title":"Patterns Ruby (STRUCTURALS)","href":"snippets/Ruby on Rails/Patterns-Ruby-(STRUCTURALS).html","category":"Ruby on Rails"},{"title":"Patterns RUBY","href":"snippets/Ruby on Rails/Patterns-RUBY.html","category":"Ruby on Rails"},{"title":"PERFORMANCE Ruby on rails","href":"snippets/Ruby on Rails/PERFORMANCE-Ruby-on-rails.html","category":"Ruby on Rails"},{"title":"Pipeline Gem","href":"snippets/Ruby on Rails/Pipeline-Gem.html","category":"Ruby on Rails"},{"title":"pluralize","href":"snippets/Ruby on Rails/pluralize.html","category":"Ruby on Rails"},{"title":"Polling API","href":"snippets/Ruby on Rails/Polling-API.html","category":"Ruby on Rails"},{"title":"PostMessage","href":"snippets/Ruby on Rails/PostMessage.html","category":"Ruby on Rails"},{"title":"Prettier Rails ERB","href":"snippets/Ruby on Rails/Prettier-Rails-ERB.html","category":"Ruby on Rails"},{"title":"Provide","href":"snippets/Ruby on Rails/Provide.html","category":"Ruby on Rails"},{"title":"Pry","href":"snippets/Ruby on Rails/Pry.html","category":"Ruby on Rails"},{"title":"Radio button witn image","href":"snippets/Ruby on Rails/Radio-button-witn-image.html","category":"Ruby on Rails"},{"title":"Rail Genius","href":"snippets/Ruby on Rails/Rail-Genius.html","category":"Ruby on Rails"},{"title":"Rails Bootstrap","href":"snippets/Ruby on Rails/Rails-Bootstrap.html","category":"Ruby on Rails"},{"title":"RAILS COMMANDS","href":"snippets/Ruby on Rails/RAILS-COMMANDS.html","category":"Ruby on Rails"},{"title":"Rails css","href":"snippets/Ruby on Rails/Rails-css.html","category":"Ruby on Rails"},{"title":"Rails Database commands","href":"snippets/Ruby on Rails/Rails-Database-commands.html","category":"Ruby on Rails"},{"title":"Rails Enviroment","href":"snippets/Ruby on Rails/Rails-Enviroment.html","category":"Ruby on Rails"},{"title":"Rails Genius","href":"snippets/Ruby on Rails/Rails-Genius.html","category":"Ruby on Rails"},{"title":"Rainbow","href":"snippets/Ruby on Rails/Rainbow.html","category":"Ruby on Rails"},{"title":"Rake Tasks","href":"snippets/Ruby on Rails/Rake-Tasks.html","category":"Ruby on Rails"},{"title":"Redirect","href":"snippets/Ruby on Rails/Redirect.html","category":"Ruby on Rails"},{"title":"Regex","href":"snippets/Ruby on Rails/Regex.html","category":"Ruby on Rails"},{"title":"Relations","href":"snippets/Ruby on Rails/Relations.html","category":"Ruby on Rails"},{"title":"Requests RAILS","href":"snippets/Ruby on Rails/Requests-RAILS.html","category":"Ruby on Rails"},{"title":"Response Rails","href":"snippets/Ruby on Rails/Response-Rails.html","category":"Ruby on Rails"},{"title":"Rolify","href":"snippets/Ruby on Rails/Rolify.html","category":"Ruby on Rails"},{"title":"Routes","href":"snippets/Ruby on Rails/Routes.html","category":"Ruby on Rails"},{"title":"RSPEC","href":"snippets/Ruby on Rails/RSPEC.html","category":"Ruby on Rails"},{"title":"Rubocop config file","href":"snippets/Ruby on Rails/Rubocop-config-file.html","category":"Ruby on Rails"},{"title":"Ruby Class","href":"snippets/Ruby on Rails/Ruby-Class.html","category":"Ruby on Rails"},{"title":"Ruby LP Rubocop","href":"snippets/Ruby on Rails/Ruby-LP-Rubocop.html","category":"Ruby on Rails"},{"title":"Rubymone problem intellij","href":"snippets/Ruby on Rails/Rubymone-problem-intellij.html","category":"Ruby on Rails"},{"title":"rvm","href":"snippets/Ruby on Rails/rvm.html","category":"Ruby on Rails"},{"title":"Sandi Metz","href":"snippets/Ruby on Rails/Sandi-Metz.html","category":"Ruby on Rails"},{"title":"Seed","href":"snippets/Ruby on Rails/Seed.html","category":"Ruby on Rails"},{"title":"SERVICE Ruby on Rails","href":"snippets/Ruby on Rails/SERVICE-Ruby-on-Rails.html","category":"Ruby on Rails"},{"title":"Service Vs Lib vs Class","href":"snippets/Ruby on Rails/Service-Vs-Lib-vs-Class.html","category":"Ruby on Rails"},{"title":"Sessions","href":"snippets/Ruby on Rails/Sessions.html","category":"Ruby on Rails"},{"title":"SHA 256","href":"snippets/Ruby on Rails/SHA-256.html","category":"Ruby on Rails"},{"title":"Sidekiq","href":"snippets/Ruby on Rails/Sidekiq.html","category":"Ruby on Rails"},{"title":"Simple Form","href":"snippets/Ruby on Rails/Simple-Form.html","category":"Ruby on Rails"},{"title":"Singleton","href":"snippets/Ruby on Rails/Singleton.html","category":"Ruby on Rails"},{"title":"SINLGETON CLASS Ruby on rails","href":"snippets/Ruby on Rails/SINLGETON-CLASS-Ruby-on-rails.html","category":"Ruby on Rails"},{"title":"sleep","href":"snippets/Ruby on Rails/sleep.html","category":"Ruby on Rails"},{"title":"SORT RUBY","href":"snippets/Ruby on Rails/SORT-RUBY.html","category":"Ruby on Rails"},{"title":"Soundex Ruby on Rails","href":"snippets/Ruby on Rails/Soundex-Ruby-on-Rails.html","category":"Ruby on Rails"},{"title":"SQL Rails ORM","href":"snippets/Ruby on Rails/SQL-Rails-ORM.html","category":"Ruby on Rails"},{"title":"Stimulus","href":"snippets/Ruby on Rails/Stimulus.html","category":"Ruby on Rails"},{"title":"Store accessors","href":"snippets/Ruby on Rails/Store-accessors.html","category":"Ruby on Rails"},{"title":"Stream Live","href":"snippets/Ruby on Rails/Stream-Live.html","category":"Ruby on Rails"},{"title":"Stress test heavy loan test","href":"snippets/Ruby on Rails/Stress-test-heavy-loan-test.html","category":"Ruby on Rails"},{"title":"String Text Convert RUBY","href":"snippets/Ruby on Rails/String-Text-Convert-RUBY.html","category":"Ruby on Rails"},{"title":"Strong Params","href":"snippets/Ruby on Rails/Strong-Params.html","category":"Ruby on Rails"},{"title":"Tap Ruby on Rails","href":"snippets/Ruby on Rails/Tap-Ruby-on-Rails.html","category":"Ruby on Rails"},{"title":"Threads","href":"snippets/Ruby on Rails/Threads.html","category":"Ruby on Rails"},{"title":"Time and Date","href":"snippets/Ruby on Rails/Time-and-Date.html","category":"Ruby on Rails"},{"title":"Tricks","href":"snippets/Ruby on Rails/Tricks.html","category":"Ruby on Rails"},{"title":"TURBO basic","href":"snippets/Ruby on Rails/TURBO-basic.html","category":"Ruby on Rails"},{"title":"Turbo Frame","href":"snippets/Ruby on Rails/Turbo-Frame.html","category":"Ruby on Rails"},{"title":"Turbo Stream","href":"snippets/Ruby on Rails/Turbo-Stream.html","category":"Ruby on Rails"},{"title":"untitled snippet 2","href":"snippets/Ruby on Rails/untitled-snippet-2.html","category":"Ruby on Rails"},{"title":"untitled snippet","href":"snippets/Ruby on Rails/untitled-snippet.html","category":"Ruby on Rails"},{"title":"Validations","href":"snippets/Ruby on Rails/Validations.html","category":"Ruby on Rails"},{"title":"Variable de Entorno ENV","href":"snippets/Ruby on Rails/Variable-de-Entorno-ENV.html","category":"Ruby on Rails"},{"title":"View Component","href":"snippets/Ruby on Rails/View-Component.html","category":"Ruby on Rails"},{"title":"Virtual Attributes","href":"snippets/Ruby on Rails/Virtual-Attributes.html","category":"Ruby on Rails"},{"title":"Webhook","href":"snippets/Ruby on Rails/Webhook.html","category":"Ruby on Rails"},{"title":"White list","href":"snippets/Ruby on Rails/White-list.html","category":"Ruby on Rails"},{"title":"Will paginate","href":"snippets/Ruby on Rails/Will_paginate.html","category":"Ruby on Rails"},{"title":"YAML","href":"snippets/Ruby on Rails/YAML.html","category":"Ruby on Rails"},{"title":"credentials XENVIO","href":"snippets/Shipedge/credentials-XENVIO.html","category":"Shipedge"},{"title":"Nova Sphere","href":"snippets/Shipedge/Nova-Sphere.html","category":"Shipedge"},{"title":"JOIN","href":"snippets/SQL/JOIN.html","category":"SQL"},{"title":"ORDER BY","href":"snippets/SQL/ORDER-BY.html","category":"SQL"},{"title":"SQL USEFULL QUERIES","href":"snippets/SQL/SQL-USEFULL-QUERIES.html","category":"SQL"},{"title":"WHERE","href":"snippets/SQL/WHERE.html","category":"SQL"},{"title":"TanStack React Query Basic","href":"snippets/TanStack/TanStack-React-Query-Basic.html","category":"TanStack"},{"title":"Curl","href":"snippets/Terminal Shell/Curl.html","category":"Terminal Shell"},{"title":"Github","href":"snippets/Terminal Shell/Github.html","category":"Terminal Shell"},{"title":"GITLAB TOKEN RENEW","href":"snippets/Terminal Shell/GITLAB-TOKEN-RENEW.html","category":"Terminal Shell"},{"title":"ngrok","href":"snippets/Terminal Shell/ngrok.html","category":"Terminal Shell"},{"title":"Oracle","href":"snippets/Terminal Shell/Oracle.html","category":"Terminal Shell"},{"title":"Permisos","href":"snippets/Terminal Shell/Permisos.html","category":"Terminal Shell"},{"title":"RAILSWAY.com","href":"snippets/Terminal Shell/RAILSWAY.com.html","category":"Terminal Shell"},{"title":"SSH Key","href":"snippets/Terminal Shell/SSH-Key.html","category":"Terminal Shell"},{"title":"WashUp","href":"snippets/Terminal Shell/WashUp.html","category":"Terminal Shell"},{"title":"Array of Objects Type","href":"snippets/TypeScript/Array-of-Objects-Type.html","category":"TypeScript"},{"title":"Callback","href":"snippets/TypeScript/Callback.html","category":"TypeScript"},{"title":"Children","href":"snippets/TypeScript/Children.html","category":"TypeScript"},{"title":"Enum","href":"snippets/TypeScript/Enum.html","category":"TypeScript"},{"title":"Events","href":"snippets/TypeScript/Events.html","category":"TypeScript"},{"title":"From const to type","href":"snippets/TypeScript/From-const-to-type.html","category":"TypeScript"},{"title":"Generics","href":"snippets/TypeScript/Generics.html","category":"TypeScript"},{"title":"Get return type of a function","href":"snippets/TypeScript/Get-return-type-of-a-function.html","category":"TypeScript"},{"title":"Interface","href":"snippets/TypeScript/Interface.html","category":"TypeScript"},{"title":"Iterate Object Properties (key) with Type Checking","href":"snippets/TypeScript/Iterate-Object-Properties-(key)-with-Type-Checking.html","category":"TypeScript"},{"title":"keyof","href":"snippets/TypeScript/keyof.html","category":"TypeScript"},{"title":"Know all properties of Nested types","href":"snippets/TypeScript/Know-all-properties-of-Nested-types.html","category":"TypeScript"},{"title":"Local Storage Typescript","href":"snippets/TypeScript/Local-Storage-Typescript.html","category":"TypeScript"},{"title":"Object with properties that match the keys of an interface","href":"snippets/TypeScript/Object-with-properties-that-match-the-keys-of-an-interface.html","category":"TypeScript"},{"title":"Omit","href":"snippets/TypeScript/Omit.html","category":"TypeScript"},{"title":"Partial","href":"snippets/TypeScript/Partial.html","category":"TypeScript"},{"title":"React Props Functional Component","href":"snippets/TypeScript/React-Props-Functional-Component.html","category":"TypeScript"},{"title":"React Types","href":"snippets/TypeScript/React-Types.html","category":"TypeScript"},{"title":"Record","href":"snippets/TypeScript/Record.html","category":"TypeScript"},{"title":"Remove a Key from a state Object in React","href":"snippets/TypeScript/Remove-a-Key-from-a-state-Object-in-React.html","category":"TypeScript"},{"title":"Return JSX function","href":"snippets/TypeScript/Return-JSX-function.html","category":"TypeScript"},{"title":"String Query Validation","href":"snippets/TypeScript/String-Query-Validation.html","category":"TypeScript"},{"title":"Tuple","href":"snippets/TypeScript/Tuple.html","category":"TypeScript"},{"title":"Type assertions (also known as Type Casting)","href":"snippets/TypeScript/Type-assertions-(also-known-as-Type-Casting).html","category":"TypeScript"},{"title":"Type Object must have a Symbol.iterator method that returns an iterator","href":"snippets/TypeScript/Type-Object-must-have-a-Symbol.iterator-method-that-returns-an-iterator.html","category":"TypeScript"},{"title":"Type","href":"snippets/TypeScript/Type.html","category":"TypeScript"},{"title":"untitled snippet","href":"snippets/TypeScript/untitled-snippet.html","category":"TypeScript"},{"title":"useClickAway","href":"snippets/TypeScript/useClickAway.html","category":"TypeScript"},{"title":"useRef","href":"snippets/TypeScript/useRef.html","category":"TypeScript"},{"title":"ORM - GRAILS","href":"snippets/Uncategorized/ORM-_GRAILS.html","category":"Uncategorized"},{"title":"Patterns Ruby (CREATIONALS)","href":"snippets/Uncategorized/Patterns-Ruby-(CREATIONALS).html","category":"Uncategorized"},{"title":"React Icons","href":"snippets/Uncategorized/React-Icons.html","category":"Uncategorized"},{"title":"Required keyword argument","href":"snippets/Uncategorized/Required-keyword-argument.html","category":"Uncategorized"},{"title":"Rosetta 2","href":"snippets/Uncategorized/Rosetta-2.html","category":"Uncategorized"},{"title":"Vita Wallet","href":"snippets/Vita Wallet/Vita-Wallet.html","category":"Vita Wallet"}];
+
+    const input    = document.getElementById('search');
+    const panel    = document.getElementById('search-results');
+    const list     = document.getElementById('results-list');
+    const meta     = document.getElementById('results-meta');
+    const noRes    = document.getElementById('no-results');
+    const catPanel = document.getElementById('categories');
+    const kbdHint  = document.getElementById('kbd-hint');
+
+    function hl(text, q) {
+      const i = text.toLowerCase().indexOf(q);
+      if (i === -1) return text;
+      return text.slice(0, i) + '<mark>' + text.slice(i, i + q.length) + '</mark>' + text.slice(i + q.length);
+    }
+
+    function search(q) {
+      if (!q) {
+        panel.classList.remove('visible');
+        catPanel.style.display = '';
+        kbdHint.style.opacity = '1';
+        return;
+      }
+      catPanel.style.display = 'none';
+      panel.classList.add('visible');
+      kbdHint.style.opacity = '0';
+
+      const matches = ALL.filter(s =>
+        s.title.toLowerCase().includes(q) ||
+        s.category.toLowerCase().includes(q) ||
+        (s.subcategory && s.subcategory.toLowerCase().includes(q))
+      );
+
+      if (matches.length === 0) {
+        list.innerHTML = '';
+        noRes.style.display = 'block';
+        meta.textContent = '';
+      } else {
+        noRes.style.display = 'none';
+        meta.textContent = matches.length + ' resultado' + (matches.length !== 1 ? 's' : '');
+        list.innerHTML = matches.map(s => {
+          const cat = s.subcategory ? s.category + ' / ' + s.subcategory : s.category;
+          return '<li><a href="' + s.href + '"><span>' + hl(s.title, q) + '</span><span class="result-cat">' + cat + '</span></a></li>';
+        }).join('');
+      }
+    }
+
+    input.addEventListener('input', () => search(input.value.trim().toLowerCase()));
+
+    document.addEventListener('keydown', e => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        input.focus();
+        input.select();
+      }
+      if (e.key === 'Escape' && document.activeElement === input) {
+        input.value = '';
+        search('');
+        input.blur();
+      }
+    });
+  </script>
+</body>
+</html>

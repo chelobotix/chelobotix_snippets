@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cookies · Ruby on Rails · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Ruby on Rails</span>
+    <span class="sep">/</span>
+    <span class="current">Cookies</span></nav>
+  <main><h1>Cookies</h1>
+<pre><code class="language-ruby"># BASIC
+# In Action Controller
+cookies[:password_reset] = { value: &quot;true&quot;, expires: 1.minute.from_now }
+
+# In JS
+:javascript
+    $(document).ready(function () {
+        var showToast = document.cookie.split(&#39;; &#39;).find(row =&gt; row.startsWith(&#39;password_reset=&#39;))
+        if(showToast){
+            showToast = showToast.split(&#39;=&#39;)
+            if (showToast.length &gt; 0 &amp;&amp; showToast[1] === &#39;true&#39;){
+                toastr.info(&#39;A recovery password link has been sent to your Email&#39;)
+            }
+        }
+    });
+    
+    
+    
+#
+</code></pre>
+<pre><code class="language-ruby"># RESPONSE
+response.set_cookie(
+  &#39;xenvio_session&#39;,
+  {
+    value: result[:xenvio_jwt],
+    path: &#39;/&#39;,
+    expires: 8.hours.from_now,
+    secure: Rails.env.production?,
+    httponly: Rails.env.production?
+  }
+)
+
+
+# REQUEST (no te olvides que el front debe incluir credentials: &#39;include&#39;)
+request.cookies[&#39;xenvio_session&#39;]
+
+# CORE =&gt; credentials: true,
+
+#o
+cookies[&#39;_csrf_token&#39;] =
+        {
+          value: form_authenticity_token,
+          domain: &quot;.shipedge.com&quot;, #Que dominios podran ller la cookie
+          path: &#39;/&#39;,
+          same_site: :strict,
+          expires: 1.minute.from_now,
+          secure: true, # esto es para forzar https
+          httponly: false # esto es para que JS pueda leer la cookie o no
+        }
+        
+        
+### DOMAIN ### RE IMPORTANTE        
+# MULTIPLE DOMAINS: NO EXISTE SOLO SUBDOMAIN CON :all o .shipedge.com  TAMPOCO PUEDES SETEAR PARA OTRO DOMINIO DIFERENTE DEL QUE ESTAS CREANDO
+# ESTO ES PARA VER QUE DOMINIOS TENDRAN ACCESO A LA COOKIE O LA PODRAN VER
+
+# SAME SITE: Esto aplica a los request que se hagan hacia el servidor para que el navegador decida si manda o no manda una cookie ya existente.
+#   :strict solo el dominio que la genero puede mandarla
+#   :lax puede mandar el dominio que la genero y cualquier subdominio
+#   :none puede mandar cualquier dominio, es peligroso
+# EJEMPLO domain: &quot;.test.com&quot;
+1. `same_site: :none`
+   - test1.test.com: Puede enviar la cookie.
+   - test2.test.com: Puede enviar  la cookie.
+   - test3.diferente.com: Puede enviar la cookie.
+
+2. `same_site: :lax`
+   - test1.test.com: Puede enviar  la cookie.
+   - test2.test.com: Puede enviar en solicitudes GET de nivel superior.
+   - test3.diferente.com: No puede enviar la cookie excepto en navegaciones de nivel superior.
+
+3. `same_site: :strict`
+   - test1.test.com: Puede enviarla cookie.
+   - test2.test.com: Puede enviar y recibir la cookie (mismo sitio).
+   - test3.diferente.com: No puede enviar ni recibir la cookie. 
+
+
+
+#
+</code></pre>
+<pre><code class="language-ruby"># DELETE
+cookies.delete(&#39;_xenvio&#39;, path: &#39;/&#39;, domain: Rails.env.development? ? &#39;127.0.0.1&#39; : &quot;.shipedge.com&quot;)
+
+
+#
+</code></pre>
+<pre><code class="language-ruby"># SI LA INFORMACION ES VITAL Y NO DEBE MODIFICARSE USAR cookies.signed[:user_id]
+# Esto hara que la cookie se pueda leer pero si se modifica sera detectado por el backend
+# Mira la pestana signed hay una explicacion muy buena 
+cookies.signed[:user_id] = {
+  value: current_user.id,
+  domain: &#39;.example.com&#39;,    # Disponible para todos los subdominios
+  same_site: :lax,           # Protege contra CSRF en solicitudes de terceros
+  secure: true               # Solo se envía en conexiones HTTPS
+}
+
+
+# Para leerla desde el backend:
+cookies.signed[&quot;_xenvio_#{subdomain}&quot;]
+# Parsearla
+begin
+  payload = JSON.parse(cookies.signed[&#39;tu_cookie&#39;]).with_indifferent_access
+rescue JSON::ParserError
+  payload = &#39;invalid cookie&#39;
+rescue StandardError =&gt; e
+  payload = e
+end
+</code></pre>
+<blockquote>
+<p><a href="https://www.writesoftwarewell.com/how-http-cookies-work-rails/">https://www.writesoftwarewell.com/how-http-cookies-work-rails/</a>
+chrome: chrome://settings/content/all</p>
+</blockquote>
+<pre><code class="language-shell">La diferencia clave entre **`cookies.signed[:user_id]`** y **`cookies[:user_id]` con `httponly: true`** radica en la **integridad y seguridad** de los datos que se almacenan en la cookie. Ambos enfoques ofrecen seguridad, pero tienen usos distintos en función de lo que necesites garantizar. A continuación, te explico las diferencias y por qué usarías una sobre la otra.
+
+### Diferencia clave
+
+1. **`cookies.signed[:user_id]`**:
+   - **Firma criptográfica**: Esta cookie incluye una firma criptográfica generada por Rails usando una clave secreta. Esto garantiza que **nadie puede modificar** el valor de la cookie sin que se detecte.
+   - **Verificación de integridad**: Si alguien intenta cambiar el contenido de la cookie (como el `user_id`), la firma ya no coincidirá, y Rails considerará la cookie como inválida.
+   - **Garantía de autenticidad**: Usas esto cuando necesitas asegurarte de que el valor almacenado en la cookie es auténtico y no ha sido manipulado en el lado del cliente.
+   
+2. **`cookies[:user_id]` con `httponly: true`**:
+   - **Protección contra acceso en JavaScript**: `httponly: true` evita que la cookie sea accesible desde JavaScript en el lado del cliente, protegiendo contra ataques XSS (Cross-Site Scripting).
+   - **No protege contra manipulación**: Aunque el valor de la cookie no puede ser leído por JavaScript, **puede ser manipulado** en el cliente (por ejemplo, usando herramientas como la consola del navegador o aplicaciones de depuración HTTP). Si alguien cambia el valor de `user_id` manualmente, el servidor **no podrá saber** si fue modificado.
+
+### Cuándo usar cada una
+
+1. **Usar `cookies.signed[:user_id]`**:
+   - **Autenticidad de datos**: Si el valor de la cookie es crítico para la seguridad de la aplicación (por ejemplo, el `user_id`), usar una cookie firmada te asegura que nadie pueda cambiar el valor sin que el servidor lo detecte. Esto es fundamental en casos donde confías en la cookie para realizar operaciones sensibles, como identificar usuarios autenticados.
+   
+   - **Ejemplo**: En una aplicación donde los usuarios tienen diferentes permisos basados en su ID, un atacante podría intentar cambiar el `user_id` manualmente para acceder a una cuenta con más privilegios. Con una cookie firmada, este intento será detectado y la cookie será invalidada.
+   
+   ```ruby
+   cookies.signed[:user_id] = {
+     value: current_user.id,
+     httponly: true,       # Protege contra acceso desde JavaScript
+     secure: true          # Solo se envía en conexiones HTTPS
+   }
+</code></pre>
+<ol start="2">
+<li><p><strong>Usar <code>cookies[:user_id]</code> con <code>httponly: true</code></strong>:</p>
+<ul>
+<li><p><strong>Protección XSS</strong>: Si simplemente quieres asegurarte de que la cookie no sea accesible por JavaScript, pero no necesitas proteger la integridad del valor en sí, puedes usar <code>httponly: true</code>. Esta opción es adecuada si el valor almacenado no es crítico para la seguridad y solo necesitas evitar que JavaScript lo lea.</p>
+</li>
+<li><p><strong>Ejemplo</strong>: Si necesitas almacenar un valor de configuración o algo que no afecte la seguridad si se modifica (como el idioma preferido de un usuario), <code>httponly: true</code> puede ser suficiente.</p>
+</li>
+</ul>
+<pre><code class="language-ruby">cookies[:user_id] = {
+  value: current_user.id,
+  httponly: true,       # Protege contra acceso desde JavaScript
+  secure: true          # Solo se envía en conexiones HTTPS
+}
+</code></pre>
+</li>
+</ol>
+<h3>¿Por qué usar una cookie firmada si ya tengo <code>httponly</code>?</h3>
+<ul>
+<li><strong><code>httponly: true</code></strong> <strong>evita la lectura en JavaScript</strong>, pero <strong>no impide</strong> que alguien modifique la cookie desde el navegador. Si alguien cambia el <code>user_id</code> manualmente en la cookie, el servidor aceptará ese valor sin ninguna verificación adicional.</li>
+<li><strong><code>cookies.signed[:user_id]</code></strong> agrega una capa adicional de seguridad, ya que <strong>verifica la integridad</strong> del valor almacenado. Esto es útil cuando el valor de la cookie puede ser crítico, como un identificador de usuario que no debe ser alterado.</li>
+</ul>
+<h3>Diferencias con <code>cookies.signed.permanent</code></h3>
+<ul>
+<li><strong><code>cookies.signed.permanent</code></strong> es simplemente una cookie firmada que tiene una duración mucho más larga (20 años). La puedes usar cuando quieres que el valor de la cookie persista durante mucho tiempo, como en el caso de un &quot;remember me&quot; para usuarios que quieren mantenerse autenticados a lo largo de sesiones prolongadas.</li>
+</ul>
+<h3>Conclusión</h3>
+<ul>
+<li><p><strong>Usa <code>cookies.signed[:user_id]</code></strong> cuando necesitas asegurarte de que el valor de la cookie (como el <code>user_id</code>) no ha sido alterado en el lado del cliente. Esto es importante para datos críticos que afectan la autenticación o la lógica de la aplicación.</p>
+</li>
+<li><p><strong>Usa <code>cookies[:user_id]</code> con <code>httponly: true</code></strong> si solo necesitas evitar que JavaScript acceda al valor, pero no te preocupa si el cliente lo puede modificar. Esto es menos seguro cuando el valor almacenado tiene relevancia para la autenticación o seguridad.</p>
+</li>
+</ul>
+<p>El enfoque más seguro en la mayoría de los casos es combinar <strong><code>cookies.signed</code></strong> con <strong><code>httponly: true</code></strong> para garantizar que la cookie no sea ni leída ni manipulada por el cliente.</p>
+<pre><code>
+</code></pre>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

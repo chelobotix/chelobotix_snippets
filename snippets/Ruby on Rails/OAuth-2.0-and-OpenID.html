@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OAuth 2.0 and OpenID · Ruby on Rails · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Ruby on Rails</span>
+    <span class="sep">/</span>
+    <span class="current">OAuth 2.0 and OpenID</span></nav>
+  <main><h1>OAuth 2.0 and OpenID</h1>
+<pre><code>OAuth 2.0 (corregido)
+
+En OAuth 2.0, una aplicación (App1) se conecta a un servidor de autorización (App2) y el usuario debe poner sus credenciales en App2. El usuario elige qué permisos quiere conceder a App1, por ejemplo, acceso a las URLs de sus fotos. App2 genera un token de acceso y lo envía a App1. App1 usará ese token de acceso para hacer un request al endpoint de fotos en App2 y obtener las fotos del usuario.
+</code></pre>
+<p><img src="file:///.attachment/01889D2D-978B-463B-BC61-D78BE647303A.jpeg" alt="PastedGraphics"></p>
+<pre><code>OpenID Connect OIDC (corregido)
+
+En OpenID Connect, el usuario quiere ingresar a App1 pero quiere usar las credenciales que ya tiene en App2. En la ventana de registro, elige acceder con App2, lo que abre una ventana de login de App2. App2 valida las credenciales del usuario y devuelve un ID Token (que es un JWT) con los datos del usuario a App1. Con esos datos, App1 puede crear una nueva cuenta o autenticar al usuario. En su backend, App1 verificará la firma del ID Token usando la clave pública de App2 cada vez que el usuario inicie sesión de esa manera.
+</code></pre>
+<pre><code class="language-shell"># ENTENDER STATE FLOW
+
+Flujo detallado del ataque CSRF en OAuth2 (sin parámetro state)
+Fase 1: Preparación del ataque
+
+El atacante crea su propia cuenta en Google (gmail@attacker.com)
+Inicia el flujo OAuth normal hacia tu aplicación:
+
+Visita: tuapp.com/auth/google
+Tu backend redirige a: accounts.google.com/oauth/authorize?client_id=TU_APP&amp;redirect_uri=tuapp.com/callback
+
+
+Se autentica con SU cuenta de Google
+
+Ingresa sus credenciales: gmail@attacker.com
+Google le muestra el consent screen
+Autoriza que TU aplicación acceda a sus datos
+
+
+
+Fase 2: Interceptación del código
+
+Google genera el authorization code y está a punto de redirigir a:
+tuapp.com/callback?code=ABC123_CODIGO_DEL_ATACANTE
+El atacante NO permite que se complete esta redirección:
+
+Cierra el navegador
+Intercepta la request con herramientas de desarrollo
+O simplemente copia la URL antes de que se ejecute
+
+
+Ahora el atacante tiene un código VÁLIDO pero NO USADO que autoriza el acceso a SU cuenta de Google
+
+Fase 3: Ejecución del ataque
+
+El atacante construye un ataque:
+
+Crea un link malicioso: tuapp.com/callback?code=ABC123_CODIGO_DEL_ATACANTE
+Lo disfraza en un email de phishing
+O lo pone en un sitio web que controla
+O usa técnicas de ingeniería social
+
+
+La víctima (usuario legítimo) hace clic en el link
+
+Puede pensar que está iniciando sesión normalmente
+O ni siquiera darse cuenta (si el link está oculto en un iframe)
+
+
+
+Fase 4: Consecuencias del ataque
+
+Tu backend procesa el callback:
+
+Recibe el código válido
+Lo intercambia con Google por un access token
+Google devuelve los datos del ATACANTE (gmail@attacker.com)
+Tu backend crea una sesión/JWT para gmail@attacker.com
+
+
+La víctima queda logueada en la cuenta del atacante:
+
+Ve el dashboard de una cuenta vacía/nueva
+Puede pensar que es su cuenta pero &quot;perdió sus datos&quot;
+O puede no darse cuenta del cambio
+
+
+
+Fase 5: Explotación
+
+La víctima usa la aplicación pensando que es SU cuenta:
+
+Sube documentos confidenciales
+Ingresa información personal
+Conecta sus cuentas bancarias
+Configura sus preferencias
+
+
+El atacante accede a toda esta información:
+
+Se loguea normalmente con gmail@attacker.com
+Ve todo lo que la víctima ingresó
+Puede modificar o eliminar la información
+
+
+
+Por qué funciona este ataque
+Sin el parámetro state, tu backend no puede distinguir entre:
+
+Un flujo OAuth iniciado legítimamente por el usuario actual
+Un código de autorización generado en otro contexto/sesión
+
+# Cómo el parámetro state previene esto
+
+Usuario legítimo inicia OAuth:
+
+Backend genera state único: &quot;xyz789&quot;
+Lo almacena temporalmente asociado a esta &quot;intención de login&quot;
+Redirige a Google incluyendo: &amp;state=xyz789
+
+
+Si el atacante intenta el mismo ataque:
+
+Su URL maliciosa sería: tuapp.com/callback?code=ABC123
+NO tiene el parámetro state
+Backend rechaza: &quot;Missing state parameter&quot;
+
+
+Incluso si el atacante incluye un state:
+
+URL: tuapp.com/callback?code=ABC123&amp;state=fake123
+Backend verifica: &quot;fake123&quot; no existe en el storage temporal
+Backend rechaza: &quot;Invalid state&quot;
+</code></pre>
+<blockquote>
+<p><a href="https://darutk.medium.com/diagrams-and-movies-of-all-the-oauth-2-0-flows-194f3c3ade85">https://darutk.medium.com/diagrams-and-movies-of-all-the-oauth-2-0-flows-194f3c3ade85</a></p>
+</blockquote>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

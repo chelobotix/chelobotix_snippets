@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gorm · Go · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Go</span>
+    <span class="sep">/</span>
+    <span class="current">Gorm</span></nav>
+  <main><h1>Gorm</h1>
+<pre><code class="language-go">// CONNECT POSTGRESS DB
+var DB *gorm.DB
+
+func main() {
+    // godotenv
+    err := godotenv.Load()
+    if err != nil {
+        fmt.Println(err)
+    }
+
+    dbName := os.Getenv(&quot;DB_NAME&quot;)
+    dbUser := os.Getenv(&quot;DB_USER&quot;)
+    dbPassword := os.Getenv(&quot;DB_PASSWORD&quot;)
+    dbHost := os.Getenv(&quot;DB_HOST&quot;)
+
+    // Connect to DB
+    dsn := fmt.Sprintf(&quot;host=%s user=%s password=%s dbname=%s port=5432 sslmode=disable TimeZone=UTC&quot;, dbHost, dbUser, dbPassword, dbName)
+    db, err := gorm.Open(postgres.Open(dsn), &amp;gorm.Config{})
+    if err != nil {
+        panic(err)
+    }
+
+    DB = db
+    fmt.Println(&quot;DB connected&quot;)
+
+    //crate instance of fiber
+    app := fiber.New()
+    }
+</code></pre>
+<pre><code class="language-go">// AUTO MIGRATE
+func AutoMigrate(db *gorm.DB) error {
+    err := db.AutoMigrate(
+        &amp;models.Bank{},
+    )
+    if err != nil {
+        return err
+    }
+
+    return nil
+}
+</code></pre>
+<pre><code class="language-go">// FIXTURE
+func LoadFixtures(db *gorm.DB) error {
+    var count int64
+    db.Model(&amp;models.EconomyIndexer{}).Count(&amp;count)
+    if count &gt; 0 {
+        log.Println(&quot;Skipping fixture loading: economy_indexers already exists.&quot;)
+        return nil
+    }
+
+    economyIndexers := []models.EconomyIndexer{
+        {Name: &quot;CDI&quot;, Value: decimal.Zero},
+        {Name: &quot;SELIC&quot;, Value: decimal.Zero},
+        {Name: &quot;IPCA&quot;, Value: decimal.Zero},
+        {Name: &quot;IGP-M&quot;, Value: decimal.Zero},
+    }
+
+    if err := db.Create(&amp;economyIndexers).Error; err != nil {
+        return err
+    }
+
+    return nil
+}
+</code></pre>
+<pre><code class="language-go">// QUERY
+
+// FIND (si no encuentra no devuelve nada o sea nil)
+err := db.Find(&amp;user, 1).Error
+err := db.Find(&amp;users, &quot;age &gt; ?&quot;, 20)
+
+// FIRST (Luego de que se hace verificas si se encontro)
+result := r.DB.First(&amp;user, &quot;email = ?&quot;, email)
+    
+if result.Error != nil {
+    if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+        return user, fmt.Errorf(&quot;usuario no encontrado con email %s&quot;, email)
+    }
+    return user, result.Error
+}
+
+
+// CREATE
+err = r.DB.Create(&amp;user).Error // models.User{}
+
+// WHERE
+result := r.DB.Where(&quot;email = ?&quot;, email).First(&amp;user)
+if result != nil {
+    if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+        return nil, nil
+    }
+    return nil, r.ErrorHandler.SetError(errors.New(&quot;error finding user&quot;), &quot;errDB&quot;)
+}
+
+// Preload
+`gorm:&quot;preload:true&quot; // debes indicar en el modelo que la relacion se puede eager laoding
+err := r.DB.Preload(&quot;YearOfBirth&quot;).Preload(&quot;OtraTabla&quot;).Find(&amp;figure)
+err := r.DB.Preload(clause.Associations).Find(&amp;figure) // Esto cargará todas las asociaciones
+</code></pre>
+<pre><code class="language-go">// MODEL
+`gorm:&quot;not null&quot;`
+`gorm:&quot;unique&quot;`
+`gorm:&quot;preload:true&quot;`
+`gorm:&quot;default:true&quot;`
+decimal.Decimal `gorm:&quot;type:decimal(10,2);not null&quot;` // Se guardara en la BD como decimal 10 enteros, 2 decimales
+`gorm:&quot;constraint:OnDelete:CASCADE;&quot;` // Configura eliminación en cascada
+ResultData       json.RawMessage `json:&quot;result_data&quot; gorm:&quot;type:json;not null&quot;`  // JSON tambien puede ser jsonb
+
+`json:&quot;country,omitempty&quot;` // El campo no se incluirá en la salida JSON n si es ull
+`json:&quot;-&quot;` // El campo nunca se incluirá en la salida JSON
+
+
+type Celebrity struct {
+    gorm.Model //esto incluye los modelos bases de gorm
+    Id        uint64 `gorm:&quot;primary_key;autoIncrement&quot; json:&quot;id&quot;`
+    FirstName string `gorm:&quot;unique&quot; json:&quot;first_name&quot;`
+    LastName  string `json:&quot;last_name&quot;`
+    YearOfBirth   YearOfBirth `gorm:&quot;foreignKey:YearOfBirthID&quot;`
+    YearOfBirthID uint `json:&quot;-&quot;` // este se va a omitir de la serializacion
+    
+</code></pre>
+<pre><code class="language-go">// MANY TO MANY
+// Author representa un autor
+type Author struct {
+    gorm.Model
+    Name  string  `gorm:&quot;not null&quot; json:&quot;name&quot;`
+    Books []Book  `gorm:&quot;many2many:author_books;&quot; json:&quot;books&quot;`
+}
+
+// Book representa un libro
+type Book struct {
+    gorm.Model
+    Title   string   `gorm:&quot;not null&quot; json:&quot;title&quot;`
+    Authors []Author `gorm:&quot;many2many:author_books;&quot; json:&quot;authors&quot;`
+}
+
+// AuthorBooks representa la tabla intermedia para la relación muchos a muchos
+type AuthorBooks struct {
+    AuthorID uint `gorm:&quot;primaryKey&quot;`
+    BookID   uint `gorm:&quot;primaryKey&quot;`
+}
+</code></pre>
+<pre><code class="language-go">// NULL FOREIGN KEY
+// Solo le añades *a la clave foranea. 
+type Product struct {
+    ID         uint    `gorm:&quot;primaryKey&quot;`
+    Name       string  `gorm:&quot;not null&quot;`
+    Category
+    CategoryID *uint   `json:&quot;category_id&quot;` // Clave foránea opcional		
+</code></pre>
+<pre><code class="language-go">// TRANSACTION
+// Debes pasar tx para que funcione
+err := s.DB.Transaction(func(tx *gorm.DB) error {
+  yearOfBirth, err := s.YearRepository.GetByYear(ctx, tx, fmi.YearOfBirth)
+    if err != nil {
+        return nil, err //rollback automatico
+    }
+
+    yearOfDeath, err := s.YearRepository.GetByYear(ctx, tx, fmi.YearOfDeath)
+    if err != nil {
+        return nil, err //rollback automatico
+    }
+    
+    return nil
+})
+</code></pre>
+<blockquote>
+<p>go get -u gorm.io/gorm
+go get -u gorm.io/driver/postgres</p>
+</blockquote>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

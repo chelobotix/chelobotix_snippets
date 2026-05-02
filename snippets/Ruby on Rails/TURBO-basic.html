@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TURBO basic · Ruby on Rails · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Ruby on Rails</span>
+    <span class="sep">/</span>
+    <span class="current">TURBO basic</span></nav>
+  <main><h1>TURBO basic</h1>
+<pre><code class="language-ruby"># Rule 1: When clicking on a link within a Turbo Frame, Turbo expects a frame of the same id on the target page. It will then replace the Frame&#39;s content on the source page with the Frame&#39;s content on the target page.
+# Rule 2: When clicking on a link within a Turbo Frame, if there is no Turbo Frame with the same id on the target page, the frame disappears, and the error Response has no matching &lt;turbo-frame id=&quot;name_of_the_frame&quot;&gt; element is logged in the console.
+# Rules 3: A link can target another frame than the one it is directly nested in thanks to the data-turbo-frame data attribute.
+</code></pre>
+<pre><code class="language-html">&lt;!-- # DOS CONTENEDORES
+# Turbo buscara el mismo id &quot;testo_turbo_frame&quot; en el link de destino, si lo encuentra ramplazara por el contenido&quot;
+# view 1 --&gt;
+&lt;%= turbo_frame_tag &quot;testo_turbo_frame&quot; do %&gt;
+  &lt;h1&gt;Testo 1&lt;/h1&gt;
+  &lt;%= link_to &quot;Go to Testo 2&quot;, testo2_path %&gt;
+&lt;% end %&gt;
+
+&lt;!-- # view 2 --&gt;
+&lt;%= turbo_frame_tag &quot;testo_turbo_frame&quot; do %&gt;
+  &lt;h1&gt;Testo 2&lt;/h1&gt;
+  &lt;%= link_to &quot;return to Testo 1&quot;, testo1_path %&gt;
+&lt;% end %&gt;
+
+
+
+&lt;!-- # TRES CONTENEDORES
+# view 1 - frame 1
+# Este frame llamara el frame 3 de la otra vista y lo remplazara en el frame 2 --&gt;
+&lt;%= turbo_frame_tag &quot;test_turbo_frame&quot; do %&gt;
+  &lt;h2&gt;VIEW 1 - Frame 1&lt;/h2&gt;
+  &lt;%= link_to &quot;Replace frame 2 for frame 3&quot;, new_task_path, data: { turbo_frame: &quot;replace&quot; } %&gt;
+&lt;% end %&gt;
+
+&lt;!-- # view 1 - frame 2 --&gt;
+# Este frame sera remplazado por el frame 3 de la otra vista
+&lt;%= turbo_frame_tag &quot;replace&quot; do %&gt;
+  &lt;p&gt;TEXT BEFORE REPLACE&lt;/p&gt;
+&lt;% end %&gt;
+
+&lt;!-- # view 2 - frame 3 --&gt;
+# Este frame remplazara el frame 2 en la vista 1
+&lt;%= turbo_frame_tag &quot;replace&quot; do %&gt;
+  &lt;p&gt;NEW TEXT AFTER REPLACE&lt;/p&gt;
+&lt;% end %&gt;
+
+
+&lt;!-- # REMPLAZANDO TODA LA VISTA --&gt;
+&lt;!-- # view 1 - frame 1 --&gt;
+&lt;%= turbo_frame_tag &quot;new_tweet_turbo_frame&quot; do %&gt;
+  &lt;%= link_to &quot;New tweet&quot;, new_tweet_path, class: &quot;btn btn-primary&quot;, data: { turbo_frame: &quot;_top&quot; } %&gt;
+&lt;% end %&gt;
+
+&lt;!-- # view 2 --&gt;
+&lt;h1 class=&quot;text-2xl font-bold&quot;&gt;New Tweet&lt;/h1&gt;
+&lt;%= render &quot;form&quot;, tweet: @tweet %&gt;
+&lt;%= link_to &quot;Cancel&quot;, tweets_path, class: &quot;btn btn-secondary&quot; %&gt;
+</code></pre>
+<pre><code class="language-ruby"># TURBO STREAM
+
+# Remove a Turbo Frame
+turbo_stream.remove
+
+# Insert a Turbo Frame at the beginning/end of a list
+turbo_stream.append
+turbo_stream.prepend
+
+# Insert a Turbo Frame before/after another Turbo Frame
+turbo_stream.before
+turbo_stream.after
+
+# Replace or update the content of a Turbo Frame
+turbo_stream.update
+turbo_stream.replace
+
+# ----------------------- #
+
+# Controller
+def testo2
+  respond_to do |format|
+    format.turbo_stream
+  end
+end
+
+
+# View =&gt; Rails buscara automaticamente testo.turbo_stream.erb
+%h2 VIEW 1 - Frame 1
+= link_to &quot;Use Turbo Stream&quot;, testo2_path, data: { turbo_stream: true }
+
+= turbo_frame_tag &quot;frame_2&quot; do
+  %h2 Frame 2
+
+
+# Controller
+def testo2
+  respond_to do |format|
+    format.turbo_stream
+  end
+end
+
+
+# testo2.turbo_stream.erb 
+= turbo_stream.remove &quot;frame_2&quot;
+
+
+
+# Prepend and Update
+= turbo_stream.prepend &quot;tasks&quot;, partial: &quot;tasks/task&quot;, locals: { task: @task }
+= turbo_stream.update Task.new, &quot;&quot;
+</code></pre>
+<pre><code class="language-ruby"># DOM_ID
+
+dom_id(Post.find(45))       # =&gt; &quot;post_45&quot;
+dom_id(Post.new)            # =&gt; &quot;new_post&quot;
+
+dom_id(Post.find(45), :edit) # =&gt; &quot;edit_post_45&quot;
+dom_id(Post.new, :custom)    # =&gt; &quot;custom_post&quot;
+
+# estas serian las equivalencias:
+&lt;%= turbo_frame_tag &quot;task_#{@task.id}&quot; do %&gt;
+  ...
+&lt;% end %&gt;
+
+&lt;%= turbo_frame_tag dom_id(@task) do %&gt;
+  ...
+&lt;% end %&gt;
+
+&lt;%= turbo_frame_tag @task %&gt;
+  ...
+&lt;% end %&gt;
+
+
+
+
+
+#
+</code></pre>
+<pre><code class="language-js">// EVENTO TURBO RAILS +6
+document.addEventListener(&quot;turbo:load&quot;, () =&gt; {
+  console.log(&quot;turbo&quot;);
+}); 
+</code></pre>
+<pre><code class="language-ruby"># DISABLE TURBO
+&lt;%= link_to &quot;New quote&quot;, new_quote_path, data: { turbo: false } %&gt;
+&lt;%= form_with model: tweet, html: { id: dom_id(tweet) }, data: { turbo: false } do |f| %&gt;
+
+
+# ALL APP
+# app/javascript/application.js
+import { Turbo } from &quot;@hotwired/turbo-rails&quot;
+Turbo.session.drive = false
+
+
+.
+</code></pre>
+<pre><code class="language-erb">&lt;!-- # PREFETCH FALSE --&gt;
+&lt;%= link_to &quot;Edit&quot;, edit_tweet_path(tweet), data: { turbo_prefetch: false } %&gt;
+&lt;!-- o --&gt;
+&lt;%= turbo-frame id=&quot;tweet_frame&quot; data-turbo-prefetch=&quot;false&quot; %&gt;
+
+
+
+.
+</code></pre>
+<pre><code class="language-erb">&lt;!-- # Width 100% --&gt;
+&lt;%= turbo_frame_tag &quot;security_form1&quot;, class: &quot;flex-1 min-w-0&quot; do %&gt;
+
+
+
+.
+</code></pre>
+<pre><code class="language-erb">&lt;!-- data-turbo-action=&quot;advance&quot; le dice a Turbo que cuando se cargue el frame, agregue una nueva entrada al historial del navegador y actualice la URL. --&gt;
+&lt;%= link_to profile_path, data: { turbo_frame: &quot;main_content&quot;, turbo_action: &quot;advance&quot; } %&gt;
+
+
+
+.
+</code></pre>
+<blockquote>
+<p><a href="https://www.hotrails.dev/turbo-rails">https://www.hotrails.dev/turbo-rails</a></p>
+</blockquote>
+<pre><code class="language-ruby"># Esto sirve para actualizar a todos los suscriptores en tiempo real
+</code></pre>
+<pre><code class="language-ruby"># MODEL
+class Task &lt; ApplicationRecord
+  after_create_commit -&gt; { broadcast_prepend_to &quot;tasks_channel&quot;, partial: &quot;tasks/task&quot;, locals: { task: self }, target: &quot;tasks&quot; }
+  after_update_commit -&gt; { broadcast_replace_to &quot;tasks_channel&quot;, partial: &quot;tasks/task&quot;, locals: { task: self }, target: &quot;tasks&quot; }
+  after_destroy_commit -&gt; { broadcast_remove_to &quot;tasks_channel&quot;, partial: &quot;tasks/task&quot;, locals: { task: self }, target: &quot;tasks&quot; }
+  
+  # With active JOBS:
+  after_create_commit -&gt; { broadcast_prepend_later_to &quot;quotes&quot; }
+  after_update_commit -&gt; { broadcast_replace_later_to &quot;quotes&quot; }
+  after_destroy_commit -&gt; { broadcast_remove_to &quot;quotes&quot; } # Este sigue igual pq no hay para JOBS
+end
+</code></pre>
+<pre><code class="language-ruby"># VIEW
+&lt;%= turbo_stream_from &quot;tasks&quot; %&gt;
+    &lt;%= turbo_frame_tag &quot;tasks&quot; do %&gt;
+        &lt;%= render @tasks %&gt;
+    &lt;% end %&gt;
+</code></pre>
+<pre><code class="language-ruby"># app/controllers/tweets_controller.rb
+# =============================================================================
+# TWEETS CONTROLLER - Arquitectura Turbo Rails
+# =============================================================================
+# Este controlador implementa el patrón CRUD usando Turbo para actualizaciones
+# sin recarga completa de página. Clave: respond_to con format.turbo_stream
+# permite que las acciones create/destroy devuelvan respuestas Turbo Stream.
+# =============================================================================
+
+class TweetsController &lt; ApplicationController
+  before_action :set_tweet, only: [:show, :edit, :update, :destroy]
+
+  # ---- INDEX ----
+  # El frame del formulario inline. El formulario se carga dentro del frame &quot;new_tweet&quot;.
+  def index
+    @tweets = Tweet.all
+  end
+
+  def show
+    # Vista completa, sin turbo_frame (usa _top al navegar)
+  end
+
+  # ---- NEW ----
+  # Solo necesario cuando se accede por URL directa (new_tweet_path).
+  # En index, el enlace data: { turbo_frame: dom_id(Tweet.new) } carga
+  # esta vista DENTRO del frame vacío, sin cambiar la URL.
+  def new
+    @tweet = Tweet.new
+  end
+
+  # ---- CREATE (Turbo Stream) ----
+  # respond_to es la pieza clave: cuando el request viene con Accept:
+  # Rails renderiza create.turbo_stream.erb
+  # en vez de hacer redirect. La vista .turbo_stream.erb define las
+  # operaciones DOM (append, update, etc.) que Turbo ejecuta en el index.html.erb.
+  def create
+    @tweet = Tweet.new(tweet_params)
+
+    if @tweet.save
+      respond_to do |format|
+        format.html { redirect_to root_path, notice: &quot;Tweet was successfully created.&quot; }
+        format.turbo_stream  # Renderiza app/views/tweets/create.turbo_stream.erb
+      end
+    else
+      render :new, status: :unprocessable_entity
+    end
+  end
+
+  # ---- EDIT ----
+  # Solo necesario cuando se accede por URL directa (edit_tweet_path).
+  # En index, el enlace data: { turbo_frame: dom_id(@tweet) } carga
+  # esta vista DENTRO del frame vacío, sin cambiar la URL.
+  def edit; end
+
+  # ---- UPDATE ----
+  # Igual que create: respond_to permite respuesta turbo_stream.
+  # update.turbo_stream.erb envía turbo_stream.replace para actualizar
+  # el elemento del DOM sin recargar.
+  def update
+    if @tweet.update(tweet_params)
+      respond_to do |format|
+        format.html { redirect_to root_path, notice: &quot;Tweet was successfully updated.&quot; }
+        format.turbo_stream  # Renderiza app/views/tweets/update.turbo_stream.erb
+      end
+    else
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
+  # ---- DESTROY (Turbo Stream) ----
+  # Igual que create: respond_to permite respuesta turbo_stream.
+  # destroy.turbo_stream.erb envía turbo_stream.remove para eliminar
+  # el elemento del DOM sin recargar.
+  def destroy
+    @tweet.destroy
+    respond_to do |format|
+      format.html { redirect_to root_path, notice: &quot;Tweet was successfully deleted.&quot; }
+      format.turbo_stream  # Renderiza app/views/tweets/destroy.turbo_stream.erb
+    end
+  end
+
+  private
+
+  def tweet_params
+    params.require(:tweet).permit(:content)
+  end
+
+  def set_tweet
+    @tweet = Tweet.find_by(id: params[:id])
+    redirect_to root_path, alert: &quot;Tweet not found&quot; if @tweet.blank?
+  end
+end
+</code></pre>
+<pre><code class="language-erb">&lt;!-- app/views/tweets/index.html.erb --&gt;
+&lt;!-- ============================================================================
+    INDEX - Página principal con Turbo Frames
+    ============================================================================
+    Patrón &quot;lazy frame&quot; + &quot;target frame&quot;: el enlace New tweet tiene
+    data: { turbo_frame: dom_id(Tweet.new) }, lo que hace que al hacer
+    clic se cargue new_tweet_path DENTRO del frame vacío (línea 18),
+    sin cambiar la URL ni recargar la página.
+    El frame &quot;tweets&quot; (línea 22) es el contenedor que recibe los
+    turbo_stream.append desde create.turbo_stream.erb. --&gt;
+
+
+&lt;div class=&quot;flex flex-col gap-2&quot;&gt;
+    &lt;h1 class=&quot;text-2xl font-bold&quot;&gt;Tweets&lt;/h1&gt;
+
+    &lt;%# Target del enlace: el frame que recibirá el contenido de new_tweet_path %&gt;
+    &lt;%= link_to &quot;New tweet&quot;, new_tweet_path, class: &quot;btn btn-primary&quot;, data: { turbo_frame: dom_id(Tweet.new) } %&gt;
+
+    &lt;%# Frame vacío: aquí se inyecta el formulario cuando se hace clic en &quot;New tweet&quot; %&gt;
+    &lt;%= turbo_frame_tag dom_id(Tweet.new) %&gt;
+
+    &lt;%# Contenedor de la lista: id=&quot;tweets&quot; es el target de turbo_stream.append en create %&gt;
+    &lt;%= turbo_frame_tag &quot;tweets&quot; do %&gt;
+        &lt;%= render @tweets %&gt;
+    &lt;% end %&gt;
+&lt;/div&gt;
+</code></pre>
+<pre><code class="language-erb">&lt;!-- app/views/tweets/new.html.erb --&gt;
+&lt;%# ============================================================================
+    NEW - Formulario de creación
+    ============================================================================
+    Envuelto en turbo_frame_tag dom_id(Tweet.new) para que coincida con
+    el target del link en index. Cuando se carga vía link (data: turbo_frame),
+    Turbo reemplaza el contenido del frame vacío con ESTE HTML.
+    El id del frame debe ser idéntico al data-turbo-frame del link.
+%&gt;
+
+&lt;%= turbo_frame_tag dom_id(Tweet.new) do %&gt;
+    &lt;h1 class=&quot;text-2xl font-bold&quot;&gt;New Tweet&lt;/h1&gt;
+
+    &lt;%= render &quot;form&quot;, tweet: @tweet %&gt;
+&lt;% end %&gt;
+</code></pre>
+<pre><code class="language-erb">&lt;!-- app/views/tweets/_tweet.html.erb --&gt;
+&lt;%# ============================================================================
+    _TWEET - Parcial de cada item en la lista
+    ============================================================================
+    Cada tweet está envuelto en turbo_frame_tag dom_id(tweet). Esto permite:
+    1) Edit: al hacer clic, la respuesta de edit_tweet_path contiene un frame
+       con el mismo id → Turbo reemplaza solo este card por el formulario.
+    2) Delete: destroy.turbo_stream.erb usa turbo_stream.remove dom_id(@tweet)
+       para eliminar este elemento del DOM sin recargar.
+    3) Show: turbo_frame: &quot;_top&quot; fuerza navegación completa (salir del frame).
+%&gt;
+
+&lt;%= turbo_frame_tag dom_id(tweet) do %&gt;
+    &lt;div class=&quot;flex flex-col gap-2&quot;&gt;
+        &lt;h1 class=&quot;text-2xl font-bold&quot;&gt;&lt;%= tweet.content %&gt;&lt;/h1&gt;
+
+        &lt;%# _top = navegación completa, ignora frames padre %&gt;
+        &lt;%= link_to &quot;Show&quot;, tweet_path(tweet), class: &quot;text-blue-600 underline&quot;, data: { turbo_frame: &quot;_top&quot; } %&gt;
+
+        &lt;%# Sin turbo_frame: Turbo busca frame con id=tweet_X en la respuesta %&gt;
+        &lt;%= link_to &quot;Edit&quot;, edit_tweet_path(tweet), class: &quot;text-green-600 underline&quot; %&gt;
+
+        &lt;%# button_to DELETE → si hay turbo_stream, usa destroy.turbo_stream.erb %&gt;
+        &lt;%= button_to &quot;Delete&quot;, tweet_path(tweet), method: :delete, class: &quot;text-red-600 underline&quot; %&gt;
+    &lt;/div&gt;
+&lt;% end %&gt;
+</code></pre>
+<pre><code class="language-erb">&lt;!-- app/views/tweets/_form.html.erb --&gt;
+&lt;%# ============================================================================
+    FORM - Parcial reutilizado en new y edit
+    ============================================================================
+    form_with model: tweet genera automáticamente la URL correcta (create/update)
+    y el método POST/PATCH. Turbo intercepta el submit y envía la petición
+    con Accept: text/vnd.turbo-stream.html cuando hay turbo_stream.
+    El link &quot;Cancel&quot; con data: { turbo_frame: &quot;tweets&quot; } vuelve a cargar
+    el frame &quot;tweets&quot; desde la página actual (index), cerrando el form.
+%&gt;
+
+&lt;%= form_with model: tweet, html: { id: dom_id(tweet) } do |f| %&gt;
+  &lt;% if tweet.errors.any? %&gt;
+    &lt;div class=&quot;mb-3 p-3 bg-red-50 border border-red-200 rounded-md text-red-700 text-sm&quot;&gt;
+      &lt;ul class=&quot;list-disc list-inside&quot;&gt;
+        &lt;% tweet.errors.full_messages.each do |msg| %&gt;
+          &lt;li&gt;&lt;%= msg %&gt;&lt;/li&gt;
+        &lt;% end %&gt;
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  &lt;% end %&gt;
+  &lt;div class=&quot;flex flex-col gap-2&quot;&gt;
+    &lt;%= f.text_field :content, class: &quot;border border-gray-300 rounded-md px-3 py-2 #{&#39;border-red-500&#39; if tweet.errors[:content].any?}&quot; %&gt;
+
+    &lt;%= f.submit &quot;Create Tweet&quot;, class: &quot;bg-blue-500 text-white p-2 rounded-md hover:cursor-pointer&quot; %&gt;
+
+    &lt;% if action_name == &quot;new&quot; %&gt;
+      &lt;%= link_to &quot;Cancel&quot;, tweets_path, class: &quot;btn btn-secondary&quot;, data: { turbo_frame: Tweet.new } %&gt;
+    &lt;% else %&gt;
+      &lt;%= link_to &quot;Cancel&quot;, tweets_path(tweet), class: &quot;btn btn-secondary&quot;, data: { turbo_frame: &quot;tweets&quot; } %&gt;
+    &lt;% end %&gt;
+  &lt;/div&gt;
+&lt;% end %&gt;
+
+</code></pre>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

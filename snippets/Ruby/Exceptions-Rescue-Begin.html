@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exceptions Rescue Begin · Ruby · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Ruby</span>
+    <span class="sep">/</span>
+    <span class="current">Exceptions Rescue Begin</span></nav>
+  <main><h1>Exceptions  Rescue Begin</h1>
+<pre><code class="language-ruby"># BEGIN
+attempts = 0
+max_attempts = 1
+
+begin
+  attempts += 1
+  puts &quot;Ejecutando intento #{attempts}&quot;
+
+  # Código que puede fallar
+  raise &quot;Error temporal&quot; if attempts &lt; 2
+
+  puts &quot;El código terminó sin errores&quot;
+
+rescue StandardError =&gt; e
+  puts &quot;Rescatado: #{e.message}&quot;
+
+  # Con retry volvemos a ejecutar desde el begin
+  retry if attempts &lt;= max_attempts
+
+else
+  # Se ejecuta si NO ocurre ninguna excepción
+  puts &quot;Se ejecuta la parte del else porque no hubo errores&quot;
+
+ensure
+  # Se ejecuta SIEMPRE, ocurra o no error
+  puts &quot;Bloque ensure ejecutado&quot;
+end
+
+</code></pre>
+<pre><code class="language-ruby"># EXCEPTIONS LIST
+
+ActiveRecord::ActiveRecordError
+# Cualquier error Active Record
+
+ActiveRecord::RecordNotFound
+# Se lanza cuando no se encuentra un registro con el ID dado, por ejemplo con `find`.
+
+ActiveRecord::RecordInvalid
+# Ocurre cuando intentas guardar un modelo inválido usando `save!` o `create!`.
+
+ActiveRecord::RecordNotUnique
+# Se lanza cuando se intenta guardar un registro que viola una restricción de unicidad en la base de datos.
+
+ActiveRecord::RecordNotSaved
+# Cuando un modelo no pudo ser guardado (`save!` falla pero no por validaciones).
+
+ActiveRecord::StaleObjectError
+# Se lanza al usar locking optimista y hay un conflicto entre versiones del registro.
+
+ActiveRecord::StatementInvalid
+# Error genérico para una sentencia SQL inválida, como errores de sintaxis o columnas inexistentes.
+
+ActiveRecord::Rollback
+# No es una excepción real; se utiliza dentro de `transaction` para forzar un rollback sin lanzar excepción.
+
+ActiveRecord::SubclassNotFound
+# Cuando Rails no puede encontrar una subclase STI (Single Table Inheritance) en una tabla.
+
+ActiveRecord::AssociationTypeMismatch
+# Cuando se asigna un objeto incorrecto a una asociación, por ejemplo, una clase equivocada.
+
+ActiveRecord::ConnectionNotEstablished
+# Rails no puede conectarse a la base de datos.
+
+ActiveRecord::ReadOnlyRecord
+# Cuando se intenta modificar un registro que fue marcado como de solo lectura (`readonly`).
+
+ActionController::RoutingError
+# Se lanza cuando no se encuentra una ruta que coincida con la solicitud.
+
+ActionController::UnknownFormat
+# El controlador no puede responder al formato solicitado (por ejemplo, `format.pdf` sin soporte).
+
+ActionController::InvalidAuthenticityToken
+# Token CSRF inválido o ausente (protección contra ataques cross-site request forgery).
+
+ActionController::ParameterMissing
+# Cuando falta un parámetro obligatorio en `params.require`.
+
+ActionController::BadRequest
+# Ocurre cuando la solicitud es inválida, por ejemplo, parámetros mal formateados.
+
+ActionController::UnpermittedParameters
+# Se lanza si se reciben parámetros no permitidos cuando se usa `params.permit` estrictamente.
+
+ActionController::UnknownHttpMethod
+# Método HTTP no soportado (por ejemplo, PATCH si no está configurado).
+
+ActionController::NotImplemented
+# Se lanza cuando una acción aún no ha sido implementada explícitamente.
+
+ActionController::UrlGenerationError
+# Error al construir una URL con `url_for` o helpers si faltan parámetros requeridos.
+
+ActionDispatch::Cookies::CookieOverflow
+# Cuando el contenido de la cookie excede el tamaño máximo permitido (~4KB).
+
+ActionDispatch::Session::SessionRestoreError
+# Error al restaurar la sesión del usuario desde la cookie o almacén.
+
+ActionDispatch::Http::Parameters::ParseError
+# Cuando Rails no puede parsear los parámetros enviados (por ejemplo, JSON malformado).
+
+ActiveModel::ValidationError
+# Ocurre cuando se intenta guardar un modelo inválido con `save!`.
+
+ActiveModel::UnknownAttributeError
+# Se lanza si se intenta asignar un atributo que no existe en el modelo.
+
+ActiveJob::DeserializationError
+# Cuando Rails no puede deserializar un objeto al ejecutar un job (por ejemplo, un modelo fue borrado).
+
+ActiveJob::SerializationError
+# Cuando Rails no puede serializar un objeto antes de encolarlo (por ejemplo, un tipo no soportado).
+
+TypeError, ArgumentError
+# Base64.urlsafe_decode64()
+
+JSON::ParserError
+# JSON.parse()
+</code></pre>
+<pre><code class="language-ruby"># RESCUE FROM
+class PostsController &lt; ApplicationController
+      rescue_from ActionController::ParameterMissing, with: :handle_empty_params
+      rescue_from ActiveRecord::RecordNotFound, with: :handle_record_not_found_exception
+
+def handle_record_not_found_exception(exception)
+  if action_name == &#39;task_executor&#39;
+    Rails.logger.info(&quot;****#{exception.message}****&quot;)
+    render(json: { error: exception.message }, status: :bad_request)
+  else
+    raise(ActiveRecord::RecordNotFound)
+  end
+end
+</code></pre>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

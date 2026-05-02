@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frame motion · React · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">React</span>
+    <span class="sep">/</span>
+    <span class="current">Frame motion</span></nav>
+  <main><h1>Frame-motion</h1>
+<pre><code class="language-typescript">import { motion } from &#39;framer-motion&#39;
+
+const Basic: React.FC = () =&gt; {
+    return (
+        &lt;&gt;
+            &lt;motion.div
+                animate={{ x: 100 }}
+                transition={{ ease: &#39;easeOut&#39;, duration: 2 }}
+                className=&quot;w-40 h-40 bg-indigo-500 m-8&quot;
+            &gt;
+                //Animate
+            &lt;/motion.div&gt;
+
+            &lt;motion.div whileHover={{ scale: 1.2 }} className=&quot;w-40 h-40 bg-indigo-500 m-8&quot;&gt;
+                //Hover
+            &lt;/motion.div&gt;
+
+            &lt;motion.div
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1.2 }}
+                transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
+                className=&quot;w-40 h-40 bg-indigo-500 m-8&quot;
+            &gt;
+                //Animate
+            &lt;/motion.div&gt;
+
+            &lt;motion.div
+                animate={{
+                    scale: [1, 2, 2, 1, 1],
+                    rotate: [0, 0, 180, 180, 0],
+                    borderRadius: [&#39;0%&#39;, &#39;0%&#39;, &#39;50%&#39;, &#39;50%&#39;, &#39;0%&#39;],
+                }}
+                transition={{
+                    duration: 2,
+                    ease: &#39;easeInOut&#39;,
+                    times: [0, 0.2, 0.5, 0.8, 1],
+                    repeat: Infinity,
+                    repeatDelay: 1,
+                }}
+                className=&quot;w-40 h-40 bg-indigo-500 m-80&quot;
+            /&gt;
+            //&lt;p className=&quot;text-2xl&quot;&gt;Scrool&lt;/p&gt;
+
+            &lt;div className=&quot;bg-green-300 h-auto flex justify-center&quot;&gt;
+                &lt;motion.div
+                    initial={{ x: &#39;-70vh&#39; }}
+                    whileInView={{ x: &#39;0%&#39; }}
+                    transition={{ duration: 1 }}
+                    viewport={{ once: true }}
+                    className=&quot;w-40 h-40 bg-indigo-500 m-36&quot;
+                &gt;
+                    //Left to center
+                &lt;/motion.div&gt;
+            &lt;/div&gt;
+
+            &lt;motion.div
+                initial={{ opacity: 0, scale: 0.5 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{
+                    duration: 0.3,
+                    ease: [0, 0.71, 0.2, 1.01],
+                    scale: {
+                        type: &#39;spring&#39;,
+                        damping: 5,
+                        stiffness: 100,
+                        restDelta: 0.001,
+                    },
+                }}
+                className=&quot;w-40 h-40 bg-indigo-500 m-36&quot;
+            &gt;
+                //damping
+            &lt;/motion.div&gt;
+
+            &lt;motion.div
+                initial={{ scale: 1 }}
+                whileInView={{ scale: 0.5 }}
+                transition={{ duration: 4 }}
+                viewport={{ once: true, margin: &#39;-200px&#39; }}
+                className=&quot;w-40 h-40 bg-indigo-500 m-36&quot;
+            &gt;
+                //margin: -200px
+            &lt;/motion.div&gt;
+        &lt;/&gt;
+    )
+}
+export { Basic }
+</code></pre>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

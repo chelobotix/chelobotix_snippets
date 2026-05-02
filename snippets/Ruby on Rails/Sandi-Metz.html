@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sandi Metz · Ruby on Rails · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Ruby on Rails</span>
+    <span class="sep">/</span>
+    <span class="current">Sandi Metz</span></nav>
+  <main><h1>Sandi Metz</h1>
+<pre><code class="language-ruby"># RESUMEN
+# 1. Siempre crear variables de instancia con accessors para poderlas cambiar mas facil a futuro.
+# 2. Cuando tu colección de datos maneja datos con significado propio, es compleja y se accede varias veces a sus posiciones
+# 3. Siemrpe crear con KEY arguments
+# 4. Si no se puede inyectar la dependencia es mejor isolarla en un metodo
+# 5. Crea un hash de errores con codigo
+# 6. ENV.fetch(&#39;API_KEY&#39;) =&gt; para fallar temprano si no existe
+# 7. Detectar Duck Types 
+# 8. Detectar posible Herencia
+</code></pre>
+<pre><code class="language-ruby"># Siempre crear variables de instancia con accessors para poderlas cambiar mas facil a futuro.
+
+class MyClass
+  private attr_reader :foo
+  
+  def initialize(foo)
+    @foo = foo
+  end
+  
+  def call
+    private_method
+  end
+  
+  private
+  
+  def private_method
+    puts &#39;private&#39;
+  end
+end
+
+
+
+#
+</code></pre>
+<pre><code class="language-ruby"># Cuando tu colección de datos maneja datos con significado propio, es compleja y se accede varias veces a sus posiciones.
+
+class RevealingReferences
+  # Solo lectura de la variable de instancia @wheels
+  attr_reader :wheels
+
+  def initialize(data)
+    # Convertimos los datos crudos (arrays) en objetos Wheel
+    @wheels = wheelify(data)
+  end
+
+  # Método que devuelve un array con los diámetros de las ruedas
+  def diameters
+    wheels.map do |wheel|
+      wheel.rim + (wheel.tire * 2)
+      # En lugar de acceder a cell[0] y cell[1],
+      # ahora usamos nombres expresivos: rim y tire
+    end
+  end
+
+  # Definimos una estructura ligera para representar una rueda
+  Wheel = Struct.new(:rim, :tire)
+
+  # Convierte un array de arrays crudos en objetos Wheel
+  def wheelify(data)
+    data.collect do |cell|
+      Wheel.new(cell[0], cell[1])
+    end
+  end
+end
+
+
+
+
+#
+</code></pre>
+<pre><code class="language-ruby"># Si no se puede inyectar la dependencia es mejor isolarla en un metodo de esta forma:
+
+class Gear
+  def initialize(chainring, cog, rim, tire)
+    @chainring = chainring
+    @cog = cog
+    @rim = rim
+    @tire = tire
+  end
+
+  def gear_inches
+    (ratio * wheel.diameter).round(2)
+  end
+
+  private
+
+  def wheel ###### &lt;= asi
+    @wheel ||= Wheel.new(@rim, @tire)
+  end
+end
+
+
+
+
+#
+</code></pre>
+<pre><code class="language-ruby"># DETECTAR DUCK TYPES
+
+# 1. Si tienes CASES que seleccionan la clase o condiciones kind_of? and is_a? mejor la pasas como instancia:
+
+class GetCarrierLabel
+  attr_reader :carrier, :shipment
+
+  def initialize(carrier:, shipment:)
+    @carrier = carrier
+    @shipment = shipment
+  end
+
+  def call
+      instance = carrier.new(shipment)
+      instance.get_label
+      carrier.valid? ? true : false
+  end
+end
+
+carrier = GetCarrierLabel.new(Carrier)
+carrier.call
+
+
+
+.
+</code></pre>
+<pre><code class="language-ruby"># DETECTAR POSIBLE HERENCIA
+
+# Si tienes variables que se llamen: &quot;type&quot;, &quot;category&quot;, etc. Puede ser una señal para convertir esa clase en una super clase
+# La herencia soluciona  tipos muy relacionados que comparten un comportamiento común pero difieren en algo.
+</code></pre>
+<p>ue se llamen</p>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

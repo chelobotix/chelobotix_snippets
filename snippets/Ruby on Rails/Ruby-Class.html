@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ruby Class · Ruby on Rails · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Ruby on Rails</span>
+    <span class="sep">/</span>
+    <span class="current">Ruby Class</span></nav>
+  <main><h1>Ruby Class</h1>
+<pre><code class="language-ruby"># class Person
+class Person
+  MY_CONSTANT = &#39;my data&#39;.freeze
+  private_constant :MY_CONSTANT
+    
+  attr_accessor :name
+  
+  def initialize(name)
+    @name = name
+    @@counter += 1
+  end
+
+  # class variable
+  @@counter = 0
+
+  # class method
+  def self.class_method
+    puts(&#39;class method&#39;)
+  end
+
+  # counter
+  def self.counter
+    @@counter
+  end
+
+
+  # method1
+  def method1
+    method2
+  end
+
+  # method2
+  def method2
+    puts(&#39;method 2&#39;)
+  end
+
+  protected
+
+  # protected method
+  def protected_method
+    puts(&#39;this is private&#39;)
+  end
+
+  private
+
+  # private method
+  def private_method
+    puts(&#39;this is private&#39;)
+  end
+end
+</code></pre>
+<pre><code class="language-ruby"># FROM A STRING ####
+# Basic
+model = &quot;Shipment&quot;
+object = model.constantize.find(id)
+
+
+# Instantiate a class from a String  (suponte que quieres instanciar Foo:Bar::YourClass)
+foo = const_get(&#39;Foo&#39;)
+# foo.class  =&gt; module
+clazz = foo.const_get(&#39;Bar&#39;).const_get(&#39;YourClass&#39;)
+my_instance = clazz.new
+my_instance.some_method
+
+
+#Call instance method from string
+foo = Foo.new
+bar = &quot;method1&quot;
+foo.send(bar)
+
+#Para modelos
+record = Shipment.find(1)
+record.send(&quot;warehouse&quot;).send(&quot;name&quot;) =&gt; record.warehouse.name
+
+# Para modelos anidados (&quot;record.warehouse.name&quot;)
+record = Shipment.find(1)
+path = &quot;record.warehouse.name&quot;
+methods = path.split(&#39;.&#39;)
+current_object = record
+methods[1..].each do |method|
+  current_object = current_object.send(method)
+end
+if current_object == &quot;warehouse_23&quot;
+
+# Simbolo operador 
+shipment = Shipment.find(1)
+operator = &quot;==&quot;
+comparison_value = &quot;warehouse_23&quot;
+field_value = shipment.name
+if field_value.send(operator, comparison_value)
+</code></pre>
+<pre><code class="language-ruby">#LLAMAR UN METODO PRIVADO DESDE UN METODO SELF (PRIVATE METHOD)
+private
+  def self.test23
+   puts &#39;test&#39;
+  end
+  private_class_method :test23
+</code></pre>
+<pre><code class="language-ruby"># CREAR UNA CLASE ON THE FLY
+Language = Class.new do
+  define_method :interpret do
+    puts &quot;Interpreting the code&quot;
+  end
+end
+
+# Interpreting the code
+Language.new.interpret
+</code></pre>
+<pre><code class="language-ruby"># METHOD ON VARIABLES
+animal = &quot;cat&quot;
+
+def animal.speak
+  puts self
+end
+
+animal.speak  # cat
+</code></pre>
+<pre><code class="language-ruby"># BLOCK
+# Mira el ejemplo es clarisimo cuando lo vas a usar. Tienes 20 configuraciones posibles, no vas a pasar todas por los parametros.
+# La variable config se apsa por referencia
+
+class MyClass
+  def test
+    config = { data_type: &#39;json&#39; }
+
+    yield(config) if block_given?
+
+    puts(config)
+  end
+end
+
+
+
+# Action
+
+def index
+  file_path = &#39;src/path/file.json&#39;
+  my_class = MyClass.new
+  my_class.test do |configure|
+    configure[:file_path] = file_path
+  end
+
+  my_class.test do |configure|
+    configure[:extra_pop] = &#39;extra joys&#39;
+  end
+end
+
+# =&gt; {:data_type=&gt;&quot;json&quot;, :file_path=&gt;&quot;src/path/file.json&quot;}
+# =&gt; {:data_type=&gt;&quot;json&quot;, :extra_pop=&gt;&quot;extra joys&quot;}
+</code></pre>
+<pre><code class="language-ruby"># MODIFY ON THE FLY
+
+# La clase entera (solo usas requiere y soreescribes lo que quieras)
+# Make sure the original class is loaded
+require &#39;british_text_object&#39;
+  # Now add some methods to the original class
+class BritishTextObject
+  def color
+    return colour
+  end
+end
+
+
+# Una instancia en especifico
+bto = BritishTextObject.new(&#39;hello&#39;, 50.8, :blue)
+
+class &lt;&lt; bto
+  def color
+    colour
+  end
+end
+
+# or
+
+def bto.color
+colour
+end
+</code></pre>
+<pre><code class="language-ruby"># inheritans
+class Student &lt; Person
+  def initialize(name, course)
+    super(name)
+    @course = course
+  end
+end
+</code></pre>
+<pre><code class="language-ruby"># SUPER
+
+super # =&gt; Pasa todos los argumentos recibidos
+super() # =&gt; No pasa ningun argumento
+super(data) # =&gt; Pasa un argumento especifico
+
+def initializer(a, b)
+    super
+end
+</code></pre>
+<pre><code class="language-ruby"># Keep global state
+class Document
+  @default_font = :times
+  
+  class &lt;&lt; self
+    attr_accessor :default_font
+  end
+  
+  attr_accessor :font
+  
+  def initialize(title, author)
+    @title = title
+    @author = author
+    @font = Document.default_font
+  end
+end
+
+
+Document.default_font
+# =&gt; :times
+
+doc1 = Document.new(&quot;Ruby Guide&quot;, &quot;Matz&quot;)
+doc1.font
+# =&gt; :times
+
+Document.default_font = :arial
+Document.default_font
+# =&gt; :arial
+
+doc1.font
+# =&gt; :times
+
+</code></pre>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

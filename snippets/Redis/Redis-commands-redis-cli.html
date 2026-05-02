@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redis commands redis cli · Redis · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Redis</span>
+    <span class="sep">/</span>
+    <span class="current">Redis commands redis cli</span></nav>
+  <main><h1>Redis commands redis-cli</h1>
+<pre><code class="language-shell">redis-server
+redis-cli
+</code></pre>
+<pre><code class="language-shell"># MONITOR para monitorear los request
+
+set name Marcelo
+set usuario1 Ana NX  # =&gt; NX - Solo establece la key si NO existe
+set usuario1 Ana XX # =&gt; XX - Solo establece la key si ya existe
+set bomb &quot;booooom&quot; EX 10 # =&gt; Con expiracion
+
+get name # =&gt; &quot;Marcelo&quot;
+del name
+getrange name 0 4 # =&gt; &quot;Marce&quot;
+
+KEYS &#39;*&#39; # =&gt; para ver todas las claves
+
+redis-cli flushall # =&gt; Borrar todo
+</code></pre>
+<pre><code class="language-shell"># MAP
+mset fName Natasha lastName Alarcon
+mget fName lastName
+# 1) &quot;Natasha&quot;
+# 2) &quot;Alarcon&quot;
+</code></pre>
+<pre><code class="language-shell"># SETEX EXPIRES
+SETEX key seconds value
+TTL bomb # =&gt; Ver el tiempo restante
+</code></pre>
+<pre><code class="language-shell">#LIST lpush or rpush for remove rpop or lpop
+lpush country Bolivia
+lpush country Brasil
+
+lrange country 0 -1
+lindex country 0
+</code></pre>
+<pre><code class="language-shell"># SETS
+sadd cities &quot;La Paz&quot; Guayaramerin &quot;Porto Velho&quot;
+smembers cities
+</code></pre>
+<pre><code class="language-shell"># HASH
+hset my_hash fName Natish age 5
+hkeys my_hash #show keys
+hvals my_hash #show values
+hdel my_hash age #remove key
+hget my_hash fName # retrieve key value
+</code></pre>
+<pre><code class="language-shell"># Transaction
+multi
+set name Luis
+set age 5
+exec
+discard # para anular la TR
+</code></pre>
+<pre><code class="language-ruby"># SCAN
+SCAN 0 MATCH el_patron_que_quieras*
+#LOOP
+def self.scan_pattern(pattern, count = 10)
+  cursor = &quot;0&quot;
+  keys = []
+
+  loop do
+    cursor, found_keys = @redis.scan(cursor, match: &quot;#{pattern}*&quot;, count: count)
+    keys += found_keys
+    break if cursor == &#39;0&#39;
+  end
+
+  keys
+end
+</code></pre>
+<pre><code class="language-shell">#PUB/SUB CHAT
+Terminal 1: SUBSCRIBE canal23
+Terminal 2: SUBSCRIBE canal23
+Terminal 3: PUBLISH canal23 &quot;Hola&quot;
+</code></pre>
+<pre><code class="language-shell"># KEYSPACE
+info keyspace
+select 1 #con esto te vas a la BD numero 1
+</code></pre>
+<blockquote>
+<p>gem &#39;redis&#39;, &#39;<del>&gt; 4.0&#39;  # Especifica la versión adecuada para Rails 5.2.1
+gem &#39;redis-rails&#39;, &#39;</del>&gt; 5.0&#39;</p>
+</blockquote>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

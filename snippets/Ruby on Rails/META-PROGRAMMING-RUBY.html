@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>META PROGRAMMING RUBY · Ruby on Rails · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Ruby on Rails</span>
+    <span class="sep">/</span>
+    <span class="current">META PROGRAMMING RUBY</span></nav>
+  <main><h1>META PROGRAMMING RUBY</h1>
+<pre><code class="language-ruby"># CLASS_EVAL - DEFINE_METHOD
+
+# Define Metodos Dinamicamente
+class Report
+end
+
+[:pdf, :csv, :json].each do |format|
+  Report.class_eval do
+    define_method(&quot;export_to_#{format}&quot;) do
+      puts &quot;Exporting to #{format}&quot;
+    end
+  end
+end
+
+r = Report.new
+r.export_to_pdf
+r.export_to_csv
+
+
+# With arguments
+class MyClass
+  define_method :my_method do |my_arg|
+    my_arg * 3
+  end
+end
+
+
+.
+</code></pre>
+<pre><code class="language-ruby"># INSTANCE_EVAL
+
+# Se usa para DSL(Domain Specific Language)
+#Piensa en instance_eval como: “Ejecuta este bloque como si estuviera escrito dentro del objeto”.
+# Ejecuta un bloque cambiando el self al objeto receptor. En este caso self se convierte en la clase Form.
+
+value = :username
+
+class Form
+  def initialize(&amp;block)
+    @fields = []
+    instance_eval(&amp;block)
+  end
+
+  def field(name)
+    @fields &lt;&lt; name
+  end
+
+  def fields
+    @fields
+  end
+end
+
+form = Form.new do
+  field(10) # closure
+  field(:email)
+  field(:password)
+end
+
+p form.fields  # =&gt; [10, :email, :password]
+
+
+.
+</code></pre>
+<pre><code class="language-ruby"># SELF.INHERITED - AUTOMATIC CLASS HOOK - Se ejecuta cada vez que se crea una sub clase.
+class BaseService
+  @services = []
+
+  def self.inherited(subclass)
+    @services &lt;&lt; subclass
+  end
+
+  def self.services
+    @services
+  end
+end
+
+
+class Testo1 &lt; BaseService
+end
+
+BaseService.services # =&gt; [Testo1]
+
+
+.
+</code></pre>
+<pre><code class="language-ruby"># SELF.INCLUDED - AUTOMATIC MODULE HOOK - Se ejecuta cada vez que un modulo en añadido a una clase.
+module Auditable
+  def self.included(klass)
+    puts &quot;#{klass} ahora es auditable&quot;
+  end
+end
+
+class Order
+  include Auditable
+end
+
+# Order ahora es auditable
+
+
+
+.
+</code></pre>
+<pre><code class="language-ruby"># METHOD_MISSING
+
+def method_missing(method_name, *args)
+  puts(&quot;Warning, warning, unknown method called: #{method_name}&quot;)
+  puts(&quot;Arguments: #{args.join(&#39; &#39;)}&quot;)
+  super # llama a Object.method_missing
+end
+
+</code></pre>
+<pre><code class="language-ruby"># Se puede usar como Middleware o Proxy para delegar a otra clase
+class AccountProtectionProxy
+  def initialize(real_object, owner_name)
+    @real_object = real_object
+    @owner_name = owner_name
+  end
+  
+  def method_missing(method_name, *args)
+    super if !@real_object.respond_to?(method_name) # Te asegures que el metodo exista en el objeto real
+    check_access # Aca usas logica antes de derivar al original
+    @real_object.send( method_name, *args )
+  end
+  
+  def respond_to_missing?
+    @real_object.respond_to?(method_name)
+  end
+  
+  def check_access
+    raise &quot;Illegal access: #{@owner_name} cannot access account.&quot; if @owner_name != &#39;natish&#39;
+  end
+end
+
+
+account_protection = AccountProtectionProxy.new(RealObject, &#39;natish&#39;)
+account_protection.call
+
+
+.
+</code></pre>
+<pre><code class="language-ruby"># CONST_MISSING
+
+def self.const_missing(const_name)
+  puts &quot;Constante faltante: #{const_name}&quot;
+end
+
+
+# Se puede usar para Warnings de DEPRECATED - DEPRECATIONS
+module Tasks
+  class Task1New; end
+  class Task2New; end
+
+  def self.const_missing(const_name)
+    case const_name
+    when :Task1
+      Rails.logger.warn(&quot;Task1 is deprecated, use Task1New&quot;)
+      Task1New
+    when :Task2
+      Rails.logger.warn(&quot;Task2 is deprecated, use Task2New&quot;)
+      Task2New
+    else
+      super
+    end
+  end
+end
+
+
+
+
+.
+</code></pre>
+<pre><code class="language-ruby"># BLACK SLATE
+# Un Blank Slate en Ruby es un objeto que tiene la menor cantidad posible de métodos heredados, para que puedas interceptar casi cualquier llamada dinámica sin interferencias.
+
+class BlankProxy &lt; BasicObject
+  def method_missing(name, *args)
+    # logic
+  end
+end
+</code></pre>
+<pre><code class="language-ruby"># USAR ALIAS PARA MANTENER EL METODO ORIGINAL
+
+class User
+  def full_name
+    &quot;#{first} #{last}&quot;
+  end
+end
+
+# monkey patch
+class User
+  alias_method :full_name_without_logging, :full_name
+
+  def full_name
+    Rails.logger.info(&quot;Calling full_name&quot;)
+    full_name_without_logging.upcase
+  end
+end
+
+
+
+.
+</code></pre>
+<pre><code class="language-ruby"># SELF-MODIFYING CLASSES ACCORDING TO ENVIROMENT
+class MyClass
+  # Dinamic definition
+  def self.enable_messages
+    if Rails.env.production
+      define_method(:send_message) do
+        message_service.call
+      end
+    else
+      define_method(:send_message) do
+        # noop
+      end
+    end
+  end
+  
+  # Initial definition
+  define_method(:send_message) do
+    # noop
+  end
+end
+
+MyClass.enable_messages
+
+
+.
+</code></pre>
+<pre><code class="language-ruby"># Refinements
+
+# Hace que un monkey patching solo funcione en un contexto lexico donde es convocado.
+
+module StringExtensions
+  refine String do
+    def reverse
+    &quot;esrever&quot;
+    end
+  end
+end
+
+module StringStuff
+  using StringExtensions
+  &quot;my_string&quot;.reverse # =&gt; &quot;esrever&quot;
+end
+
+&quot;my_string&quot;.reverse # =&gt; &quot;gnirts_ym&quot;
+
+.
+</code></pre>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

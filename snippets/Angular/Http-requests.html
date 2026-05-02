@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Http requests · Angular · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Angular</span>
+    <span class="sep">/</span>
+    <span class="current">Http requests</span></nav>
+  <main><h1>Http requests</h1>
+<pre><code class="language-ts">// main.ts
+bootstrapApplication(AppComponent,{
+  providers: [provideHttpClient(withFetch())]
+}).catch((err) =&gt; console.error(err));
+</code></pre>
+<pre><code class="language-ts">// METHODS
+this.httpClient.get&lt;IPost&gt;(`https://jsonplaceholder.typicode.com/posts/1`).pipe(
+      tap((response) =&gt; {}),
+      
+      map((response) =&gt; {}),
+      
+      filter((response) =&gt; {}) ,
+      
+      //Se usa para ahcer un request en base al resultado de la primera
+      switchMap((params) =&gt; {
+        return this.httpClient.get&lt;IPost&gt;(`https://jsonplaceholder.typicode.com/posts/${params[5][&quot;id&quot;]}`).pipe(
+          tap((data: IPost) =&gt; {
+            console.log(data)
+          })
+        )
+      })
+      ).suscribe())
+      
+</code></pre>
+<pre><code class="language-ts">// Incluir Headers
+this.httpClient.post(&#39;test.com/auth&#39;, body, { headers: headers, observe: &#39;response&#39; })
+</code></pre>
+<pre><code class="language-ts">//COMPONENT
+//TS
+export class SearchComponent implements AfterViewChecked {
+  postService = inject(PostService)
+  posts$: Observable&lt;IPost[]&gt; = of([]) //or = new Observable()
+
+  handleSearch() {
+    this.posts$ = this.postService.searchPosts(this.searchData)
+  }
+}
+
+
+
+//HTML
+//*** Si no vas a suscribirte al observable tienes que usar ASYNC SI O SI!!! 
+//Este if determina el type que te devolvera el observer
+&lt;div *ngIf=&quot;post$ | async as data; else loading&quot;&gt;
+  {{ data.post.title }}
+&lt;/div&gt;
+
+&lt;ng-template #loading&gt;
+  &lt;p&gt;Loading.......&lt;/p&gt;
+&lt;/ng-template&gt;
+//or
+@if (posts$ | async; as posts) {
+  @for (post of posts; track post.id) {
+    post.title  
+  }
+}
+
+
+//Service
+export class PostService {
+  private httpClient = inject(HttpClient)
+  private base_url = &#39;http://localhost:3000/api/v1&#39;
+  isLoading = signal&lt;boolean&gt;(false)
+
+  searchPosts(query: string) {
+    this.isLoading.set(true)
+
+    return this.post(`/search_posts?q[title_or_body_or_tags_cont]=${query}`, {}, {}).pipe(
+      map((response) =&gt; {response}),
+      tap(() =&gt; this.isLoading.set(false)),
+      catchError((error) =&gt; {
+        this.isLoading.set(false)
+        return of([])
+      })
+    )
+  }
+
+  private get(endpoint: string): Observable&lt;IPosts&gt; {
+    return this.httpClient.get&lt;IPosts&gt;(`${this.base_url}${endpoint}`)
+  }
+
+  private post(endpoint: string, header: {}, body: {}): Observable&lt;IPosts&gt; {
+    const headers = new HttpHeaders(header)
+
+    return this.httpClient.post&lt;IPosts&gt;(`${this.base_url}${endpoint}`, body, { headers: headers })
+  }
+}
+
+</code></pre>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

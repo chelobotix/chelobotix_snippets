@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Basic Go · Go · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Go</span>
+    <span class="sep">/</span>
+    <span class="current">Basic Go</span></nav>
+  <main><h1>Basic Go</h1>
+<pre><code class="language-go">// STRUCT
+
+// user package
+type User struct {
+    firstName string // Las propiedades en minusculas para que solo se puedan alterar desde el constructor
+    lastName  string
+}
+
+package user
+
+func New(FirstName, LastName) *User {
+  return &amp;User{
+    FirstName: FirstName,
+    LastName: LastName,
+  }
+}
+
+// main package
+func main() {
+    user := User{
+        FirstName: &quot;Natish&quot;,
+        LastName:  &quot;Alarcon&quot;,
+    }
+
+    fmt.Println(user.LastName)
+}
+</code></pre>
+<pre><code class="language-go">// STRUCT RECEIVER es para que una varible se comporte como un objeto con un metodo
+// 1. Primero creas la struct
+// 2. Luego instancias el struct n := MiTest{Name: &quot;Chelo&quot;}
+// 3. Luego creas la funcion y le pones (n *MiTest)
+// 4. Por ultimo con tu varialbe llamas a la funcion como si fuera un metodo
+type MiTest struct {
+    Name string
+}
+
+func main() {
+    n := MiTest{Name: &quot;Chelo&quot;}
+    n.funcMiTest()}
+
+func (n *MiTest) funcMiTest() {
+    fmt.Println(n.Name)
+}
+</code></pre>
+<pre><code class="language-go">// MAP
+myMap := map[string]string{} 
+// or myMap := make(map[string]string) 
+//or myMap := make(map[string]string, 10)  -&gt; Mapa con capacidad para 10 elementos
+myMap[&quot;first_name&quot;] = &quot;John&quot;
+
+fmt.Println(
+
+// store anything
+days := map[string]interface{}{}
+myMap := make(map[string]interface{})
+
+// Delete Key
+delete(myMap, &quot;first_name&quot;)
+</code></pre>
+<pre><code class="language-go">//SLICE
+var my_slice []string
+my_slice = append(my_slice, &quot;John&quot;)
+
+// or
+numbers := []int{1, 2, 3}
+
+// interface slice
+data := []interface{}{1, &quot;hola&quot;, true}
+
+// copy
+src := []string{&quot;a&quot;, &quot;b&quot;, &quot;c&quot;}
+dst := make([]string, len(src), len(src))
+
+copy(dst, src)
+
+// include?
+slices.Contains(my_slice, my_item)
+
+// make con capacidad (espacio ya reservado en memoria)
+s := make([]int, 0)              // slice vacío, len=0 cap=0
+s := make([]int, 5)              // len=5 cap=5 (con valores cero)
+s := make([]int, 5, 10)          // len=5 cap=10
+</code></pre>
+<pre><code class="language-go">// LOOP ITERATORS
+for i := 0; i &lt;= 10; i++ {
+    log.Println(i)
+}
+
+// slice
+numbers := []string{&quot;apple&quot;, &quot;banana&quot;, &quot;orange&quot;}
+
+for index, number := range numbers {
+    log.Println(number, index)
+}
+for _, number := range numbers {
+    log.Println(number)
+}
+
+// map
+for key, value := range myMap {
+    log.Println(key, value)
+}
+
+// string
+for _, c := range &quot;hello&quot; {
+        fmt.Printf(&quot;%c\n&quot;, c)
+    }
+    
+// boolean (es como un while)
+for boolean_value {
+  
+}
+</code></pre>
+<pre><code class="language-go">// BUSCAR TODOS LOS ARCHIVOS EN UN DIRECTORIO
+pages, err := filepath.Glob(&quot;./templates/*.gohtml&quot;)
+</code></pre>
+<pre><code class="language-go">// Interfaces
+type MyNumbers interface {
+    int64 | float64
+}
+
+func SumIntsOrFloats[K comparable, V MyNumbers | float64](m map[K]V) V {
+    var s V
+    for _, v := range m {
+        s += v
+    }
+    return s
+}
+
+</code></pre>
+<blockquote>
+<p>export GOPATH=$HOME/go
+export PATH=$GOPATH/bin:$PATH</p>
+</blockquote>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

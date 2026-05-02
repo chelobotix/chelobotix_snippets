@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rails Bootstrap · Ruby on Rails · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Ruby on Rails</span>
+    <span class="sep">/</span>
+    <span class="current">Rails Bootstrap</span></nav>
+  <main><h1>Rails Bootstrap</h1>
+<pre><code class="language-ruby">1. rails new myapp --css bootstrap
+2. bin/importmap pin bootstrap 
+4. aplication.js -&gt; import * as bootstrap from &quot;bootstrap&quot; (si es que no hiciste el paso uno)
+3/ compilar con ./bin/dev
+
+
+
+</code></pre>
+<pre><code>NO NECESITAS IMPORTAR NINGUNA CLASE DE BOOTSTRAP EN NINGUNA PARTE!
+
+En application.bootstrap.scss
+@import &quot;custom.css.scss&quot;;
+
+Solo la sobreescribes...
+# custom.css.scss
+
+.navbar-brand {
+  font-size: 100px;
+}
+</code></pre>
+<p>Adding Bootstrap to Rails 7</p>
+<p>Reference: <a href="https://www.linkedin.com/pulse/rails-7-bootstrap-52-importmap-md-habibur-rahman-habib/">https://www.linkedin.com/pulse/rails-7-bootstrap-52-importmap-md-habibur-rahman-habib/</a></p>
+<p>INSTRUCTIONS</p>
+<ol>
+<li>Add the following to Gemfile:
+gem &quot;bootstrap&quot;
+gem &quot;sassc-rails&quot;</li>
+</ol>
+<p>Then $ bundle install</p>
+<ol start="2">
+<li><p>Rename application.css to application.scss</p>
+</li>
+<li><p>Import Bootstrap styles in app/assets/stylesheets/application.scss:
+$primary: green;
+@import &quot;bootstrap&quot;;</p>
+</li>
+<li><p>Include bootstrap in your app/javascript/application.js:
+import &quot;popper&quot;
+import &quot;bootstrap&quot;</p>
+</li>
+<li><p>Go to config/importmap.rb and add the following:
+pin &quot;popper&quot;, to: &#39;popper.js&#39;, preload: true
+pin &quot;bootstrap&quot;, to: &#39;bootstrap.min.js&#39;, preload: true</p>
+</li>
+<li><p>Add the following to config/initializers/assets.rb:
+Rails.application.config.assets.precompile += %w( bootstrap.min.js popper.js)</p>
+</li>
+<li><p>Test that everything works by adding some navigation (see below example) and restarting the server.</p>
+</li>
+</ol>
+<pre><code>&lt;div class=&quot;container-flouid&quot;&gt;
+  &lt;nav class=&quot;navbar navbar-expand-lg bg-light&quot;&gt;
+    &lt;div class=&quot;container&quot;&gt;
+      &lt;a class=&quot;navbar-brand&quot; href=&quot;/&quot;&gt;
+        &lt;h3&gt;Your Logo&lt;/h3&gt;
+      &lt;/a&gt;
+      &lt;button class=&quot;navbar-toggler&quot; type=&quot;button&quot; data-bs-toggle=&quot;collapse&quot; data-bs-target=&quot;#navbarTogglerDemo02&quot; aria-controls=&quot;navbarTogglerDemo02&quot; aria-expanded=&quot;false&quot; aria-label=&quot;Toggle navigation&quot;&gt;
+        &lt;span class=&quot;navbar-toggler-icon&quot;&gt;&lt;/span&gt;
+      &lt;/button&gt;
+      &lt;div class=&quot;collapse navbar-collapse&quot; id=&quot;navbarTogglerDemo02&quot;&gt;
+        &lt;ul class=&quot;navbar-nav me-auto mb-2 mb-lg-0&quot;&gt;
+          &lt;li class=&quot;nav-item&quot;&gt;
+            &lt;a class=&quot;nav-link active&quot; aria-current=&quot;page&quot; href=&quot;#&quot;&gt;Member&lt;/a&gt;
+          &lt;/li&gt;
+          &lt;li class=&quot;nav-item&quot;&gt;
+            &lt;a class=&quot;nav-link active&quot; href=&quot;#&quot;&gt;Courses&lt;/a&gt;
+          &lt;/li&gt;
+
+          &lt;li class=&quot;nav-item&quot;&gt;
+            &lt;a class=&quot;nav-link active&quot; aria-current=&quot;page&quot; href=&quot;#&quot;&gt;Blog&lt;/a&gt;
+          &lt;/li&gt;
+
+          &lt;li class=&quot;nav-item&quot;&gt;
+            &lt;a class=&quot;nav-link active&quot; aria-current=&quot;page&quot; href=&quot;#&quot;&gt;Event&lt;/a&gt;
+          &lt;/li&gt;
+
+        &lt;/ul&gt;
+        &lt;form class=&quot;&quot;&gt;
+          &lt;a class=&quot;btn btn-outline-primary mr-2&quot; href=&quot;#&quot;&gt;Login&lt;/a&gt;
+          &lt;a class=&quot;btn btn-outline-success&quot; href=&quot;#&quot;&gt;Become member&lt;/a&gt;
+        &lt;/form&gt;
+
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/nav&gt;
+&lt;/div&gt;
+</code></pre>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

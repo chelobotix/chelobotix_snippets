@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Docker Basic · Docker · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Docker</span>
+    <span class="sep">/</span>
+    <span class="current">Docker Basic</span></nav>
+  <main><h1>Docker Basic</h1>
+<pre><code class="language-shell"># RUN (CREATE NEW CONTAINER)
+--name # para poner el nombre a tu contenedor
+-p 3000:3000 # binding del puerto
+-e 
+-it # para interactuar con el contenedor
+-v ${PWD}:/usr/src/app # enlaza el directorio actual a la ruta /usr/src/app del contenedor. Los cambios en el contenedor se replicaran fuera. 
+</code></pre>
+<pre><code class="language-shell"># DOCKER COMPOSE
+docker compose up -d
+docker compose down
+docker compose exec app rails db:migrate
+</code></pre>
+<pre><code class="language-shell"># Si tienes DockerFile ES MEJOR DOCKER COMPOSE
+docker build . # desde la ruta donde esta el archivo
+</code></pre>
+<pre><code class="language-shell"># START (start an existing container) ES MEJOR DOCKER COMPOSE UP 
+docker compose up -d # esto es mejor
+docker start 45f79fc27b5f
+
+
+# LOGS
+docker logs a3816abd27e5
+docker logs affectionate_fermi
+docker logs --follow mongo_test #Quedar escuchando
+</code></pre>
+<pre><code class="language-shell"># TERMINAL
+docker exec -it my_container bash
+
+# O un comando en especifico
+docker exec -it my_container my_command
+
+# Con enviroment
+RAILS_ENV=production bundle exec rails c
+
+# Rails
+bundle exec rails c
+
+# Postgres
+docker cp db.backup &lt;nombre_contenedor_postgres&gt;:/db.backup
+docker exec -it &lt;nombre_contenedor_postgres&gt; bash
+pg_restore -U postgres -d my_database /db.backup
+#o psql -U postgres -d my_database -f /db.backup
+
+CREATE USER x5;
+ALTER USER x5 WITH createdb;
+ALTER USER x5 WITH superuser;
+ALTER USER x5 WITH login;
+
+\du # Para ver los usuarios
+
+CREATE DATABASE x5_development;
+
+psql -U x5 -d x5_development
+
+docker cp /Users/shipedge/Documents/Programming/Shipedge/Dbs/nuevo.sql xenvio-db-1:/tmp/nuevo.sql
+
+psql -U x5 x5_development &lt; /tmp/nuevo.sql
+
+
+
+# VALKEY
+docker exec -it my-valkey-container valkey-cli
+</code></pre>
+<pre><code class="language-shell"># NETWORK
+docker network ls
+docker network create mongo-network
+
+</code></pre>
+<pre><code class="language-shell"># COPIAR ARCHIVO
+docker cp D:\SHIPEDGE\XENVIO\x5.xenvio-master\nuevo.sql x5xenvio-master-db-1:/tmp/nuevo.sql
+</code></pre>
+<pre><code class="language-shell"># RUBY ON RAILS
+1. Configurar las variables de entorno como estan en el docker-compose(otro fragmento), igual el docker-entrypoint.
+2. Una vez que ya tienes tu DockerFile configurado y el docker-compose correr: docker compose up -d  desde el directorio raiz
+3. Configurar Dbeaver como en la foto
+4. Acceder a la terminal 
+
+</code></pre>
+<p><img src="file:///.attachment/A572C2B0-0154-4CE5-8C1F-9EE3B4B0D537.png" alt="PastedGraphics"></p>
+<pre><code class="language-shell"># Detach Vita Wallet
+docker compose run --rm --service-ports api
+PORT=3001 npm start
+
+docker run --rm -it \
+  --name rails_marce \
+  -v &quot;$(pwd)&quot;:/rails \
+  -v bundle:/usr/local/bundle \
+  -p 3000:3000 \
+  -p 12345:12345 \
+  -e RAILS_ENV=development \
+  -e REDIS_URL=redis://redis:6379/0 \
+  -e postgres_user_password=postgres \
+  -e postgres_user_name=postgres \
+  -e postgres_host=postgres_api \
+  -e postgres_port=5432 \
+  -e redis_ip_address=redis_api \
+  --network=$(docker network ls | grep $(basename $(pwd)) | awk &#39;{print $1}&#39;) \
+  --entrypoint bash \
+  api:2025-01
+  
+  rdbg -n --open --host 0.0.0.0 --port 12345 -c -- rails server -b 0.0.0.0
+  
+  
+  # VSCODE launch.json
+  
+  docker-compose
+  
+  {
+    &quot;version&quot;: &quot;0.2.0&quot;,
+    &quot;configurations&quot;: [
+      {
+        &quot;type&quot;: &quot;rdbg&quot;,
+        &quot;name&quot;: &quot;Attach to Docker rdbg&quot;,
+        &quot;request&quot;: &quot;attach&quot;,
+        &quot;debugPort&quot;: &quot;localhost:12345&quot;,
+        &quot;localfsMap&quot;: {
+          &quot;/rails&quot;: &quot;${workspaceFolder}&quot;
+        },
+        &quot;showDebuggerOutput&quot;: true,
+        &quot;command&quot;: &quot;rails server -b 0.0.0.0&quot;,
+        &quot;askParameters&quot;: false,
+        &quot;useBundler&quot;: true,
+        &quot;pathMaps&quot;: [
+          {
+            &quot;localRoot&quot;: &quot;${workspaceFolder}&quot;,
+            &quot;remoteRoot&quot;: &quot;/rails&quot;
+          }
+        ],
+        &quot;env&quot;: {
+          &quot;RAILS_ENV&quot;: &quot;development&quot;
+        }
+      }
+    ]
+  }
+</code></pre>
+<pre><code class="language-shell"># KILL
+docker kill $(docker ps -q)
+</code></pre>
+<blockquote>
+<p><a href="https://semaphoreci.com/community/tutorials/dockerizing-a-ruby-on-rails-application">https://semaphoreci.com/community/tutorials/dockerizing-a-ruby-on-rails-application</a>
+<a href="https://schembri.me/rubymine-with-docker/">https://schembri.me/rubymine-with-docker/</a></p>
+</blockquote>
+<pre><code class="language-ruby">ARG RUBY_VERSION=3.3.1
+FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
+
+# Rails app lives here
+WORKDIR /usr/src/rails
+
+# Install base packages
+RUN apt-get update -qq &amp;&amp; \
+    apt-get install --no-install-recommends -y curl libjemalloc2 libvips sqlite3 libpq-dev &amp;&amp; \
+    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+# Install packages needed to build gems
+RUN apt-get update -qq &amp;&amp; \
+    apt-get install --no-install-recommends -y build-essential git pkg-config &amp;&amp; \
+    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+# Install application gems
+COPY --link Gemfile Gemfile.lock ./
+RUN bundle install &amp;&amp; \
+    bundle exec bootsnap precompile --gemfile &amp;&amp; \
+    rm -rf ~/.bundle/ &quot;${BUNDLE_PATH}&quot;/ruby/*/cache &quot;${BUNDLE_PATH}&quot;/ruby/*/bundler/gems/*/.git
+
+# Copy application code
+COPY --link . .
+
+CMD [&quot;rails&quot;, &quot;server&quot;, &quot;-b&quot;, &quot;0.0.0.0&quot;]
+</code></pre>
+<pre><code>version: &#39;3.9&#39;
+services:
+  app:
+    build: . # Esto usara el Dockerfile que esta en el mismo directorio
+    ports:
+      - &#39;3000:3000&#39;
+    volumes:
+      - .:/usr/src/rails # Crearemos un volumen para linkear los cambios entre host y container
+    environment:
+      RAILS_ENV: ${RAILS_ENV}
+      DATABASE_URL: ${DATABASE_URL}
+    command: [&#39;any_terminal_command&#39;]
+    depends_on:
+      - db
+          
+  db:
+    container_name: postgres_database
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - &quot;6432:5432&quot;
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
+  
+</code></pre>
+<pre><code># .env
+DATABASE_URL=postgresql://x5:password@db:5432/rails_app_development
+POSTGRES_USER=x5
+POSTGRES_PASSWORD=password
+POSTGRES_DB=rails_app_development
+</code></pre>
+<pre><code>#!/bin/bash -e
+
+# Add any container initialization steps here
+rm -f /rails/tmp/pids/server.pid
+rails db:prepare
+
+exec &quot;${@}&quot;
+</code></pre>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

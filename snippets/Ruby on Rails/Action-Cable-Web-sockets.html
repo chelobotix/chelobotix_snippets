@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Action Cable Web sockets · Ruby on Rails · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Ruby on Rails</span>
+    <span class="sep">/</span>
+    <span class="current">Action Cable Web sockets</span></nav>
+  <main><h1>Action Cable Web sockets</h1>
+<pre><code>1. generate channel
+rails g channel batepapo
+
+2. create a channel inside app/channels/yourChannelfile.rb
+def subscribed
+    stream_from(&#39;el mismo nombre que tu channel&#39;) 
+    # Por ejemplo BatepapoChannel
+end
+
+3. Add to routes
+mount ActionCable.server, at: &#39;/cable&#39;
+
+4. Ahora manejas desde tu controlador del modelo que te interesa transmitir, en este caso desde el controlador de Messages en la accion create y te pasas un hash como segundo argumento con lo que quieres transmitir
+def create
+    message = current_user.messages.build!(message_params)
+    if message.save
+      ActionCable.server.broadcast(&#39;BatepapoChannel&#39;, mensaje: &#39;hola&#39;)
+    end
+end
+
+
+5. Aca puedes elegir dos opciones si estas en local puedes desactivar forgery
+en el archivo config/enviroment/development añades:
+config.action_cable.disable_request_forgery_protection = true
+
+o si estas en producction puedes poner los origenes permitidos en config/enviroment/production
+config.action_cable.allowed_request_origins = [&#39;*&#39;]
+
+
+6. luego ya manejas el JS en tu coffee asi:
+received: (data) -&gt;
+    $(&#39;#chat-box&#39;).append(&quot;&lt;p&gt;#{data.mensaje}&lt;/p&gt;&quot;)
+    
+o en tu JS en la carpeta channel
+  received(data) {
+    // Called when there&#39;s incoming data on the websocket for this channel
+      const chatBox = document.getElementById(&#39;chat-box&#39;)
+      chatBox.insertAdjacentHTML(&#39;beforeend&#39;, `&lt;p&gt;${data.message}&lt;/p&gt;`)
+  }
+});
+    
+7. y en tu vista que seria index.erb
+&lt;div id=&quot;chat-box&quot;&gt;&lt;/div&gt;
+
+&lt;%= form_with(scope: :message, url: messages_path, remote: true, method: :post) do |f| %&gt;
+  &lt;%= f.text_field :text, placeholder: &#39;Enter your message&#39;, autofocus: true %&gt;
+  &lt;%= f.submit &quot;send message&quot; %&gt;
+
+&lt;% end %&gt;
+</code></pre>
+<pre><code class="language-shell">ActionCable.server.config
+</code></pre>
+<pre><code class="language-ruby"># connention.rb
+module ApplicationCable
+  class Connection &lt; ActionCable::Connection::Base
+    identified_by :current_user
+
+    def connect
+      self.current_user = find_verified_user
+    end
+
+    private
+
+    def find_verified_user
+      verified_user = env[&#39;warden&#39;].user
+      if !verified_user.nil?
+        verified_user
+      else
+        reject_unauthorized_connection
+      end
+    end
+  end
+end
+</code></pre>
+<pre><code class="language-ruby">1.  &quot;config/initializers/action_cable.rb&quot;
+if Rails.env.development?
+  Rails.application.config.action_cable.allowed_request_origins =  [&#39;http://localhost:3000&#39;, &#39;http://127.0.0.1:3000&#39;]
+end
+
+2. cable.yml
+development:
+  redis: &amp;redis
+    adapter: redis
+    url: redis://localhost:6379/1
+
+test:
+  adapter: async
+
+production:
+  adapter: redis
+  url: redis://localhost:6379/1
+  channel_prefix: bla_production
+  
+
+3. routes.rb
+mount ActionCable.server =&gt; &#39;/cable&#39;
+
+
+4. /layouts/application.html.haml
+= action_cable_meta_tag
+
+
+5. rails generate channel UserInfoChannel
+
+
+6. From JOB or Controller (acordate pq  te mereces este puesto, la lograte brow!)
+ActionCable.server.broadcast(stream_id, mensaje: &#39;hola&#39;) 
+
+7. initializer development.rb
+config.action_cable.mount_path = &#39;/cable&#39;
+
+</code></pre>
+<pre><code>1. cable.yml
+development:
+  adapter: redis
+  url: redis://localhost:6379/1
+  
+2. gemfile solo necesitas
+gem &quot;redis&quot;, &quot;&gt;= 4.0.1&quot;
+
+</code></pre>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

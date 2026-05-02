@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>View Component · Ruby on Rails · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Ruby on Rails</span>
+    <span class="sep">/</span>
+    <span class="current">View Component</span></nav>
+  <main><h1>View Component</h1>
+<pre><code class="language-ruby">rails generate component Greeting name
+</code></pre>
+<h1>Helpers de Rails usados en ViewComponent</h1>
+<h2><code>content_tag</code></h2>
+<h3>Firma</h3>
+<pre><code class="language-ruby">content_tag(tag_name, content = nil, options = nil, &amp;block)
+</code></pre>
+<h3>Qué hace</h3>
+<p>Genera una etiqueta HTML.</p>
+<h3>Ejemplo</h3>
+<pre><code class="language-ruby">content_tag(:div, class: &#39;box&#39;) do
+  concat(&quot;Hello&quot;)
+end
+</code></pre>
+<h3>HTML generado</h3>
+<pre><code class="language-html">&lt;div class=&quot;box&quot;&gt;
+  Hello
+&lt;/div&gt;
+</code></pre>
+<h3>Ejemplo sin bloque</h3>
+<pre><code class="language-ruby">content_tag(:span, &quot;Hello&quot;, class: &quot;red&quot;)
+</code></pre>
+<h3>HTML generado</h3>
+<pre><code class="language-html">&lt;span class=&quot;red&quot;&gt;Hello&lt;/span&gt;
+</code></pre>
+<hr>
+<h2><code>concat</code></h2>
+<h3>Firma</h3>
+<pre><code class="language-ruby">concat(content)
+</code></pre>
+<h3>Qué hace</h3>
+<p>Agrega contenido al buffer HTML actual dentro de un bloque.</p>
+<h3>Ejemplo</h3>
+<pre><code class="language-ruby">content_tag(:div) do
+  concat(&quot;A&quot;)
+  concat(&quot;B&quot;)
+end
+</code></pre>
+<h3>HTML generado</h3>
+<pre><code class="language-html">&lt;div&gt;AB&lt;/div&gt;
+</code></pre>
+<h3>Nota importante</h3>
+<p>Sin <code>concat</code>, dentro de un bloque Rails solo renderiza el último valor retornado.</p>
+<hr>
+<h2><code>label_tag</code></h2>
+<h3>Firma</h3>
+<pre><code class="language-ruby">label_tag(name = nil, content_or_options = nil, options = nil, &amp;block)
+</code></pre>
+<h3>Qué hace</h3>
+<p>Genera una etiqueta <code>&lt;label&gt;</code>.</p>
+<h3>Ejemplo</h3>
+<pre><code class="language-ruby">label_tag(&quot;email&quot;, &quot;Email&quot;)
+</code></pre>
+<h3>HTML generado</h3>
+<pre><code class="language-html">&lt;label for=&quot;email&quot;&gt;Email&lt;/label&gt;
+</code></pre>
+<h3>Ejemplo con bloque</h3>
+<pre><code class="language-ruby">label_tag(&quot;city&quot;) do
+  &quot;City&quot;
+end
+</code></pre>
+<h3>HTML generado</h3>
+<pre><code class="language-html">&lt;label for=&quot;city&quot;&gt;City&lt;/label&gt;
+</code></pre>
+<hr>
+<h2><code>text_field_tag</code></h2>
+<h3>Firma</h3>
+<pre><code class="language-ruby">text_field_tag(name, value = nil, options = {})
+</code></pre>
+<h3>Qué hace</h3>
+<p>Genera un <code>&lt;input type=&quot;text&quot;&gt;</code>.</p>
+<h3>Ejemplo</h3>
+<pre><code class="language-ruby">text_field_tag(&quot;city&quot;)
+</code></pre>
+<h3>HTML generado</h3>
+<pre><code class="language-html">&lt;input type=&quot;text&quot; name=&quot;city&quot;&gt;
+</code></pre>
+<h3>Ejemplo con valor</h3>
+<pre><code class="language-ruby">text_field_tag(&quot;city&quot;, &quot;Miami&quot;)
+</code></pre>
+<h3>HTML generado</h3>
+<pre><code class="language-html">&lt;input type=&quot;text&quot; name=&quot;city&quot; value=&quot;Miami&quot;&gt;
+</code></pre>
+<hr>
+<h2><code>select_tag</code></h2>
+<h3>Firma</h3>
+<pre><code class="language-ruby">select_tag(name, option_tags = nil, options = {})
+</code></pre>
+<h3>Qué hace</h3>
+<p>Genera un <code>&lt;select&gt;</code>.</p>
+<h3>Ejemplo</h3>
+<pre><code class="language-ruby">select_tag(&quot;country&quot;, options_for_select([[&quot;USA&quot;, &quot;US&quot;]]))
+</code></pre>
+<h3>HTML generado</h3>
+<pre><code class="language-html">&lt;select name=&quot;country&quot;&gt;
+  &lt;option value=&quot;US&quot;&gt;USA&lt;/option&gt;
+&lt;/select&gt;
+</code></pre>
+<hr>
+<h2><code>options_for_select</code></h2>
+<h3>Firma</h3>
+<pre><code class="language-ruby">options_for_select(container, selected = nil)
+</code></pre>
+<h3>Qué hace</h3>
+<p>Genera etiquetas <code>&lt;option&gt;</code> para un select.</p>
+<h3>Ejemplo</h3>
+<pre><code class="language-ruby">options_for_select([[&quot;USA&quot;, &quot;US&quot;], [&quot;Canada&quot;, &quot;CA&quot;]])
+</code></pre>
+<h3>HTML generado</h3>
+<pre><code class="language-html">&lt;option value=&quot;US&quot;&gt;USA&lt;/option&gt;
+&lt;option value=&quot;CA&quot;&gt;Canada&lt;/option&gt;
+</code></pre>
+<h3>Ejemplo con selected</h3>
+<pre><code class="language-ruby">options_for_select([[&quot;USA&quot;, &quot;US&quot;]], &quot;US&quot;)
+</code></pre>
+<h3>HTML generado</h3>
+<pre><code class="language-html">&lt;option value=&quot;US&quot; selected=&quot;selected&quot;&gt;USA&lt;/option&gt;
+</code></pre>
+<hr>
+<h2><code>fields_for</code></h2>
+<h3>Firma</h3>
+<pre><code class="language-ruby">fields_for(record_name, record_object = nil, options = {}, &amp;block)
+</code></pre>
+<h3>Qué hace</h3>
+<p>Genera campos anidados para estructuras complejas.</p>
+<h3>Ejemplo</h3>
+<pre><code class="language-ruby">form.fields_for(&#39;locations[]&#39;, OpenStruct.new, index: 0) do |f|
+  f.text_field(:city)
+end
+</code></pre>
+<h3>HTML generado</h3>
+<pre><code class="language-html">&lt;input type=&quot;text&quot; name=&quot;locations[0][city]&quot;&gt;
+</code></pre>
+<h3>Uso típico</h3>
+<p>Sirve para:</p>
+<ul>
+<li>nested params</li>
+<li>múltiples objetos</li>
+<li>arrays dinámicos</li>
+</ul>
+<hr>
+<h2><code>form.text_field</code></h2>
+<h3>Firma</h3>
+<pre><code class="language-ruby">form.text_field(method, options = {})
+</code></pre>
+<h3>Qué hace</h3>
+<p>Genera input ligado al form builder.</p>
+<h3>Ejemplo</h3>
+<pre><code class="language-ruby">form.text_field(:name)
+</code></pre>
+<h3>HTML generado</h3>
+<pre><code class="language-html">&lt;input type=&quot;text&quot; name=&quot;model[name]&quot; id=&quot;model_name&quot;&gt;
+</code></pre>
+<hr>
+<h2><code>form.select</code></h2>
+<h3>Firma</h3>
+<pre><code class="language-ruby">form.select(method, choices = nil, options = {}, html_options = {})
+</code></pre>
+<h3>Qué hace</h3>
+<p>Genera select ligado al form builder.</p>
+<h3>Ejemplo</h3>
+<pre><code class="language-ruby">form.select(:country, [[&quot;USA&quot;, &quot;US&quot;]])
+</code></pre>
+<h3>HTML generado</h3>
+<pre><code class="language-html">&lt;select name=&quot;model[country]&quot; id=&quot;model_country&quot;&gt;
+  &lt;option value=&quot;US&quot;&gt;USA&lt;/option&gt;
+&lt;/select&gt;
+</code></pre>
+<hr>
+<h1>Diferencia importante: <code>_tag</code> vs <code>form builder</code></h1>
+<h2>Helpers <code>_tag</code></h2>
+<pre><code class="language-ruby">text_field_tag(&quot;city&quot;)
+</code></pre>
+<h3>Tú controlas manualmente:</h3>
+<ul>
+<li>name</li>
+<li>value</li>
+<li>id</li>
+</ul>
+<hr>
+<h2>Helpers de form builder</h2>
+<pre><code class="language-ruby">form.text_field(:city)
+</code></pre>
+<h3>Rails genera automáticamente:</h3>
+<ul>
+<li>name</li>
+<li>id</li>
+<li>asociación con modelo</li>
+</ul>
+<hr>
+<h1>Regla mental rápida</h1>
+<h2><code>_tag</code></h2>
+<p>HTML manual</p>
+<h2><code>form builder</code></h2>
+<p>HTML ligado al modelo</p>
+<hr>
+<h1>Seguridad ⚠️</h1>
+<h2><code>content_tag</code></h2>
+<p>Rails escapa contenido automáticamente.</p>
+<h3>Riesgo</h3>
+<pre><code class="language-ruby">content_tag(:div, user_input.html_safe)
+</code></pre>
+<p>Puede abrir XSS.</p>
+<hr>
+<h2><code>concat</code></h2>
+<p>Si concatenas contenido externo sin sanitizar:</p>
+<pre><code class="language-ruby">concat(user_input)
+</code></pre>
+<p>puede ser riesgoso si usas <code>html_safe</code>.</p>
+<hr>
+<h2><code>fields_for</code></h2>
+<p>Si el index está mal definido:</p>
+<pre><code class="language-ruby">locations[][city]
+</code></pre>
+<p>params pueden llegar corruptos.</p>
+<hr>
+<h1>Nota práctica para ViewComponent</h1>
+<p>En componentes complejos:</p>
+<pre><code class="language-ruby">content_tag + concat
+</code></pre>
+<p>es el patrón estándar porque permite construir árboles HTML limpios sin ERB.</p>
+<blockquote>
+<p><a href="https://api.rubyonrails.org/v8.1.3/classes/ActionView/Helpers/TagHelper.html">https://api.rubyonrails.org/v8.1.3/classes/ActionView/Helpers/TagHelper.html</a></p>
+</blockquote>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

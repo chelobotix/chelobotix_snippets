@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nova Sphere · Shipedge · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Shipedge</span>
+    <span class="sep">/</span>
+    <span class="current">Nova Sphere</span></nav>
+  <main><h1>Nova Sphere</h1>
+<pre><code>Instalar NovaSphere Login en tu App
+Prerequisitos:
+
+app creada en novasphere(es requierido app_id y app_key generada en este paso)
+un sistema backend(o frontend) para enviar la credencial
+1.- Redireccionamiento
+Nova Sphere usa redireccionamiento como medio mas seguro para implementar la authenticacion, por lo tanto
+cada sistema que requiera authenticacion debera implementar la logica que se encuentra en este documento
+empezando con el direccionamiento a una url registrada en la lista blanca de la app.
+
+Cuando se crea la app en Nova, este nos devolvera la siguiente estructura basica:
+
+{
+    &quot;app_id&quot;: &quot;app_omniorders&quot;,
+    &quot;app_key&quot;: &quot;ak_omniorders&quot;,
+    &quot;app_url&quot;: &quot;https://app.omniorders.com&quot;,
+    &quot;callbacks&quot;: [
+        &quot;http://localhost:8000/callback&quot;,
+        &quot;https://mi.backend.com/callback&quot;
+    ]
+}
+donde callbacks es la coleccion de url validas para donde se redireccionaran las peticiones de autenticacion, 
+tambien donde llegaran las credenciales en el parametro &quot;code&quot;.
+
+1.1.- FRONTEND
+para empezar con el redireccionamiento creamos por ejemplo un button en nuestro login page:
+
+//ejemplo en react
+const ButtonLogin = ({ app_id, state, redirect_uri }) =&gt; {
+    return (&lt;button
+        onClick={() =&gt; {
+            window.location.href = `${process.env.NOVASPHERE_FRONTEND}/app/${app_id}?redirect_uri=${redirect_uri}&amp;state=${state}`;
+        }}
+    &gt;
+        Login with NovasSphere
+    &lt;/button&gt;);
+}
+donde:
+
+process.env.NOVASPHERE_FRONTEND es la url de redireccionamiento, en esta caso extraendolo de las variables de entorno,
+puedes tambien solo tenerlo como constante(la url es: https://accounts.shipedge.com)
+
+app_id es la app_id de la app que creamos en novasphere
+redirect_uri es la url de redireccionamiento, recuerda que tiene que estar en la lista blanca de la app(callbacks).
+state es el estado que nos permitira compartir parametros a nova y devolvernos a nuestra app, por ejemplo
+cuando un usuario viene a nuestra app por un link compartido y este link tiene parametros como una ruta e ids de un registro,
+puedes envolverlos en un state y mandarlos a la url de redireccionamiento, este al terminarse el login satisfactoriamente devolvera
+el mismo state que enviaste
+
+1.2.- BACKEND
+Tienes en tu sistema ya sea front o backend crear una url de redireccionamiento, el cual registraras en tu app(callbacks).
+En este caso usaremos &quot;http://localhost:8000/login/callback&quot; para redireccionar.
+
+Entonces con el paso anterior usando una app de ejemplo nuestra url de redireccionamiento es: https://accounts.shipedge.com/app/app_omniorders/login?redirect_uri=http://localhost:8000/login/callback
+
+Terminado el login nos llegara a la url de redireccionamiento el code, el cual es un JWT en base64, para leerlo usamos:
+
+//en el caso de un backend basado en nodejs
+
+const code = req.query.code;
+//tiempo de expiracion del token
+const expiresAt = req.query.expires_at;
+//obteniendo el token
+const jwt = atob(code);
+y si en caso se envio un state, este llegara tambien a la url de redireccionamiento, para leerlo usamos:
+
+const { code, state, expires_at } = req.query;
+
+//token del usuario
+const jwt = atob(code);
+//parametros que enviaste para volver a recivirlos, puedes enviar por ejemplo donde estaba en el front y para volverlo a llevar al mismo lugar pero con una session valida
+const params = atob(state);
+seguidamente con el jwt podriamos consultar a por informacion de quien este usuario logeado, usando la api de novasphere
+y credenciales de tu app:
+
+export const getUser = async (input: { token: string }) =&gt; {
+  const res = await fetch(
+    `${process.env.APINOVA_URL}/api/v1/app/${process.env.APP_ID}/user`, //app_omniorders por ejemplo
+    {
+      method: &quot;GET&quot;,
+      headers: {
+        &quot;Content-Type&quot;: &quot;application/json&quot;,
+        &quot;App-Key&quot;: process.env.APP_KEY //ak_omniorders por ejemplo
+        &quot;Authorization&quot;: input.token,
+      },
+      cache: &quot;no-cache&quot;
+    }
+  );
+  return res.json() as Promise&lt;{
+    id: string,
+    email: string,
+    name: string,
+  }&gt;;
+}
+el cual nos retornara un:
+
+{
+  &quot;id&quot;: &quot;user_omniorders&quot;,
+  &quot;email&quot;: &quot;q0s2w@example.com&quot;,
+  &quot;name&quot;: &quot;John Doe&quot;
+}
+con esto ya tienes lo necesario para tener un usuario valido, authenticado y con parametros a donde redireccionar(el state)
+
+Que es lo que sigue?
+Con estos valores, lo que puedes hacer es, a tu modelos de usuario ligar el id de nova, tambien guardarle el token(porfavor de manera encriptada) 
+ya que con estos valores para el siguiente paso podras usarlos(pagos).
+
+Tambien para evitar cuello de botella consultado si usuario valido o no, lo que procede hacer  es con tu propia base de datos
+crear un jwt que si compartas a tu frontend y que este use con tu backend porque de esta forma es rapida la forma de trabajar.
+
+Refresh Token
+Para refrescar un jwt que esta apunto de expirar, puedes hacerlo con la api de novasphere:
+
+//donde { token } es el token que obtuviste anteriores pasos
+export const refreshToken = async (input: { token: string }) =&gt; {
+  const res = await fetch(
+    `${process.env.APINOVA_URL}/api/v1/app/${process.env.APP_ID}/user/refresh`, //app_omniorders por ejemplo
+    {
+      method: &quot;POST&quot;,
+      headers: {
+        &quot;Content-Type&quot;: &quot;application/json&quot;,
+        &quot;App-Key&quot;: process.env.APP_KEY //ak_omniorders por ejemplo
+        &quot;Authorization&quot;: input.token,
+      },
+      cache: &quot;no-cache&quot;
+    }
+  );
+  return res.json() as Promise&lt;{
+    token: string
+    expires_at: string
+  }&gt;;
+}
+</code></pre>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

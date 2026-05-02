@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Validations · Ruby on Rails · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Ruby on Rails</span>
+    <span class="sep">/</span>
+    <span class="current">Validations</span></nav>
+  <main><h1>Validations</h1>
+<pre><code class="language-ruby"># Validations
+validates :name, presence: true, uniqueness: { case_sensitive: false }
+validates :post_counter, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+validates :name, length: { minimum: 6, maximum: 100 }
+</code></pre>
+<pre><code class="language-ruby"># Decimals
+validates :cushion_margin,
+            numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 },
+            format: { with: /\A\d+(\.\d{1,2})?\z/,
+            message: &#39;two decimals max allowed&#39; }
+</code></pre>
+<pre><code class="language-ruby"># Boolean
+validates :active, inclusion: { in: [true, false] }
+</code></pre>
+<pre><code class="language-ruby"># ACTIVE STORAGE
+validates :logo, content_type: %w[image/svg+xml image/png image/jpeg image/jpg]
+</code></pre>
+<pre><code class="language-ruby"># INCLUDE ACT AS PARANOID
+validates :name, presence: true, uniqueness: { conditions: -&gt; { with_deleted } }
+</code></pre>
+<pre><code class="language-ruby"># email
+self.email.match?(URI::MailTo::EMAIL_REGEXP)
+
+# o
+VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i
+private_constant :VALID_EMAIL_REGEX
+validates :email, presence: true, length: { maximum: 100 }, format: { with: VALID_EMAIL_REGEX }
+</code></pre>
+<pre><code class="language-ruby">#Enum rails 5
+STATUSES = %w[action conditional end].freeze
+private_constant :STATUSES
+validates :category, presence: true, inclusion: { in: STATUSES }
+#or
+enum status: { pending: 0, accepted: 1, failed: 2 } #para que jale la palabra la columna debe ser de tipo integer en la DB
+</code></pre>
+<pre><code class="language-ruby"># Boolean
+validates :active, inclusion: { in: [true, false] }
+</code></pre>
+<pre><code class="language-ruby"># JSON (en este caso el field se llama headers)
+validate validate :json_format
+
+def json_format
+  begin
+    parsed = JSON.parse(headers)
+    unless parsed.is_a?(Hash)
+      errors.add(:headers, &quot;Invalid JSON&quot;)
+    end
+  rescue JSON::ParserError
+    errors.add(:headers, &quot;Invalid JSON&quot;)
+  end
+end
+</code></pre>
+<pre><code class="language-ruby"># Validation with scope (en este caso el nombre puede ser unico pero por warehouse si es el mismo nombre y pertenece a otro warehouse no hay lio)
+validates :name, presence: true, uniqueness: { scope: :warehouse_id }
+</code></pre>
+<pre><code class="language-ruby">#METHOD
+validate :tags_array?
+
+  private
+
+  def tags_array?
+    !tags.empty? ? true : errors.add(:tags, &#39;has to be an array&#39;)
+  end
+  
+</code></pre>
+<pre><code class="language-ruby"># MODIFIERS
+validates :name, presence: true, length: { minimum: 8 }, on: :create
+validate :name, if: -&gt; { paid? } # paid? es un metodo xD
+validate :name, unless: -&gt; { paid? } # paid? es un metodo xD
+validates :name, length: { minimum: 8 }, allow_nil: true # Si se ingresa un nombre debe ser minimo 8, tambien se acepta nil
+</code></pre>
+<pre><code class="language-ruby"># With_Options
+with_options presence: true do
+  validates :name
+  validates :email
+  validates :password
+end
+</code></pre>
+<pre><code class="language-ruby"># Associations (corre las validaciones de la asocioacion tambien)
+validates_associated :items
+</code></pre>
+<pre><code class="language-ruby"># URL - URI
+def validate_url_format
+    uri = ::URI.parse(url)
+    errors.add(:url, &#39;Invalid URL&#39;) unless uri.is_a?(::URI::HTTP) || uri.is_a?(::URI::HTTPS)
+  end
+</code></pre>
+<pre><code class="language-ruby"># MINIMAMENTE UNA ASOCIOACION - app.warehouse_apps -&gt; minimo debe haber un warehouse_apps
+def validate_minimum_one_warehouse_app
+  remaining = warehouse_apps.reject(&amp;:marked_for_destruction?)
+  errors.add(:base, &#39;At least one warehouse app is required&#39;) if remaining.empty?
+end
+</code></pre>
+<blockquote>
+<p><a href="https://dev.to/daviducolo/rails-model-validation-a-comprehensive-guide-with-code-examples-21mh">https://dev.to/daviducolo/rails-model-validation-a-comprehensive-guide-with-code-examples-21mh</a></p>
+</blockquote>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

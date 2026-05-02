@@ -1,0 +1,4 @@
+# MailHog
+
+mailhog
+Brew mailhog

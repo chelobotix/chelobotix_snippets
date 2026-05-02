@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Concurrency GO · Go · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Go</span>
+    <span class="sep">/</span>
+    <span class="current">Concurrency GO</span></nav>
+  <main><h1>Concurrency GO</h1>
+<pre><code class="language-go">// Go Routine
+var wg sync.WaitGroup
+
+func main() {
+    wg.Add(1)
+    go foo()
+    bar()
+    wg.Wait()
+}
+
+func foo() {
+    for i := 0; i &lt; 3; i++ {
+        fmt.Println(&quot;foo:&quot;, i)
+    }
+    defer wg.Done()
+}
+
+func bar() {
+    for i := 0; i &lt; 3; i++ {
+        fmt.Println(&quot;bar:&quot;, i)
+    }
+}
+</code></pre>
+<pre><code class="language-go">// WAIT GROUP
+// Sirve para que todas las go routines acaben antes de que el MAIN acabe
+var wg sync.WaitGroup
+wg.Add(2)
+wg.Done()
+wg.Wait()
+</code></pre>
+<pre><code class="language-go">// RACE CONDITION
+go run -race main.go 
+</code></pre>
+<pre><code class="language-go">// MUTEX
+var mutex sync.Mutex
+
+    for i := 0; i &lt; gs; i++ {
+        go func() {
+            mutex.Lock()
+            // yout logic
+            mutex.Unlock()
+        }()
+    }
+</code></pre>
+<pre><code class="language-go">// ATOMIC EN VEZ DE MUTEX
+var counter int64 // Debe ser de tipo int64 para usar con atomic
+
+func increment(wg *sync.WaitGroup) {
+    defer wg.Done()
+    for i := 0; i &lt; 1000; i++ {
+        atomic.AddInt64(&amp;counter, 1) // Incremento atómico
+    }
+}
+</code></pre>
+<pre><code class="language-go">// CHANNELS
+// Basic
+func main() {
+    c := make(chan int)
+
+    go func() {
+        c &lt;- 42
+    }()
+}
+
+// or
+func main() {
+    done := make(chan bool)
+    go greet(done)
+
+    &lt;-done
+
+}
+
+func greet(done chan bool) {
+    time.Sleep(2 * time.Second)
+    fmt.Printf(&quot;Saludos&quot;)
+    done &lt;- true
+}
+
+</code></pre>
+<pre><code class="language-go">// Buffer Channel
+c := make(chan int, 1)
+</code></pre>
+<pre><code class="language-go">// One Direction 
+c := make(chan &lt;- int) //send
+c := make(&lt;- chan int) //receive
+</code></pre>
+<pre><code class="language-go">// Close Channel (Usas cuando hay una iteracion y no se sabe cuando acabara)
+// EL CIERRE DEL CANAL DEBE SER RESPONSABILIDAD DE QUIEN LO ESCRIBE O QUIEN LO ENVIA (casi siempre main)
+close(c)
+</code></pre>
+<pre><code class="language-go">// Range (si no se sabe cuanto va a iterar tienes que juntarlo con close dentro el go rutine)
+for i := range c {
+    fmt.Println(i)
+}
+</code></pre>
+<pre><code class="language-go">// SELECT
+func test2(e, o, q chan int) {
+    for {
+        select {
+        case v := &lt;-e:
+            fmt.Println(&quot;even&quot;, v)
+        case v := &lt;-o:
+            fmt.Println(&quot;odd&quot;, v)
+        case _ = &lt;-q:
+            close(q)
+            return
+        }
+    }
+}
+</code></pre>
+<pre><code class="language-go">// 2 task uno luego del otro
+package main
+
+import (
+    &quot;fmt&quot;
+    &quot;time&quot;
+)
+
+// Primera tarea pesada
+func task1(input int, result chan int) {
+    output := input * 2         // Operación pesada ficticia
+    result &lt;- output            // Enviar resultado al canal
+}
+
+// Segunda tarea pesada
+func task2(input int, result chan int) {
+    output := input + 10        // Operación pesada ficticia
+    result &lt;- output            // Enviar resultado al canal
+}
+
+func main() {
+    // Crear canales
+    task1Result := make(chan int)
+    task2Result := make(chan int)
+
+    // Lanzar goroutines para ambas tareas
+    go task1(5, task1Result) // Inicia la primera tarea
+    go func() {
+        // La segunda tarea depende del resultado de la primera
+        resultFromTask1 := &lt;-task1Result // Espera el resultado de la primera tarea
+        task2(resultFromTask1, task2Result)
+    }()
+
+    // Recibir el resultado final
+    finalResult := &lt;-task2Result // Espera el resultado de la segunda tarea
+    fmt.Printf(&quot;Resultado final: %d\n&quot;, finalResult)
+}
+</code></pre>
+<pre><code class="language-go">// EJEMPLO COMPLETO DATE TU TIEMPO
+package main
+
+import (
+    &quot;fmt&quot;
+    &quot;time&quot;
+)
+
+func main() {
+    numbers := []int{2, 4, 6, 8}
+    channel1 := make(chan int)
+    channel2 := make(chan int)
+
+    for _, number := range numbers {
+        go test1(number, channel1)
+        go func() {
+            resultFromTest1 := &lt;-channel1
+            test2(resultFromTest1, channel2)
+        }()
+    }
+
+    counter := 0
+    for i := range channel2 {
+        fmt.Println(i)
+        if counter == len(numbers)-1 {
+            close(channel2)
+        }
+        counter++
+    }
+}
+
+func test1(n int, result chan int) {
+    fmt.Println(&quot;test 1 started...&quot;)
+    time.Sleep(1 * time.Second)
+    result &lt;- n + 1
+}
+
+func test2(n int, result chan int) {
+    fmt.Println(&quot;test 2 started...&quot;)
+    time.Sleep(1 * time.Second)
+    result &lt;- n + 2
+}
+</code></pre>
+<pre><code class="language-go">// FAN-IN PATTERN
+package main
+
+import (
+    &quot;fmt&quot;
+    &quot;sync&quot;
+)
+
+func main() {
+    fanInChannel := make(chan int)
+    numbers1Channel := make(chan int)
+    numbers2Channel := make(chan int)
+    var wg sync.WaitGroup
+
+    wg.Add(2)
+
+    go task1(numbers1Channel, &amp;wg)
+    go task2(numbers2Channel, &amp;wg)
+    go fanIn(numbers1Channel, numbers2Channel, fanInChannel)
+
+    go func() {
+        wg.Wait()
+        close(fanInChannel)
+    }()
+
+    for fi := range fanInChannel {
+        fmt.Println(fi)
+    }
+
+    fmt.Println(&quot;Finish!&quot;)
+}
+
+func task1(numbers chan&lt;- int, wg *sync.WaitGroup) {
+    defer wg.Done()
+    for i := 1; i &lt;= 10; i++ {
+        if i%2 == 0 {
+            numbers &lt;- i
+        }
+    }
+    close(numbers)
+}
+
+func task2(numbers chan&lt;- int, wg *sync.WaitGroup) {
+    defer wg.Done()
+    for i := 1; i &lt;= 10; i++ {
+        if i%2 != 0 {
+            numbers &lt;- i
+        }
+    }
+    close(numbers)
+}
+
+func fanIn(numbers1, numbers2 &lt;-chan int, fanInChan chan&lt;- int) {
+    var wg sync.WaitGroup
+    wg.Add(2)
+
+    go func() {
+        defer wg.Done()
+        for n := range numbers1 {
+            fanInChan &lt;- n
+        }
+    }()
+
+    go func() {
+        defer wg.Done()
+        for n := range numbers2 {
+            fanInChan &lt;- n
+        }
+    }()
+
+    wg.Wait()
+}
+</code></pre>
+<pre><code class="language-go">// FAN-OUT PATTERN
+package main
+
+import (
+    &quot;fmt&quot;
+    &quot;sync&quot;
+)
+
+func main() {
+    var wg sync.WaitGroup
+    fanOutChan := make(chan int)
+
+    // Lanzar 9 goroutines (workers)
+    for i := 1; i &lt;= 9; i++ {
+        wg.Add(1)
+        go task1(i, fanOutChan, &amp;wg)
+    }
+
+    // Lanza una goroutine para cerrar el canal cuando todas las goroutines terminen
+    go func() {
+        wg.Wait()
+        close(fanOutChan)
+    }()
+
+    // Leer los resultados del canal
+    for result := range fanOutChan {
+        fmt.Println(result)
+    }
+
+    fmt.Println(&quot;Fin del programa.&quot;)
+}
+
+func task1(number int, fanOutChan chan int, wg *sync.WaitGroup) {
+    defer wg.Done()
+    // Enviar el cuadrado del número al canal
+    fanOutChan &lt;- number * number
+}
+</code></pre>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

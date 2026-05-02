@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sidekiq · Ruby on Rails · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Ruby on Rails</span>
+    <span class="sep">/</span>
+    <span class="current">Sidekiq</span></nav>
+  <main><h1>Sidekiq</h1>
+<pre><code class="language-shell">bundle exec sidekiq
+</code></pre>
+<pre><code class="language-shell">1. docker compose run --rm --service-ports api bundle exec sidekiq
+2. le das control c y se abrira recien sidekiq
+3. en otra pestaña abres terminal docker exec -it nombre_de_contenedor bash
+</code></pre>
+<pre><code class="language-shell"># Directo sin Async
+V3::Bvnk::WalletStatusWorker.new.perform(account_provider_user_id)
+
+# Async
+V3::Bvnk::WalletStatusWorker.perform_async(account_provider_user_id)
+
+# Con Delay
+V3::Bvnk::WalletStatusWorker.perform_in(1.hour, account_provider_user_id)
+</code></pre>
+<pre><code class="language-ruby">sidekiq_retries_exhausted do |msg, ex|
+  handle_exhausted_retries(msg, ex)
+end
+
+# msg
+Es un hash con todos los metadatos del job que falló, incluyendo:
+
+Nombre de la clase (&#39;class&#39;)
+
+Argumentos originales (&#39;args&#39;)
+
+Número de intentos (&#39;retry_count&#39;)
+
+Timestamps
+
+Queue, etc.
+
+
+# ex
+Es la instancia de la excepción que causó el último fallo del job.
+
+Contiene el mensaje de error (ex.message)
+
+El backtrace (ex.backtrace)
+
+Y cualquier otra propiedad normal de un objeto Exception en Ruby.
+</code></pre>
+<pre><code class="language-ruby"># DELAYED JOBS
+</code></pre>
+<pre><code class="language-ruby"># config/application.rb
+config.active_job.queue_adapter = :sidekiq
+</code></pre>
+<pre><code class="language-ruby"># TERMINAL
+rails jobs:work
+</code></pre>
+<pre><code class="language-ruby"># GENERATE
+rails generate job webhook
+ImportShipmentJob.perform_later(@channel_request) if @channel_request.aasm_state == &#39;waiting&#39;
+</code></pre>
+<pre><code class="language-ruby"># KILL ALL ENQUEUE JOBS
+Delayed::Job.delete_all
+</code></pre>
+<pre><code class="language-ruby">module V3
+  module Bvnk
+    class WalletStatusWorker
+      include Sidekiq::Worker
+
+      sidekiq_options retry: 5
+
+      sidekiq_retries_exhausted do |msg, ex|
+        handle_exhausted_retries(msg, ex)
+      end
+
+      # Performs wallet status verification for the given account provider user
+      #
+      # @param account_provider_user_id [Integer] The ID of the account provider user
+      #
+      # @return [void]
+      #
+      # @raise [StandardError] When wallet status is still INACTIVE
+      def perform(account_provider_user_id)
+        account_provider_user = AccountProviderUser.find(account_provider_user_id)
+
+        if account_provider_user.present? &amp;&amp; account_provider_user.is_a?(AccountProviderUser)
+          Rails.logger.info(&quot;Iniciando verificación de estado para account_provider_user: #{account_provider_user.id}&quot;)
+
+          service = ::Bvnk::Wallet::WalletStatusChecker.new(account_provider_user)
+          service.call
+
+          unless service.valid?
+            error_message = &quot;WalletStatus todavia en estado INACTIVE | wallet_id: #{account_provider_user.wallet_id}&quot;
+            raise StandardError.new(error_message)
+          end
+        else
+          Rails.logger.error(&#39;WalletStatusWorker falló. Error: account_provider_user no es válido.&#39;)
+        end
+      end
+
+      # Handles the scenario when all retries have been exhausted
+      #
+      # @param msg [Hash] The Sidekiq message containing job details
+      # @param ex [Exception] The exception that caused the retries to be exhausted
+      #
+      # @return [void]
+      def self.handle_exhausted_retries(msg, ex)
+        account_provider_user_id = msg[&#39;args&#39;].first
+        account_provider_user = AccountProviderUser.find(account_provider_user_id)
+
+        error_message = &quot;WalletStatusWorker falló después de 5 reintentos. Error: #{ex.message}&quot;
+
+        Rails.logger.error(error_message)
+
+        # Sends a failure notification when wallet creation verification fails
+        handle_failure_notification(account_provider_user)
+      end
+
+      # Sends a failure notification when wallet creation verification fails
+      #
+      # @param account_provider_user [AccountProviderUser] The account provider user
+      # @return [void]
+      def self.handle_failure_notification(account_provider_user)
+        service = ::Bvnk::NotificationHandler.new(
+          user: account_provider_user.user,
+          currency: account_provider_user.account_provider_country&amp;.currency&amp;.singular_name.to_s,
+          scope: &#39;wallet&#39;,
+          type: &#39;created_failed&#39;,
+          is_success: false,
+          errors: &quot;Se agotaron los retries para verificar la habilitacion de la billetera #{account_provider_user.inspect}&quot;
+        )
+
+        service.call
+      end
+    end
+  end
+end
+</code></pre>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

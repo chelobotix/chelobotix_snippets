@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Threads · Ruby on Rails · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Ruby on Rails</span>
+    <span class="sep">/</span>
+    <span class="current">Threads</span></nav>
+  <main><h1>Threads</h1>
+<pre><code class="language-ruby">Usa threads cuando:
+
+Necesitas alto throughput dentro del mismo proceso web
+
+Estás haciendo muchas llamadas a APIs externas (operaciones I/O-bound)
+
+Quieres procesamiento en paralelo (batching) dentro de un mismo request
+
+Usa Sidekiq / Resque cuando:
+
+El trabajo es de larga duración
+
+El trabajo puede ejecutarse con retraso
+
+El trabajo debe sobrevivir reinicios del servidor
+</code></pre>
+<pre><code class="language-ruby"># EJEMPLO SENIOR
+class BatchTransactionService
+  THREADS = 5
+
+  def self.process_all_pending
+    ids = Transaction.where(status: :pending).pluck(:id)
+    pool = Concurrent::FixedThreadPool.new(THREADS)
+
+    ids.each do |id|
+      pool.post do
+        ActiveRecord::Base.connection_pool.with_connection do
+          TransactionProcessor.perform(id)
+        end
+      end
+    end
+
+   pool.shutdown
+    pool.wait_for_termination
+  end
+end
+</code></pre>
+<pre><code class="language-ruby"># En Ruby
+def print_number(n)
+  sleep 1
+  puts n
+end
+
+start_time = Time.now
+threads = []
+
+numbers = [1,2,3,4]
+
+numbers.each do |n|
+  threads &lt;&lt; Thread.new {print_number(n)}
+end
+
+threads.each(&amp;:join) # El comadno thread.join hace que el programa espere hasta que el thread termine.
+
+puts start_time - Time.now
+</code></pre>
+<pre><code class="language-ruby"># MUTEX (se usa para prevenir race condition)
+balance = 100
+threads = []
+mutex = Mutex.new
+
+10.times do |n|
+  threads &lt;&lt; Thread.new do
+    sleep 0.1
+    
+    mutex.synchronize do
+      balance -= 10
+    end
+  end
+end
+
+threads.each(&amp;:join)
+
+puts balance
+</code></pre>
+<pre><code class="language-ruby"># ActiveRecord::Base.connection_pool.with_connection
+
+# 6️⃣ Analogía simple (clave para tus notas)
+
+# 🧠 Pool = caja con 5 llaves
+# 🧵 Thread = persona
+
+# Sin with_connection:
+
+#La persona toma una llave y se va a su casa
+
+# Con with_connection:
+
+#La persona entra, usa la llave y la devuelve
+
+✔ Threads creados manualmente
+✔ Scripts concurrentes
+✔ Rake tasks
+✔ Rails runner
+✔ Servicios paralelos
+
+❌ Controllers
+❌ Models
+❌ Background jobs (Sidekiq ya lo hace)
+
+threads = tx_ids.map do |id|
+  Thread.new do
+    ActiveRecord::Base.connection_pool.with_connection do
+      TransactionProcessor.perform(id)
+    end
+  end
+end
+
+threads.each(&amp;:join)
+</code></pre>
+<blockquote>
+<p><a href="https://github.com/ruby-concurrency/concurrent-ruby">https://github.com/ruby-concurrency/concurrent-ruby</a></p>
+</blockquote>
+<p><a href="https://freedium.cfd/https://medium.com/@raviskit2012/handling-multithreading-in-a-ruby-on-rails-transaction-processing-app-280c502af162">https://freedium.cfd/https://medium.com/@raviskit2012/handling-multithreading-in-a-ruby-on-rails-transaction-processing-app-280c502af162</a></p>
+<pre><code class="language-ruby">class ThreadsController &lt; ApplicationController
+  def threads_api; end
+
+  def api_call_slow
+    start_time = Time.current
+    @response_api = []
+    5.times do
+      res = HTTParty.get(&#39;https://catfact.ninja/fact&#39;)
+      @response_api &lt;&lt; res[&#39;fact&#39;]
+    end
+    @time_elapsed = Time.current - start_time
+  end
+
+  # FASTER
+  def api_call_fast
+    start_time = Time.current
+    threads = []
+    @response_api = []
+    mutex = Mutex.new
+    
+    5.times do
+      threads &lt;&lt; Thread.new do
+        res = HTTParty.get(&#39;https://catfact.ninja/fact&#39;)
+        
+        mutex.synchronize {
+        @response_api &lt;&lt; res[&#39;fact&#39;]
+      }
+      end
+    end
+    threads.each(&amp;:join)
+    @time_elapsed = Time.current - start_time
+  end
+end
+</code></pre>
+<blockquote>
+<p><a href="https://workingwithruby.com/wwrt/mutex/">https://workingwithruby.com/wwrt/mutex/</a></p>
+</blockquote>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

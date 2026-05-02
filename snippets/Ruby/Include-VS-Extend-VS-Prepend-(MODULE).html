@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Include VS Extend VS Prepend (MODULE) · Ruby · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Ruby</span>
+    <span class="sep">/</span>
+    <span class="current">Include VS Extend VS Prepend (MODULE)</span></nav>
+  <main><h1>Include VS Extend VS Prepend (MODULE)</h1>
+<pre><code class="language-ruby"># INCLUDE se usa para poder usar los metodos de un modulo como metodos de instancia. (Busca primero en la clase luego en el modulo)
+# EXTEND se usa para poder usar los metodos de un modulo como metodos de clase
+# PREPEND se usa para poder usar los metodos de un modulo como decorators, pq se anade por detras en el ancestor chain (Busca primero en el modulo, luego en la clase)
+
+
+# IMPORTANTE: lo que es private se mantiene en ambos casos
+</code></pre>
+<p><img src="file:///.attachment/C7927B47-57A0-4ADA-8E4F-2B11A28875EC.jpeg" alt="PastedGraphics"></p>
+<pre><code class="language-ruby"># Prepend
+# Busca primero en el modulo, luego en la clase
+module MyDecorator
+  def flowers
+    flowers = &#39;more flowers&#39;
+
+    result = super
+
+    puts &quot;#{result} and #{flowers}&quot;
+  end
+end
+
+class MyClass
+  prepend MyDecorator
+
+  def flowers
+    &#39;some flowers&#39;
+  end
+end
+
+my_class = MyClass.new
+my_class.flowers
+</code></pre>
+<p><img src="file:///.attachment/905D7073-6FC5-47F8-B390-1CA4EE6BCD8E.jpeg" alt="PastedGraphics"></p>
+<pre><code class="language-ruby">module Foo
+  def foo
+    puts &#39;foo&#39;
+  end
+end
+
+# Uso de include: Incorpora los métodos del módulo como métodos de instancia
+class Bar1
+  include Foo  # include mezcla el módulo Foo en Bar1, haciendo que sus métodos
+               # estén disponibles como métodos de instancia para los objetos de Bar1
+end
+
+# Uso de extend: Incorpora los métodos del módulo como métodos de clase
+class Bar2
+  extend Foo   # extend agrega los métodos de Foo directamente al singleton class
+               # de Bar2, lo que los convierte en métodos de clase (estáticos)
+end
+
+
+bar1 = Bar1.new
+bar1.foo      
+
+Bar2.foo       # Llama al método foo como método de clase
+</code></pre>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

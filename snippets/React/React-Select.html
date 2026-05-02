@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>React Select · React · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">React</span>
+    <span class="sep">/</span>
+    <span class="current">React Select</span></nav>
+  <main><h1>React Select</h1>
+<pre><code class="language-javascript">import style from &#39;./ReactSelect&#39;
+import Select, { components } from &#39;react-select&#39;
+import { useState } from &#39;react&#39;
+
+//this format is mandatory
+const options = [
+    { value: &#39;chocolate&#39;, label: &#39;Chocolate&#39; },
+    { value: &#39;strawberry&#39;, label: &#39;Strawberry&#39; },
+    { value: &#39;vanilla&#39;, label: &#39;Vanilla&#39; },
+    { value: &#39;banana&#39;, label: &#39;Banana&#39; },
+    { value: &#39;passion&#39;, label: &#39;Passion Fruit&#39; },
+]
+
+// option to 3# select
+const Option = (props) =&gt; {
+    return (
+        &lt;div&gt;
+            &lt;button&gt;
+                &lt;components.Option {...props} /&gt;
+            &lt;/button&gt;
+        &lt;/div&gt;
+    )
+}
+
+// add button at the end of the 4# list
+const AddButton = (props) =&gt; {
+    return (
+        &lt;components.MenuList {...props}&gt;
+            {props.children}
+            &lt;button&gt;Save&lt;/button&gt;
+        &lt;/components.MenuList&gt;
+    )
+}
+
+const ReactSelect = () =&gt; {
+    const [text1, setText1] = useState(null)
+    const [text2, setText2] = useState(null)
+
+    const handleMultiple = (e) =&gt; {
+        console.log(e) // Array of objects
+        setText2(e)
+    }
+
+    return (
+        &lt;div className=&quot;App&quot;&gt;
+            &lt;h3 className={`${style.heading}`}&gt;Single&lt;/h3&gt;
+            &lt;Select
+                options={options}
+                onChange={(itemSelected) =&gt; setText1(itemSelected.label)}
+                onMenuOpen={() =&gt; console.log(&#39;open&#39;)}
+                onMenuClose={() =&gt; console.log(&#39;close&#39;)}
+            /&gt;
+            {text1 ? &lt;p&gt;{text1}&lt;/p&gt; : &lt;p&gt;Nothing here&lt;/p&gt;}
+            &lt;hr /&gt;
+
+            &lt;h3&gt;Multi&lt;/h3&gt;
+            &lt;Select isMulti defaultValue={[options[2], options[5]]} options={options} onChange={handleMultiple} /&gt;
+            {text2 ? text2.map((item, index) =&gt; &lt;p key={index}&gt;{item.label}&lt;/p&gt;) : &lt;p&gt;Nothing here&lt;/p&gt;}
+            &lt;hr /&gt;
+
+            &lt;h3 className={`${style.heading}`}&gt;Custom 1&lt;/h3&gt;
+            &lt;Select components={{ Option }} options={options} closeMenuOnSelect={false} isMulti /&gt;
+            &lt;hr /&gt;
+
+            &lt;h3 className={`${style.heading}`}&gt;Custom 2&lt;/h3&gt;
+            &lt;Select components={{ MenuList: AddButton }} options={options} closeMenuOnSelect={false} isMulti /&gt;
+            &lt;hr /&gt;
+        &lt;/div&gt;
+    )
+}
+
+export default ReactSelect
+</code></pre>
+<blockquote>
+<p>sudo npm i --save react-select</p>
+</blockquote>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

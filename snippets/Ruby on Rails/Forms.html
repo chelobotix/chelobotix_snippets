@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forms · Ruby on Rails · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Ruby on Rails</span>
+    <span class="sep">/</span>
+    <span class="current">Forms</span></nav>
+  <main><h1>Forms</h1>
+<pre><code class="language-ruby"># USA FORM_WITH SIEMPRE QUE PUEDAS
+# 1. Con Modelo (Model-backed form)
+form_with(model: @article) do |f|
+  f.text_field :title
+  f.submit
+end
+
+# 2. Con URL (URL-backed form)
+form_with(url: search_path) do |f|
+  f.text_field :query
+  f.submit
+end
+
+# 3. Sin modelo ni URL (Generic form)
+form_with(scope: :article) do |f|
+  f.text_field :title
+  f.submit
+end
+
+# Opciones adicionales comunes:
+form_with(model: @article, local: true) # Deshabilita AJAX
+form_with(model: @article, method: :patch) # Específica método HTTP
+form_with(model: [@user, @article]) # Formularios anidados
+form_with(model: @article, class: &quot;my-form&quot;) # Añade clases CSS
+
+
+# BASIC 
+&lt;%= form_with model: @user, class: &quot;w-10/12&quot; do |f|%&gt;
+
+
+########
+# sin cambios en el modelo de la BD (session)
+&lt;%= form_with scope: :session, url: login_path, class: &quot;w-10/12&quot;, local: true do |f|%&gt;
+
+
+######
+# sin index ni show
+&lt;%= form_with(model: @user, url: users_path, method: :post, class: &quot;ui form&quot;) do |f| %&gt;
+
+
+##########
+#Para modelos polimorficos asumiendo que se tiene la ruta anidada 
+&lt;%= render partial: &quot;comments/form&quot;, locals: {commentable: @article} %&gt;
+&lt;%= form_with(model: [commentable, Comment.new], method: :post, class: &quot;&quot;) do |f| %&gt;
+
+
+
+######
+# form_for siempre se usa en un objeto y automaticamente genera los campos necesarios
+&lt;%= form_for(:session, html: {class: &quot;w-40&quot;, role: &quot;form&quot;}, url: login_path %&gt; 
+
+
+
+######
+# cuando no se trabaja con ningun modelo y se quiere procesar el query string
+# cosa.com?crypto_name=bitcoin
+# tambien se puede usar:
+# &lt;%= form_with url:search_crypto_path, method: &quot;get&quot;, local: true do %&gt;
+
+
+######
+# Para usar AJAX
+1. ./bin/importmap pin @rails/ujs@7
+2. application.js: 
+import Rails from &#39;@rails/ujs&#39;;
+
+Rails.start();
+3. 
+&lt;%= form_for(@message, html: { class: &quot;ui&quot;, role: &quot;form&quot; } , url: message_path, remote: true) do |f| %&gt;
+#or
+&lt;%= form_tag search_stock_path, data: {turbo: false}, remote: true, method: :get do %&gt;
+
+
+#################
+# SUBMIT
+
+# basic
+&lt;%= f.submit &quot;Log in&quot; class: &#39;px-5&#39; %&gt;
+
+# Contional
+&lt;%= f.submit(@user.new_record? ? &quot;Sign up&quot;: &quot;Update Account&quot;, class: &#39;px-5 py-3 bg-blue-600 text-white rounded-lg border-[1px] border-white&#39;) %&gt;
+
+###############
+# FIELD
+&lt;div class=&quot;flex justify-center items-center&quot;&gt;
+    &lt;%= f.label :password, class: &#39;w-40&#39; %&gt;
+    &lt;%= f.password_field :password, placeholder: &#39;Enter your password&#39;, required: true, class: &#39;w-50&#39;, autofocus: true %&gt;
+&lt;/div&gt;
+</code></pre>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

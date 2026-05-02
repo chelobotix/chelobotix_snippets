@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DeepSeek Mid Level · Prompts · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Prompts</span>
+    <span class="sep">/</span>
+    <span class="current">DeepSeek Mid Level</span></nav>
+  <main><h1>DeepSeek Mid Level</h1>
+<pre><code class="language-text">¡Hola! Soy un programador de Ruby on Rails con 1 año de experiencia profesional. Mi objetivo es alcanzar un nivel MID para finales de este año. Para ayudarme en este proceso, necesito que todas las respuestas sigan la siguiente estructura:
+
+1. NIVEL DE LA PREGUNTA:
+- Indicar si es Junior/Mid/Senior y explicar por qué se considera de ese nivel
+
+2. EXPLICACIÓN TEÓRICA:
+- Detallar los conceptos fundamentales relacionados con la pregunta
+- Explicar las ventajas y desventajas de la solución propuesta
+- Mencionar casos de uso recomendados
+
+3. PATRONES DE DISEÑO:
+- Sugerir patrones de diseño aplicables
+- Explicar el flujo lógico del patrón (sin código)
+- Justificar por qué ese patrón es adecuado
+
+4. IMPLEMENTACIÓN:
+- Proporcionar código de ejemplo
+- Priorizar la simplicidad y legibilidad
+- Incluir comentarios explicativos
+
+5. CONSIDERACIONES DE SEGURIDAD:
+- Identificar posibles vulnerabilidades
+- Sugerir medidas de mitigación
+- Mencionar mejores prácticas
+
+6. RUTA DE APRENDIZAJE:
+- Temas relacionados para profundizar
+- Recursos recomendados
+- Habilidades necesarias para nivel MID
+
+Ejemplo de respuesta:
+
+Nivel de la Pregunta: Mid
+Este es un problema de configuración de ambiente que requiere comprensión de la arquitectura del sistema y dependencias.
+
+Explicación Teórica:
+OpenSSL es una biblioteca de criptografía que proporciona implementaciones de protocolos SSL/TLS. En Ruby, es crucial para:
+- Conexiones seguras HTTPS
+- Generación de certificados
+- Encriptación de datos
+Los problemas de compilación son comunes especialmente en nuevas arquitecturas como Apple Silicon.
+
+Patrones de Diseño Relacionados:
+- Factory Method: Para la creación de conexiones seguras
+- Singleton: Para manejar una única instancia de configuración SSL
+- Adapter: Para compatibilidad entre diferentes versiones de SSL
+
+Flujo de implementación:
+1. Instalación de dependencias del sistema
+2. Configuración de variables de entorno
+3. Reinstalación de Ruby con soporte SSL
+4. Verificación de la instalación
+5. Configuración de Bundler
+
+[RESTO DEL CÓDIGO Y SOLUCIÓN COMO EN EL EJEMPLO ANTERIOR]
+
+Consideraciones de Seguridad:
+- Mantener OpenSSL actualizado
+- Verificar firmas digitales de gemas
+- Usar HTTPS para fuentes de gemas
+- Implementar políticas de actualización regular
+
+Ruta de Aprendizaje para nivel MID:
+- Profundizar en gestión de certificados SSL
+- Estudiar configuración de servidores web
+- Comprender gestión de dependencias en Ruby
+- Familiarizarse con herramientas de debugging
+
+EJEMPLO DE RESPUESTA:
+Nivel de la Pregunta: Mid. Es Mid porque requiere entender las implicaciones de ....
+
+Explicación Detallada:
+
+El error que estás experimentando sugiere que Ruby no se compiló correctamente con soporte para OpenSSL. Esto es un problema común, especialmente en sistemas macOS, y más aún en los nuevos Mac con chips M1/M2. Vamos a resolverlo paso a paso:
+
+1. Primero, asegúrate de que OpenSSL esté instalado a través de Homebrew:
+
+   ```bash
+   brew install openssl@1.1
+</code></pre>
+<ol start="2">
+<li><p>Ahora, necesitamos decirle a RVM dónde encontrar OpenSSL. Agrega estas líneas a tu archivo <code>~/.zshrc</code> o <code>~/.bash_profile</code>:</p>
+<pre><code class="language-bash">export LDFLAGS=&quot;-L/opt/homebrew/opt/openssl@1.1/lib&quot;
+export CPPFLAGS=&quot;-I/opt/homebrew/opt/openssl@1.1/include&quot;
+export PKG_CONFIG_PATH=&quot;/opt/homebrew/opt/openssl@1.1/lib/pkgconfig&quot;
+</code></pre>
+</li>
+<li><p>Recarga tu perfil de shell:</p>
+<pre><code class="language-bash">source ~/.zshrc  # o source ~/.bash_profile
+</code></pre>
+</li>
+<li><p>Ahora, vamos a reinstalar Ruby 3.0.3 con RVM, especificando explícitamente el uso de OpenSSL:</p>
+<pre><code class="language-bash">rvm remove 3.0.3
+rvm install 3.0.3 --with-openssl-dir=/opt/homebrew/opt/openssl@1.1
+</code></pre>
+</li>
+<li><p>Una vez que Ruby se haya reinstalado, selecciónalo:</p>
+<pre><code class="language-bash">rvm use 3.0.3
+</code></pre>
+</li>
+<li><p>Ahora, actualiza Bundler a la versión requerida:</p>
+<pre><code class="language-bash">gem install bundler:2.3.4
+</code></pre>
+</li>
+<li><p>Finalmente, intenta ejecutar <code>bundle</code> nuevamente.</p>
+</li>
+</ol>
+<p>Si aún tienes problemas, puedes intentar lo siguiente:</p>
+<ol start="8">
+<li><p>Verifica que estás usando la versión correcta de Ruby:</p>
+<pre><code class="language-bash">ruby -v
+</code></pre>
+</li>
+<li><p>Comprueba que OpenSSL está disponible para Ruby:</p>
+<pre><code class="language-ruby">ruby -ropenssl -e &quot;puts OpenSSL::OPENSSL_VERSION&quot;
+</code></pre>
+</li>
+</ol>
+<p>Riesgos de Seguridad:</p>
+<ul>
+<li>Asegúrate de mantener OpenSSL actualizado para evitar vulnerabilidades de seguridad conocidas.</li>
+<li>Utiliza siempre fuentes HTTPS en tu Gemfile para prevenir ataques de intermediario.</li>
+</ul>
+<p>Seguimiento del Progreso:
+Este tipo de problema de configuración es común en el desarrollo de Ruby, especialmente en nuevas arquitecturas como Apple Silicon. Resolver estos problema</p>
+<pre><code>
+</code></pre>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

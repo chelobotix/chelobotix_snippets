@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patterns GO · Go · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Go</span>
+    <span class="sep">/</span>
+    <span class="current">Patterns GO</span></nav>
+  <main><h1>Patterns GO</h1>
+<pre><code class="language-go">// **** El patrón Singleton garantiza que una clase tenga una única instancia en toda la aplicación y proporciona un punto global de acceso a esa instancia. ****
+
+// Administrar conexiones a bases de datos.
+// Controlar acceso a recursos compartidos (como un archivo de configuración o un logger).
+// Mantener el estado global de una aplicación.
+</code></pre>
+<pre><code class="language-go">// SINGLETON
+// BASIC
+package singleton
+
+type PersonInterface interface {
+    IncrementAge()
+    GetAge() int
+}
+
+type person struct {
+    name string
+    age  int
+}
+
+var p *person
+
+func NewPerson() PersonInterface {
+  // IMPORTANT
+    if p == nil {
+        p = &amp;person{}
+    }
+    return p
+}
+
+func (p *person) IncrementAge() {
+    ...
+}
+
+func (p *person) GetAge() int {
+    ...
+}
+
+
+
+
+
+
+
+
+//
+</code></pre>
+<pre><code class="language-go">// WITH CONCURRENCY
+package singleton
+
+import &quot;sync&quot;
+
+type PersonInterface interface {
+    IncrementAge()
+    GetAge() int
+}
+
+type person struct {
+    name string
+    age  int
+}
+
+var (
+    p    *person
+    once sync.Once // IMPORTANT
+    mux  sync.Mutex // IMPORTANT
+)
+
+func NewPerson() PersonInterface {
+  // IMPORTANT
+    once.Do(func() {
+        p = &amp;person{}
+    })
+
+    return p
+}
+
+func (p *person) IncrementAge() {
+    // IMPORTANT
+    mux.Lock()
+    p.setAge(p.age + 1)
+    mux.Unlock()
+}
+</code></pre>
+<pre><code class="language-go">// **** Es un patrón de diseño creacional ideal para objetos simples que proporciona una interfaz para crear objetos en una superclase, pero permite que las subclases decidan qué tipo de objeto se instanciará. ****
+
+// Se utiliza para abstraer y centralizar la creación de objetos, evitando exponer directamente la lógica de instanciación y facilitando la extensibilidad del código. Ejemplos típicos incluyen:
+// Crear objetos que comparten una misma interfaz o clase base, pero cuyas implementaciones pueden variar.
+// Manejar casos donde la lógica de creación es compleja o depende de parámetros específicos.
+</code></pre>
+<pre><code class="language-go">// FACTORY BASIC
+package factory
+
+import (
+    &quot;errors&quot;
+    &quot;fmt&quot;
+)
+
+type shape interface {
+    Draw() string
+}
+
+type circle struct {
+}
+
+type square struct {
+}
+
+func (c circle) Draw() string {
+    return &quot;draw circle&quot;
+}
+
+func (s square) Draw() string {
+    return &quot;draw square&quot;
+}
+
+var shapeRegistry = map[string]func() shape{
+    &quot;circle&quot;: func() shape { return circle{} }, //esta funcion retorna la interface shape
+    &quot;square&quot;: func() shape { return square{} },
+}
+
+func FactoryShape(shapeType string) (shape, error) {
+    switch shapeType {
+    case &quot;circle&quot;:
+        return circle{}, nil
+    case &quot;square&quot;:
+        return square{}, nil
+    default:
+        return nil, errors.New(fmt.Sprintf(&quot;shape %s not found&quot;, shapeType))
+
+    }
+}
+
+
+
+
+
+
+//
+</code></pre>
+<pre><code class="language-go">// FACTORY MAP WITH FUNCTIONS (Esto es cuando ya tienes muchos casos, es mejor usar un map)
+package factory
+
+import &quot;errors&quot;
+
+type shape interface {
+    Draw() string
+}
+
+type circle struct {
+}
+
+type square struct {
+}
+
+func (c circle) Draw() string {
+    return &quot;draw circle&quot;
+}
+
+func (s square) Draw() string {
+    return &quot;draw square&quot;
+}
+ // Este es el mapa con las funciones
+var shapeRegistry = map[string]func() shape{
+    &quot;circle&quot;: func() shape { return circle{} }, //esta funcion retorna la interface shape
+    &quot;square&quot;: func() shape { return square{} },
+}
+
+func FactoryShape(shapeType string) (shape, error) {
+    newShape, found := shapeRegistry[shapeType]
+
+    if found {
+        return newShape(), nil //aca retornas el resultado de la funcion que retorna una interface shape
+    }
+
+    return nil, errors.New(&quot;shape not found&quot;)
+}
+
+</code></pre>
+<p><img src="file:///.attachment/47E72F54-502A-4625-B113-69C4CE86A631.png" alt="PastedGraphics"></p>
+<pre><code class="language-go">// ABAJO HAY UN EJEMPLO FACILITO CON PIZZA
+
+// ****El patrón Builder se utiliza para construir objetos complejos paso a paso. Es ideal cuando un objeto tiene muchas configuraciones posibles o partes opcionales. Permite separar el proceso de construcción (el cómo) de la representación final del objeto (el qué).****
+
+
+
+// SE NECESITAN 4 ACTORES:
+// - PRODUCT
+// - BUILDER
+// - CONCRETE BUILDER
+// - DIRECTOR
+
+// El Director le da instrucciones al Builder.
+// El Builder sigue los pasos para construir partes específicas del Producto. (interface)
+// El Concrete Builder implementa los pasos específicos y construye el Producto final. (struct que implementa la interface builder)
+// El producto es devuelto al cliente cuando está completo.
+</code></pre>
+<pre><code class="language-go">// MAIN
+func main() {
+    json := &amp;message.JSONMessageBuilder{}
+    xml := &amp;message.XMLMessageBuilder{}
+    sender1 := &amp;message.Sender{}
+    sender2 := &amp;message.Sender{}
+
+    sender1.SetBuilder(json)
+    sender2.SetBuilder(xml)
+
+    response, err := sender1.BuildMessage(&quot;Natish&quot;, &quot;Te Amo&quot;)
+    if err != nil {
+        fmt.Println(err)
+    }
+
+    fmt.Println(string(response.Body))
+
+    response, err = sender2.BuildMessage(&quot;Natish&quot;, &quot;Te Amo&quot;)
+    if err != nil {
+        fmt.Println(err)
+    }
+
+    fmt.Println(string(response.Body))
+
+}
+</code></pre>
+<pre><code class="language-go">package message
+
+// PRODUCT
+// ES EL PRODUCTO QUE QUEREMOS CREAR Y SU RESULTADO
+
+type Message struct {
+    Recipient string `json:&quot;recipient&quot; xml:&quot;recipient&quot;`
+    Text      string `json:&quot;text&quot; xml:&quot;text&quot;`
+}
+
+type Response struct {
+    Body   []byte
+    Format string
+}
+</code></pre>
+<pre><code class="language-go">package message
+
+// BUILDER
+// ES LA INTERFACE QUE TIENEN QUE IMPLEMENTAR LOS CONCRETE BUILDERS
+
+type MsgBuilder interface {
+    SetRecipient(recipient string) MsgBuilder
+    SetText(recipient string) MsgBuilder
+    Build() (*Response, error)
+}
+</code></pre>
+<pre><code class="language-go">package message
+
+// CONCRETE BUILDER JSON
+
+import &quot;encoding/json&quot;
+
+type JSONMessageBuilder struct {
+    message Message
+}
+
+func (b *JSONMessageBuilder) SetRecipient(recipient string) MsgBuilder {
+    b.message.Recipient = recipient
+
+    return b
+}
+
+func (b *JSONMessageBuilder) SetText(text string) MsgBuilder {
+    b.message.Text = text
+
+    return b
+}
+
+func (b *JSONMessageBuilder) Build() (*Response, error) {
+    data, err := json.Marshal(b.message)
+    if err != nil {
+        return nil, err
+    }
+
+    return &amp;Response{
+        Body:   data,
+        Format: &quot;JSON&quot;,
+    }, nil
+}
+</code></pre>
+<pre><code class="language-go">package message
+
+// CONCRETE BUILDER XML
+
+import (
+    &quot;encoding/xml&quot;
+)
+
+type XMLMessageBuilder struct {
+    message Message
+}
+
+func (b *XMLMessageBuilder) SetRecipient(recipient string) MsgBuilder {
+    b.message.Recipient = recipient
+
+    return b
+}
+
+func (b *XMLMessageBuilder) SetText(recipient string) MsgBuilder {
+    b.message.Recipient = recipient
+
+    return b
+}
+
+func (b *XMLMessageBuilder) Build() (*Response, error) {
+    data, err := xml.Marshal(b.message)
+    if err != nil {
+        return nil, err
+    }
+
+    return &amp;Response{
+        Body:   data,
+        Format: &quot;XML&quot;,
+    }, nil
+}
+</code></pre>
+<pre><code class="language-go">package message
+
+// DIRECTOR 
+// ES EL QUE SE ENCARGARA DE CREAR LOS PRODUCTOS CON SUS ESPECIFICACIONES
+
+type Sender struct {
+    builder MsgBuilder
+}
+
+// SetBuilder asigna builder al struct Sender
+func (s *Sender) SetBuilder(b MsgBuilder) {
+    s.builder = b
+}
+
+func (s *Sender) BuildMessage(recipient, text string) (*Response, error) {
+    m, err := s.builder.SetRecipient(recipient).SetText(text).Build()
+    if err != nil {
+        return nil, err
+    }
+
+    return m, nil
+}
+
+
+
+
+
+
+
+//
+</code></pre>
+<pre><code class="language-go">// PIZZA
+package main
+
+import &quot;fmt&quot;
+
+type Pizza struct {
+    Size      string
+    Crust     string
+    Cheese    bool
+    Pepperoni bool
+    Mushrooms bool
+    // other toppings...
+}
+
+type PizzaBuilder interface {
+    SetSize(size string) PizzaBuilder
+    SetCrust(crust string) PizzaBuilder
+    AddCheese() PizzaBuilder
+    AddPepperoni() PizzaBuilder
+    AddMushrooms() PizzaBuilder
+    Build() Pizza
+}
+
+type ConcretePizzaBuilder struct {
+    pizza Pizza
+}
+
+func (b *ConcretePizzaBuilder) SetSize(size string) PizzaBuilder {
+    b.pizza.Size = size
+    return b
+}
+
+func (b *ConcretePizzaBuilder) SetCrust(crust string) PizzaBuilder {
+    b.pizza.Crust = crust
+    return b
+}
+
+func (b *ConcretePizzaBuilder) AddCheese() PizzaBuilder {
+    b.pizza.Cheese = true
+    return b
+}
+
+func (b *ConcretePizzaBuilder) AddPepperoni() PizzaBuilder {
+    b.pizza.Pepperoni = true
+    return b
+}
+
+func (b *ConcretePizzaBuilder) AddMushrooms() PizzaBuilder {
+    b.pizza.Mushrooms = true
+    return b
+}
+
+func (b *ConcretePizzaBuilder) Build() Pizza {
+    return b.pizza
+}
+
+type PizzaDirector struct{}
+
+func (d *PizzaDirector) CreateMargherita(builder PizzaBuilder) Pizza {
+    return builder.SetSize(&quot;Medium&quot;).SetCrust(&quot;Thin&quot;).AddCheese().Build()
+}
+
+// Other predefined pizzas can be added...
+
+func main() {
+    builder := &amp;ConcretePizzaBuilder{} // concrete builder
+    director := PizzaDirector{} // director
+
+    // Predefined Margherita
+    margherita := director.CreateMargherita(builder)
+    fmt.Println(&quot;Margherita:&quot;, margherita)
+
+    // Custom Pizza
+    customPizza := builder.SetSize(&quot;Large&quot;).AddPepperoni().AddMushrooms().Build()
+    fmt.Println(&quot;Custom Pizza:&quot;, customPizza)
+}
+</code></pre>
+<pre><code class="language-go">// Patrón creacional que se utiliza para crear nuevos objetos a partir de una copia (o clon) de un objeto existente
+package main
+
+import &quot;fmt&quot;
+
+type prototype struct {
+    name    string
+    age     int
+    friends []string
+    color   *string
+    phones  map[string]string
+}
+
+
+// IMPORTANT
+func (p *prototype) Clone() prototype {
+    friends := make([]string, len(p.friends), len(p.friends))
+    copy(friends, p.friends)
+
+    color := *p.color
+
+    phones := map[string]string{}
+
+    for k, v := range p.phones {
+        phones[k] = v
+    }
+
+    return prototype{
+        name:    p.name,
+        age:     p.age,
+        friends: friends,
+        color:   &amp;color,
+        phones:  phones,
+    }
+
+}
+
+func main() {
+    color := &quot;yellow&quot;
+    p1 := prototype{
+        name:    &quot;Marce&quot;,
+        age:     43,
+        friends: []string{&quot;Natish&quot;, &quot;Allisson&quot;, &quot;Roger&quot;},
+        color:   &amp;color,
+        phones:  map[string]string{&quot;choco&quot;: &quot;1234&quot;, &quot;payo&quot;: &quot;4321&quot;},
+    }
+
+    p2 := p1.Clone()
+    p2.name = &quot;Natish&quot;
+    p2.age = 6
+    p2.friends[0] = &quot;Marce&quot;
+    p2.phones[&quot;choco&quot;] = &quot;567&quot;
+    color = &quot;blue&quot;
+}
+</code></pre>
+<pre><code class="language-go">// Actúa como intermediario entre un cliente y un objeto real. Se usa para controlar el acceso al objeto original, mejorar su rendimiento o agregar funcionalidades adicionales como control de acceso, logging, cache, lazy initialization.
+</code></pre>
+<p><img src="file:///.attachment/8EFE297A-4ABD-4ED5-92D1-FC6201B9CE17.png" alt="PastedGraphics"></p>
+<pre><code class="language-go">// 1.Definir una interfaz común. Esta interfaz declara los métodos que tanto el objeto real como el proxy deben implementar. Garantiza que el proxy sea intercambiable con el objeto real
+type Driven interface {
+    Drive() // Este metodo sera implementado por el objeto real y por el proxy
+}
+
+// 2. Implementar el objeto real (RealSubject). Crea la clase que contiene la lógica principal. Implementa la interfaz común
+type Car struct {
+  model string
+}
+
+func (c *Car) Drive() string {
+    return &quot;Driving &quot; + c.model
+}
+
+// 3. Crear el Proxy.Implementa la misma interfaz. Mantiene una referencia al objeto real. Controla el acceso al objeto real. Puede realizar tareas adicionales antes/después
+
+type CarProxy struct {
+    car       *Car
+    isDriver  bool
+}
+
+// 4. Implementar la lógica del Proxy
+func NewCarProxy(model string, isDriver bool) *CarProxy {
+    return &amp;CarProxy{
+        car: &amp;Car{model: model},
+        isDriver: isDriver,
+    }
+}
+
+func (p *CarProxy) Drive() string {
+    if !p.isDriver {
+        return &quot;Error: No tienes permiso para conducir&quot;
+    }
+    return p.car.Drive()
+}
+
+// 5. Implementar MAIN
+func main() {
+    carProxy := NewCarProxy(&quot;Toyota&quot;, false)
+    fmt.Println(carProxy.Drive()) // Error: No tienes permiso para conducir
+
+    carProxy = NewCarProxy(&quot;Nissan&quot;, true)
+    fmt.Println(carProxy.Drive()) // Driving Toyota
+}
+</code></pre>
+<pre><code class="language-go">// LOCAL - PROXY
+package local
+
+import (
+    &quot;testo_echo/internal/book&quot;
+    &quot;testo_echo/internal/remote&quot;
+)
+
+type Local struct {
+    Remote *remote.Data // esto es el repositorio que se conecta a la BD
+    cache  book.Books
+}
+
+func New() Proxy {
+    return &amp;Local{
+        Remote: remote.New(&quot;https://something.com&quot;, 8080, &quot;myUser&quot;, &quot;password&quot;),
+        cache:  make(book.Books, 0),
+    }
+}
+
+func (l *Local) GetByID(id uint) book.Book {
+    for _, item := range l.cache {
+        if item.ID == id {
+            return item
+        }
+    }
+
+    foundBook := l.Remote.ByID(id)
+    l.cache = append(l.cache, foundBook)
+    
+    return l.Remote.ByID(id)
+}
+
+func (l *Local) GetAll() book.Books {
+    return l.Remote.All()
+}
+</code></pre>
+<pre><code class="language-go">// OBJECT
+package book
+
+type Book struct {
+    ID     uint
+    Name   string
+    Author string
+}
+
+type Books []Book
+</code></pre>
+<pre><code class="language-go">// MAIN
+package main
+
+import (
+    &quot;fmt&quot;
+    &quot;github.com/labstack/echo/v4&quot;
+    &quot;testo_echo/internal/local&quot;
+    &quot;time&quot;
+)
+
+var loc local.Proxy
+
+func GetByID(id uint) {
+    start := time.Now()
+    fmt.Printf(&quot;%v\n&quot;, loc.GetByID(id))
+    elapsed := time.Since(start)
+    fmt.Printf(&quot;elapsed time: %v\n&quot;, elapsed)
+}
+
+func GetAll() {
+    start := time.Now()
+    fmt.Printf(&quot;%v\n&quot;, loc.GetAll())
+    elapsed := time.Since(start)
+    fmt.Printf(&quot;elapsed time: %v\n&quot;, elapsed)
+}
+
+func main() {
+    e := echo.New()
+
+    loc = local.New()
+
+    GetByID(1)
+    GetByID(2)
+    GetByID(2)
+    GetByID(2)
+    GetByID(3)
+    GetAll()
+}
+</code></pre>
+<pre><code class="language-go">// Permite que objetos incompatibles trabajen juntos. Actúa como un puente. Es como un adaptador de corriente que permite conectar un enchufe americano en un tomacorriente europeo.
+</code></pre>
+<pre><code class="language-go">
+// 1. Identificar la interfaz incompatible (Bicycle y Car)
+// BICYCLE
+type Bicycle struct {
+    Brand string
+    Color string
+}
+
+func (b *Bicycle) Run() {
+    fmt.Println(&quot;running...&quot;)
+}
+
+// CAR
+package car
+
+import &quot;fmt&quot;
+
+type Car struct {
+    Brand  string
+    Model  string
+    Engine bool
+}
+
+func (c *Car) TurnOn() {
+    if c.Engine {
+        fmt.Println(&quot;it is already turn on&quot;)
+    } else {
+        c.Engine = true
+        fmt.Println(&quot;turned on&quot;)
+    }
+}
+
+func (c *Car) Accelerate() {
+    fmt.Println(&quot;accelerating...&quot;)
+}
+
+
+
+
+//
+</code></pre>
+<pre><code class="language-go">// 2. Crear la interfaz objetivo (Adapter)
+package adapter
+
+type Adapter interface {
+    Move() // este es el metodo que llamara a los objetos incompatibles
+}
+
+// 3. Crear el Adapter que implementa la interfaz objetivo
+// BICYCLE
+package adapter
+
+import (
+    &quot;testo_echo/internal/bicycle&quot;
+)
+
+type BicycleAdapter struct {
+    Bicycle *bicycle.Bicycle
+}
+
+func (c *BicycleAdapter) Move() {
+    c.Bicycle.Run()
+}
+
+//CAR
+package adapter
+
+import &quot;testo_echo/internal/car&quot;
+
+type CarAdapter struct {
+    Car *car.Car // en el Adapter, mantener una referencia al Adaptee
+}
+
+func (c *CarAdapter) Move() {
+    c.Car.TurnOn()
+    c.Car.Accelerate()
+}
+
+
+// 4. Implementar los objetos de la interfaz objetivo usando un Factory
+package adapter
+
+import (
+    &quot;testo_echo/internal/bicycle&quot;
+    &quot;testo_echo/internal/car&quot;
+)
+
+func Factory(s string) Adapter {
+    switch s {
+    case &quot;bicycle&quot;:
+        newBicycle := bicycle.Bicycle{}
+        return &amp;BicycleAdapter{Bicycle: &amp;newBicycle}
+    case &quot;car&quot;:
+        newCar := car.Car{}
+        return &amp;CarAdapter{Car: &amp;newCar}
+    }
+
+    return nil
+}
+
+
+
+//
+</code></pre>
+<pre><code class="language-go">// 5. El cliente interactúa con el Adapter usando la interfaz objetivo
+bicycle := adapter.Factory(&quot;bicycle&quot;)
+bicycle.Move()
+
+car := adapter.Factory(&quot;car&quot;)
+car.Move()
+</code></pre>
+<pre><code class="language-go">//El patrón Facade (Fachada) es un patrón estructural que proporciona una interfaz simplificada a un conjunto complejo de subsistemas. Sus principales características son:
+
+// * Oculta la complejidad del sistema
+// * Proporciona un punto único de entrada a un subsistema
+// * Reduce el acoplamiento entre cliente y subsistemas
+// * Promueve el principio de menor conocimiento
+</code></pre>
+<p><img src="file:///.attachment/97CBDA1B-699A-43AF-8179-ACBFD4CDCE0B.png" alt="PastedGraphics"></p>
+<pre><code class="language-go">// Subsistemas complejos
+type CPU struct{}
+func (c *CPU) Start() { fmt.Println(&quot;CPU starting&quot;) }
+
+type Memory struct{}
+func (m *Memory) Load() { fmt.Println(&quot;Memory loading&quot;) }
+
+type HardDrive struct{}
+func (h *HardDrive) Read() { fmt.Println(&quot;HardDrive reading&quot;) }
+
+// Facade
+type ComputerFacade struct {
+    cpu       *CPU
+    memory    *Memory
+    hardDrive *HardDrive
+}
+
+func NewComputerFacade() *ComputerFacade {
+    return &amp;ComputerFacade{
+        cpu:       &amp;CPU{},
+        memory:    &amp;Memory{},
+        hardDrive: &amp;HardDrive{},
+    }
+}
+
+// Método simplificado para el cliente
+func (c *ComputerFacade) Start() {
+    c.cpu.Start()
+    c.memory.Load()
+    c.hardDrive.Read()
+}
+
+// Cliente
+func main() {
+    computer := NewComputerFacade()
+    computer.Start()  // Una única llamada simple
+}
+</code></pre>
+<pre><code class="language-go">// Separa una abstracción(clase que maneja al logica) de su representacion o implementacion(clase que muestra la logica), permitiendo que ambas evolucionen independientemente. Se usa para evitar el problema de la herencia rígida, ofreciendo una alternativa flexible mediante la composición.
+</code></pre>
+<pre><code class="language-go">// 1. Primero creas la abstraccion (parte que maneja la logica)
+
+package todo
+
+import &quot;testo_echo/internal/list&quot;
+
+type ToDo interface {
+    SetList(l list.List)
+    Add(name string)
+    Print()
+}
+</code></pre>
+<pre><code class="language-go">package todo
+
+import &quot;testo_echo/internal/list&quot;
+
+// Implementation of TODO list
+
+type Any struct {
+    rendering list.List
+    todos     []string
+}
+
+func NewAny() *Any {
+    return &amp;Any{}
+}
+
+func (a *Any) SetList(l list.List) {
+    a.rendering = l
+}
+
+func (a *Any) Add(name string) {
+    a.todos = append(a.todos, name)
+}
+
+func (a *Any) Print() {
+    a.rendering.Print(a.todos)
+}
+</code></pre>
+<pre><code class="language-go">package todo
+
+import &quot;testo_echo/internal/list&quot;
+
+type Unique struct {
+    rendering list.List
+    todos     []string
+}
+
+func NewUnique() *Unique {
+    return &amp;Unique{}
+}
+
+func (a *Unique) SetList(l list.List) {
+    a.rendering = l
+}
+
+func (a *Unique) Add(name string) {
+    for _, todo := range a.todos {
+        if todo == name {
+            return
+        }
+    }
+
+    a.todos = append(a.todos, name)
+}
+
+func (a *Unique) Print() {
+    a.rendering.Print(a.todos)
+}
+</code></pre>
+<pre><code class="language-go">// 2. Crear la reprementacion (parte que se ocupara de msotrar el resultado de la logica)
+package list
+
+type List interface {
+    Print([]string)
+}
+</code></pre>
+<pre><code class="language-go">package list
+
+import &quot;fmt&quot;
+
+type PlainRepresentation struct {
+}
+
+func NewPlain() *PlainRepresentation {
+    return &amp;PlainRepresentation{}
+}
+
+func (p *PlainRepresentation) Print(todos []string) {
+    for _, todo := range todos {
+        fmt.Println(&quot;\t&quot;, todo)
+    }
+}
+</code></pre>
+<pre><code class="language-go">package list
+
+import &quot;fmt&quot;
+
+type BulletRepresentation struct {
+    bullet rune
+}
+
+func NewBullet(b rune) *BulletRepresentation {
+    return &amp;BulletRepresentation{
+        bullet: b,
+    }
+}
+
+func (b *BulletRepresentation) Print(todos []string) {
+    for _, todo := range todos {
+        fmt.Println(&quot;\t&quot;, string(b.bullet), todo)
+    }
+}
+</code></pre>
+<pre><code class="language-go">// 3. CLIENT
+func factoryToDo(s string) todo.ToDo {
+    switch s {
+    case &quot;any&quot;:
+        return todo.NewAny()
+    case &quot;unique&quot;:
+        return todo.NewUnique()
+    default:
+        return nil
+    }
+}
+
+func factoryList(s string) list.List {
+    switch s {
+    case &quot;plain&quot;:
+        return list.NewPlain()
+    case &quot;bullet&quot;:
+        return list.NewBullet(&#39;*&#39;)
+    default:
+        return nil
+    }
+}
+
+func main() {
+    e := echo.New()
+
+    todos := factoryToDo(&quot;unique&quot;)
+    rendering := factoryList(&quot;bullet&quot;)
+
+    todos.SetList(rendering)
+
+    todos.Add(&quot;Task # 1&quot;)
+    todos.Add(&quot;Task # 2&quot;)
+    todos.Add(&quot;Task # 2&quot;)
+    todos.Add(&quot;Task # 3&quot;)
+    todos.Add(&quot;Task # 4&quot;)
+
+    todos.Print()
+
+    e.Logger.Fatal(e.Start(&quot;:1323&quot;))
+}
+</code></pre>
+<pre><code class="language-go">// Util cuando trabajas con estructuras jerárquicas, como árboles, donde tanto los elementos básicos (hojas) como los grupos de elementos (compuestos) deben ser manejados de la misma forma por el código cliente.
+// Solo puede usarse cuando el modelo se repite de manera jerarquica. Por ejemplo un modelo Caja que contiene productois pero al mismo tiempo tambien puede contener otra Caja y dentro de esa otra Caja.
+</code></pre>
+<p><img src="file:///.attachment/CD544207-A3A2-47EC-A5E4-AE4D178465FB.png" alt="PastedGraphics"></p>
+<pre><code class="language-go">// 1. Crear la interface
+package project
+
+type Item interface {
+    Add(Item)
+    String() string
+    Price() int
+}
+</code></pre>
+<pre><code class="language-go">// 2. Crear la estructura de mas bajo nivel
+package project
+
+import (
+    &quot;fmt&quot;
+    &quot;strconv&quot;
+    &quot;strings&quot;
+)
+
+type SubTask struct {
+    Name         string
+    SubTaskPrice int
+}
+
+func (s *SubTask) Add(i Item) {
+    fmt.Println(&quot;No sub tasks accepted at this level&quot;)
+}
+
+func (s *SubTask) String() string {
+    sb := strings.Builder{}
+    sb.WriteString(&quot;\t\t|--&quot;)
+    sb.WriteString(s.Name)
+    sb.WriteString(&quot; $&quot;)
+    sb.WriteString(strconv.Itoa(s.SubTaskPrice))
+    sb.WriteString(&quot;\n&quot;)
+
+    return sb.String()
+}
+
+func (s *SubTask) Price() int {
+    return s.SubTaskPrice
+}
+ 
+</code></pre>
+<pre><code class="language-go">// Crear la estructura que le sigue en jerarquia
+package project
+
+import (
+    &quot;strconv&quot;
+    &quot;strings&quot;
+)
+
+type Task struct {
+    Name        string
+    Responsable string
+    TaskPrice   int
+    SubTask     []Item
+}
+
+func (t *Task) Add(i Item) {
+    t.SubTask = append(t.SubTask, i)
+}
+
+func (t *Task) String() string {
+    sb := strings.Builder{}
+    sb.WriteString(&quot;\t|--&quot;)
+    sb.WriteString(t.Name)
+    sb.WriteString(&quot; - &quot;)
+    sb.WriteString(t.Responsable)
+    sb.WriteString(&quot; $&quot;)
+    sb.WriteString(strconv.Itoa(t.Price()))
+    sb.WriteString(&quot;\n&quot;)
+
+    for _, subTask := range t.SubTask {
+        sb.WriteString(subTask.String())
+    }
+
+    return sb.String()
+}
+
+func (t *Task) Price() int {
+    price := t.TaskPrice
+
+    for _, subTask := range t.SubTask {
+        price += subTask.Price()
+    }
+
+    return price
+}
+</code></pre>
+<pre><code class="language-go">// Crear la estructura de mas ALTO nivel
+package project
+
+import (
+    &quot;strconv&quot;
+    &quot;strings&quot;
+)
+
+type Project struct {
+    Name  string
+    Tasks []Item
+}
+
+func (p *Project) Add(item Item) {
+    p.Tasks = append(p.Tasks, item)
+}
+
+func (p *Project) String() string {
+    sb := strings.Builder{}
+    sb.WriteString(p.Name)
+    sb.WriteString(&quot; $&quot;)
+    sb.WriteString(strconv.Itoa(p.Price()))
+    sb.WriteString(&quot;\n&quot;)
+
+    for _, task := range p.Tasks {
+        sb.WriteString(task.String())
+    }
+
+    return sb.String()
+}
+
+func (p *Project) Price() int {
+    price := 0
+
+    for _, task := range p.Tasks {
+        price += task.Price()
+    }
+
+    return price
+}
+</code></pre>
+<pre><code class="language-go">// CLIENT
+func main() {
+    e := echo.New()
+
+    project := project2.Project{Name: &quot;My Project&quot;}
+    t1 := project2.Task{Name: &quot;Mockup&quot;, Responsable: &quot;UI Designer&quot;, TaskPrice: 1000}
+    t2 := project2.Task{Name: &quot;Mockup&quot;, Responsable: &quot;Web Designer&quot;}
+    st21 := project2.SubTask{Name: &quot;HTML Design&quot;, SubTaskPrice: 300}
+    st22 := project2.SubTask{Name: &quot;CSS Design&quot;, SubTaskPrice: 200}
+
+    t2.Add(&amp;st21)
+    t2.Add(&amp;st22)
+
+    project.Add(&amp;t1)
+    project.Add(&amp;t2)
+
+    fmt.Println(&amp;project)
+
+    e.Logger.Fatal(e.Start(&quot;:1323&quot;))
+}
+</code></pre>
+<pre><code class="language-go">// Pe­r­mi­te aña­dir fu­n­cio­na­li­da­des a ob­je­tos co­lo­ca­n­do estos ob­je­tos de­n­tro de ob­je­tos en­ca­p­su­la­do­res es­pe­cia­les que co­n­tie­nen estas fu­n­cio­na­li­da­des.”
+</code></pre>
+<p><img src="file:///.attachment/2F55A1D5-251F-42E2-907C-981DD4875E7F.png" alt="PastedGraphics"></p>
+<pre><code class="language-go">// 1. El Co­m­po­ne­n­te de­cla­ra la in­te­r­faz común tanto para wra­p­pe­rs como para ob­je­tos envueltos.
+
+
+// 2. Co­m­po­ne­n­te Co­n­cre­to es una clase de ob­je­tos en­vue­l­tos. De­fi­ne el co­m­po­r­ta­mie­n­to bá­si­co, que los de­co­ra­do­res pue­den alterar.
+
+
+// 3. La clase De­co­ra­do­ra Base tiene un campo para re­fe­re­n­ciar un ob­je­to en­vue­l­to. El tipo del campo debe de­cla­rar­se como la in­te­r­faz del co­m­po­ne­n­te para que pueda co­n­te­ner tanto los co­m­po­ne­n­tes co­n­cre­tos como los de­co­ra­do­res. La clase de­co­ra­do­ra base de­le­ga todas las ope­ra­cio­nes al ob­je­to envuelto.
+
+
+// 4. Los De­co­ra­do­res Co­n­cre­tos de­fi­nen fu­n­cio­na­li­da­des adi­cio­na­les que se pue­den aña­dir di­ná­mi­ca­me­n­te a los co­m­po­ne­n­tes. Los de­co­ra­do­res co­n­cre­tos so­bre­s­cri­ben mé­to­dos de la clase de­co­ra­do­ra base y eje­cu­tan su co­m­po­r­ta­mie­n­to, ya sea antes o de­s­pués de in­vo­car al mé­to­do padre.
+
+
+// 5. El Clie­n­te puede en­vo­l­ver co­m­po­ne­n­tes en va­rias capas de de­co­ra­do­res, sie­m­pre y cua­n­do tra­ba­jen con todos los ob­je­tos a tra­vés de la in­te­r­faz del componente.
+</code></pre>
+<pre><code class="language-go">// Interface
+type Donut interface {
+    GetPrice() int
+    GetDescription() string
+}
+</code></pre>
+<pre><code class="language-go">// Concrete Component
+type donut struct {
+    price       int
+    description string
+}
+
+func New(price int, description string) Donut {
+    return &amp;donut{
+        price:       price,
+        description: description,
+    }
+}
+
+func (d *donut) GetPrice() int {
+    return d.price
+}
+
+func (d *donut) GetDescription() string {
+    return d.description
+}
+</code></pre>
+<pre><code class="language-go">// Decorator
+type DonutWithMoreSugar struct {
+    donut donut.Donut
+}
+
+func New(d donut.Donut) *DonutWithMoreSugar {
+    return &amp;DonutWithMoreSugar{donut: d}
+}
+
+func (d *DonutWithMoreSugar) GetPrice() int {
+    return d.donut.GetPrice() + 20
+}
+
+func (d *DonutWithMoreSugar) GetDescription() string {
+    return d.donut.GetDescription() + &quot;, with more sugar&quot;
+}
+</code></pre>
+<pre><code class="language-go">// Client
+package main
+
+import (
+    &quot;fmt&quot;
+    &quot;github.com/labstack/echo/v4&quot;
+    donut2 &quot;testo_echo/internal/donut&quot;
+    &quot;testo_echo/internal/donut_decorator&quot;
+)
+
+func main() {
+    e := echo.New()
+
+    simpleDonut := donut2.New(10, &quot;Strawberry donut&quot;)
+    fmt.Println(simpleDonut.GetPrice())
+    fmt.Println(simpleDonut.GetDescription())
+
+    superDonut := donut_decorator.New(simpleDonut)
+    fmt.Println(superDonut.GetPrice())
+    fmt.Println(superDonut.GetDescription())
+
+    e.Logger.Fatal(e.Start(&quot;:1323&quot;))
+}
+</code></pre>
+<p><img src="file:///.attachment/B30576C4-50D3-46B5-86A3-0B8520406E6E.png" alt="PastedGraphics"></p>
+<pre><code class="language-go">// Pe­r­mi­te de­fi­nir un me­ca­ni­s­mo de su­s­cri­p­ción para no­ti­fi­car a va­rios ob­je­tos sobre cua­l­quier eve­n­to que le su­ce­da al ob­je­to que están observando.
+</code></pre>
+<p><img src="file:///.attachment/1F531572-77DB-4930-905A-67E8B39BFD81.png" alt="PastedGraphics"></p>
+<pre><code class="language-go">// 1. Re­pa­sa tu ló­gi­ca de ne­go­cio e in­te­n­ta di­vi­di­r­la en dos pa­r­tes: la fu­n­cio­na­li­dad ce­n­tral, in­de­pe­n­die­n­te del resto de có­di­go, ac­tua­rá como no­ti­fi­ca­dor; el resto se co­n­ve­r­ti­rá en un grupo de cla­ses suscriptoras.
+
+// 2. De­cla­ra la in­te­r­faz su­s­cri­p­to­ra. Como mí­ni­mo, de­be­rá de­cla­rar un único mé­to­do actualizar.
+
+// 3. De­cla­ra la in­te­r­faz no­ti­fi­ca­do­ra y de­s­cri­be un par de mé­to­dos para aña­dir  y eli­mi­nar de la lista un ob­je­to su­s­cri­p­tor. Re­cue­r­da que los no­ti­fi­ca­do­res deben tra­ba­jar con su­s­cri­p­to­res úni­ca­me­n­te a tra­vés de la in­te­r­faz suscriptora.
+
+// 4. De­ci­de dónde co­lo­car la lista de su­s­cri­p­ción y la im­ple­me­n­ta­ción de mé­to­dos de su­s­cri­p­ción. No­r­ma­l­me­n­te, este có­di­go tiene el mismo as­pe­c­to para todos los tipos de no­ti­fi­ca­do­res, por lo que el lugar obvio para co­lo­car­lo es en una clase ab­s­tra­c­ta de­ri­va­da di­re­c­ta­me­n­te de la in­te­r­faz no­ti­fi­ca­do­ra. Los no­ti­fi­ca­do­res co­n­cre­tos ex­tie­n­den esa clase, he­re­da­n­do el co­m­po­r­ta­mie­n­to de suscripción. Sin em­ba­r­go, si estás apli­ca­n­do el pa­trón a una je­ra­r­quía de cla­ses exi­s­te­n­tes, co­n­si­de­ra una so­lu­ción ba­sa­da en la co­m­po­si­ción: co­lo­ca la ló­gi­ca de la su­s­cri­p­ción en un ob­je­to se­pa­ra­do y haz que todos los no­ti­fi­ca­do­res reales la utilicen.
+
+// 5. Crea cla­ses no­ti­fi­ca­do­ras co­n­cre­tas. Cada vez que su­ce­da algo im­po­r­ta­n­te de­n­tro de una no­ti­fi­ca­do­ra, de­be­rá no­ti­fi­car a todos sus suscriptores.
+
+// 6. Im­ple­me­n­ta los mé­to­dos de no­ti­fi­ca­ción de ac­tua­li­za­cio­nes en cla­ses su­s­cri­p­to­ras co­n­cre­tas. La ma­yo­ría de las su­s­cri­p­to­ras ne­ce­si­ta­rán cie­r­ta in­fo­r­ma­ción de co­n­te­x­to sobre el eve­n­to, que puede pa­sar­se como ar­gu­me­n­to del mé­to­do de notificación. Pero hay otra op­ción. Al re­ci­bir una no­ti­fi­ca­ción, el su­s­cri­p­tor puede ex­traer la in­fo­r­ma­ción di­re­c­ta­me­n­te de ella. En este caso, el no­ti­fi­ca­dor debe pa­sar­se a sí mismo a tra­vés del mé­to­do de ac­tua­li­za­ción. La op­ción menos fle­xi­ble es vi­n­cu­lar un no­ti­fi­ca­dor con el su­s­cri­p­tor de forma pe­r­ma­ne­n­te a tra­vés del constructor.
+
+// 7. “El clie­n­te debe crear todos los su­s­cri­p­to­res ne­ce­sa­rios y re­gi­s­trar­los con los no­ti­fi­ca­do­res adecuados.
+</code></pre>
+<pre><code class="language-go">package observerPattern
+
+type Publisher interface {
+    RegisterObserver(name string, observer Subscriber)
+    RemoveObserver(name string)
+    NotifyObservers()
+    SetMessage(message string)
+}
+
+type publisher struct {
+    message   string
+    observers map[string]Subscriber
+}
+
+func NewPublisher() Publisher {
+    return &amp;publisher{}
+}
+
+func (p *publisher) RegisterObserver(name string, observer Subscriber) {
+    if p.observers == nil {
+        p.observers = make(map[string]Subscriber)
+    }
+
+    p.observers[name] = observer
+}
+
+func (p *publisher) RemoveObserver(name string) {
+    delete(p.observers, name)
+}
+</code></pre>
+<pre><code class="language-go">package observerPattern
+
+// Subscriber define la interfaz para los suscriptores
+type Subscriber interface {
+    Notify(data string)
+}
+</code></pre>
+<pre><code class="language-go">package email
+
+import &quot;fmt&quot;
+
+type Email struct {
+}
+
+func (e *Email) Notify(data string) {
+    sendEmail(data)
+}
+
+func sendEmail(message string) {
+    // send email
+    fmt.Printf(&quot;send email: %v&quot;, message)
+}
+</code></pre>
+<pre><code class="language-go">package slack
+
+import &quot;fmt&quot;
+
+type Slack struct {
+}
+
+func (s *Slack) Notify(data string) {
+    sendMessage(data)
+}
+
+func sendMessage(message string) {
+    // send message to slack
+    fmt.Printf(&quot;send message to slack: %v&quot;, message)
+}
+</code></pre>
+<pre><code class="language-go">// Client
+func main() {
+    e := echo.New()
+    newPublisher := observerPattern.NewPublisher()
+    email := email2.Email{}
+    slack := slack2.Slack{}
+
+    newPublisher.RegisterObserver(&quot;email&quot;, &amp;email)
+    newPublisher.RegisterObserver(&quot;slack&quot;, &amp;slack)
+
+    newPublisher.SetMessage(&quot;This is a new message&quot;)
+    newPublisher.NotifyObservers()
+
+    e.Logger.Fatal(e.Start(&quot;:1323&quot;))
+}
+</code></pre>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

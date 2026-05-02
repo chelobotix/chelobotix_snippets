@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ECHO FRAMEWORK · Go · Chelobotix Snippets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  nav {
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  nav a { color: #58a6ff; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  nav .sep { color: #484f58; }
+  nav .current { color: #8b949e; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  h2 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin: 28px 0 12px; }
+  h3 { font-size: 15px; font-weight: 600; color: #e6edf3; margin: 20px 0 8px; }
+  p { color: #e6edf3; font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  pre {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #30363d;
+  }
+  pre code.hljs {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace !important;
+    font-size: 13px !important;
+    padding: 20px !important;
+    display: block;
+    line-height: 1.6;
+  }
+  code:not(pre code) {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #e6edf3;
+  }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { font-size: 14px; line-height: 1.7; margin-bottom: 4px; }
+  strong { color: #f0f6fc; }
+  hr { border: none; border-top: 1px solid #21262d; margin: 24px 0; }
+</style>
+</head>
+<body>
+  <nav><a href="../../index.html">Chelobotix Snippets</a>
+    <span class="sep">/</span>
+    <span class="current">Go</span>
+    <span class="sep">/</span>
+    <span class="current">ECHO FRAMEWORK</span></nav>
+  <main><h1>ECHO FRAMEWORK</h1>
+<pre><code class="language-go">// RETURNS
+// JSON
+c.Response().Header().Set(&quot;Authorization&quot;, &quot;Bearer &quot;+jwtToken)
+return c.JSON(http.StatusOK, map[string]any{
+        &quot;state&quot;: &quot;token generated&quot;,
+        })
+</code></pre>
+<pre><code class="language-go">// REQUEST
+
+//Headers
+userAgent := c.Request().Header.Get(&quot;User-Agent&quot;)
+</code></pre>
+<pre><code class="language-go">//PARAMS
+
+// URL QUEARY PARAMS ?poro=lolo
+c.QueryParams()
+// Param
+id := c.Param(&quot;id&quot;) // /banks/:id
+err := c.Bind(&amp;newBank) // JSON
+</code></pre>
+<pre><code class="language-go">// READ BODY
+body, err := io.ReadAll(c.Request().Body)
+
+// Restaurar para leer de nuevo
+c.Request().Body = io.NopCloser(bytes.NewBuffer(body))
+err = c.Bind(&amp;bank)
+</code></pre>
+<pre><code class="language-go">// RENDER ERROR
+return echo.NewHTTPError(http.StatusBadRequest, &quot;Invalid JSON&quot;).SetInternal(err)
+</code></pre>
+<pre><code class="language-go">// ROUTES
+
+g := e.Group(&quot;/api/v1&quot;)
+g.GET(&quot;/banks&quot;, bankHandler.List)
+g.GET(&quot;/banks/:id&quot;, bankHandler.GetByID)
+
+
+// Middleware
+protected := e.Group(&quot;&quot;)
+
+
+// Nested Groups
+protected = e.Group(&quot;&quot;)
+g := protected.Group(&quot;/auth&quot;)
+g.GET(&quot;/check-token&quot;, authHandler.CheckToken) // =&gt; /auth/check-token 
+</code></pre>
+<pre><code class="language-go">// MIDDLEWARE
+func (b *blacklist) Validate(next echo.HandlerFunc) echo.HandlerFunc {
+    return func(c echo.Context) error {
+        userToken, ok := c.Get(&quot;user&quot;).(*jwt.Token)
+        if !ok || !userToken.Valid {
+            return echo.NewHTTPError(401, &quot;token inválido&quot;)
+        }
+        
+        return next(c)
+    }
+}
+</code></pre>
+<pre><code class="language-go">package main
+
+import (
+    &quot;fmt&quot;
+    &quot;github.com/golang-jwt/jwt/v5&quot;
+    echojwt &quot;github.com/labstack/echo-jwt/v4&quot;
+    &quot;github.com/labstack/echo/v4&quot;
+    &quot;net/http&quot;
+
+    &quot;time&quot;
+)
+
+type User struct {
+    Name string
+    Age  int
+}
+
+type Claims struct {
+    Name string `json:&quot;name&quot;`
+    Age  int    `json:&quot;age&quot;`
+    jwt.RegisteredClaims
+}
+
+var secretKey = []byte(&quot;secret&quot;)
+
+func generateToken(user *User) (string, error) {
+    claims := Claims{
+        Name: user.Name,
+        Age:  user.Age,
+        RegisteredClaims: jwt.RegisteredClaims{
+            ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+            IssuedAt:  jwt.NewNumericDate(time.Now()),
+            NotBefore: jwt.NewNumericDate(time.Now()),
+            Issuer:    &quot;your-app&quot;,
+        },
+    }
+
+    token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+    tokenString, err := token.SignedString(secretKey)
+    if err != nil {
+        return &quot;&quot;, nil
+    }
+
+    return tokenString, nil
+}
+
+func main() {
+    e := echo.New()
+
+    user := User{
+        Name: &quot;Natish&quot;,
+        Age:  6,
+    }
+
+    token, err := generateToken(&amp;user)
+    if err != nil {
+        fmt.Println(err)
+    }
+
+    fmt.Println(token)
+    
+    // Grupo de rutas sin proteccion
+    unprotected := e.Group(&quot;&quot;)
+    unprotected.GET(&quot;/sss&quot;, func(c echo.Context) error {
+        return c.JSON(http.StatusOK, &quot;pocollossss&quot;)
+    })
+    
+  // Grupo de rutas con proteccion
+    protected := e.Group(&quot;&quot;)
+    protected.Use(echojwt.WithConfig(echojwt.Config{
+        SigningKey: secretKey,
+        ErrorHandler: func(e echo.Context, err error) error {
+            return echo.NewHTTPError(http.StatusUnauthorized, &quot;invalid token&quot;)
+        },
+    }))
+
+    protected.GET(&quot;/&quot;, func(c echo.Context) error {
+        return c.JSON(http.StatusOK, &quot;pocollo&quot;)
+    })
+    e.Logger.Fatal(e.Start(&quot;:1323&quot;))
+}
+</code></pre>
+</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>
